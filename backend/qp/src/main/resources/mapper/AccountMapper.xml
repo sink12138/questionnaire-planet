@@ -8,7 +8,7 @@
         select * from Account where account_id = #{id}
     </select>
     <insert id="insert" parameterType="Account" useGeneratedKeys="true" keyProperty="accountId">
-        insert into Account values (#{email}, #{username}, #{password}, #{verified})
+        insert into Account(email, username, password, verified) values (#{email}, #{username}, #{password}, #{verified})
     </insert>
     <update id="update" parameterType="Account">
         update Account set password = #{password}, username = #{username} where account_id = #{accountId}
