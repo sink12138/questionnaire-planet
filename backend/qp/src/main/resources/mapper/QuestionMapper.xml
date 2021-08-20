@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.buaa.qp.dao.QuestionDao">
+    <select id="selectByTid" parameterType="Integer" resultType="Question">
+        select * from Question where template_id = #{templateId}
+    </select>
+    <insert id="insert" parameterType="Question" useGeneratedKeys="true" keyProperty="questionId">
+        insert into Question values (#{templateId}, #{type}, #{stem}, #{description}, #{required}, #{args})
+    </insert>
+    <delete id="deleteByTid" parameterType="Integer">
+        delete from question where template_id = #{templateId}
+    </delete>
+</mapper>

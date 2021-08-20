@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.buaa.qp.dao.TemplateDao">
+    <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="TemplateId">
+        insert into template values (#{owner}, #{title}, #{description}, #{password})
+    </insert>
+    <update id="update" parameterType="Template">
+        update template set title = #{title}, description = #{description}, password = #{password} where template_id = #{templatteId}
+    </update>
+</mapper>

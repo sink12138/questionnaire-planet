@@ -41,8 +41,7 @@ public class Question {
         this.args = args;
     }
 
-    public Question(Integer questionId, Integer templateId, String type, String stem, String description, Boolean required, String args) {
-        this.questionId = questionId;
+    public Question(Integer templateId, String type, String stem, String description, Boolean required, String args) {
         this.templateId = templateId;
         this.type = type;
         this.stem = stem;

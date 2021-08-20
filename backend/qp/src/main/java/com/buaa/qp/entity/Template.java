@@ -16,13 +16,13 @@ public class Template {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer templateId;
 
+    private Integer owner;
+
     private String title;
 
     private String description;
 
     private String password;
-
-    private Integer owner;
 
     public Template() {
 

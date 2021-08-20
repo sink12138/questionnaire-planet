@@ -28,8 +28,7 @@ public class Account {
 
     }
 
-    public Account(Integer accountId, String email, String username, String password, Boolean verified) {
-        this.accountId = accountId;
+    public Account(String email, String username, String password, Boolean verified) {
         this.email = email;
         this.username = username;
         this.password = password;
