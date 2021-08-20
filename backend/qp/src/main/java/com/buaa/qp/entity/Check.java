@@ -22,4 +22,15 @@ public class Check {
     private String code;
 
     private Date checkingTime;
+
+    public Check() {
+
+    }
+
+    public Check(Integer checkId, Integer accountId, String code, Date checkingTime) {
+        this.checkId = checkId;
+        this.accountId = accountId;
+        this.code = code;
+        this.checkingTime = checkingTime;
+    }
 }

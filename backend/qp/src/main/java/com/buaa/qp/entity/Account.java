@@ -24,4 +24,15 @@ public class Account {
 
     private Boolean verified;
 
+    public Account() {
+
+    }
+
+    public Account(Integer accountId, String email, String username, String password, Boolean verified) {
+        this.accountId = accountId;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.verified = verified;
+    }
 }
