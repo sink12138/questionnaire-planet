@@ -2,16 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.buaa.qp.dao.AccountDao">
     <select id="selectByEmail" parameterType="String" resultType="Account">
-        select * from Account where email = #{email}
+        select * from account where email = #{email}
     </select>
     <select id="selectById" parameterType="Integer" resultType="Account">
-        select * from Account where account_id = #{id}
+        select * from account where account_id = #{id}
     </select>
     <insert id="insert" parameterType="Account" useGeneratedKeys="true" keyProperty="accountId">
-        insert into Account(email, username, password, verified) values (#{email}, #{username}, #{password}, #{verified})
+        insert into account(email, username, password, verified) values (#{email}, #{username}, #{password}, #{verified})
     </insert>
     <update id="update" parameterType="Account">
-        update Account set password = #{password}, username = #{username} where account_id = #{accountId}
+        update account set password = #{password}, username = #{username} where account_id = #{accountId}
     </update>
 
 </mapper>
