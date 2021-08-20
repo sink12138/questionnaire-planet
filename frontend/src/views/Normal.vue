@@ -12,12 +12,10 @@
         label="问卷题目"
         :rules="{
           required: true,
-          message: '请填写问卷题目',
-          trigger: 'blur',
         }"
       >
         <el-input
-          v-model="title"
+          v-model="modelForm.title"
           style="width: 258px"
           clearable
           placeholder="请填写问卷题目"
@@ -28,12 +26,10 @@
         label="问卷描述"
         :rules="{
           required: true,
-          message: '请填写问卷描述',
-          trigger: 'blur',
         }"
       >
         <el-input
-          v-model="description"
+          v-model="modelForm.description"
           style="width: 258px"
           clearable
           placeholder="请填写问卷描述"
@@ -42,15 +38,19 @@
       <!-- 问卷密码 -->
       <el-form-item label="问卷密码">
         <el-input
-          v-model="password"
+          v-model="modelForm.password"
           style="width: 258px"
           clearable
           placeholder="可为空"
         />
       </el-form-item>
-      <vuedraggable v-model="modelForm.questions" class="wrapper" @end="end">
-        <div>
-          <el-collapse v-model="activeNames">
+      <div>
+        <el-collapse v-model="activeNames">
+          <vuedraggable
+            v-model="modelForm.questions"
+            class="wrapper"
+            @end="end"
+          >
             <el-collapse-item
               v-for="(item, index) in modelForm.questions"
               :key="index"
@@ -248,9 +248,9 @@
                 <el-button @click="removeQuestion(index)">删除题目</el-button>
               </el-form-item>
             </el-collapse-item>
-          </el-collapse>
-        </div>
-      </vuedraggable>
+          </vuedraggable>
+        </el-collapse>
+      </div>
       <el-form-item>
         <el-button @click="addQuestion">新增题目</el-button>
         <el-button style="margin-top: 10px" @click="addSubmit()"
@@ -280,7 +280,7 @@ export default {
       rules: {},
       modelForm: {
         templateId: 0,
-        title: "",
+        title: "新的问卷",
         description: "",
         password: "",
         questions: [
@@ -340,7 +340,8 @@ export default {
       this.template.type = this.modelForm.questions[index].type;
       this.template.required = this.modelForm.questions[index].required;
       this.template.questionName = this.modelForm.questions[index].questionName;
-      this.template.questionSummary = this.modelForm.questions[index].questionSummary;
+      this.template.questionSummary =
+        this.modelForm.questions[index].questionSummary;
       this.template.max = this.modelForm.questions[index].max;
       this.template.min = this.modelForm.questions[index].min;
       this.template.height = this.modelForm.questions[index].height;
