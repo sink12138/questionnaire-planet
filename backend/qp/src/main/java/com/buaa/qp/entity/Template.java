@@ -28,6 +28,13 @@ public class Template {
 
     }
 
+    public Template(String title, String description, String password, Integer owner) {
+        this.title = title;
+        this.description = description;
+        this.password = password;
+        this.owner = owner;
+    }
+
     public Template(Integer templateId, String title, String description, String password, Integer owner) {
         this.templateId = templateId;
         this.title = title;

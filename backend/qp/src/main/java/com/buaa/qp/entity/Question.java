@@ -33,6 +33,14 @@ public class Question {
 
     }
 
+    public Question(String type, String stem, String description, Boolean required, String args) {
+        this.type = type;
+        this.stem = stem;
+        this.description = description;
+        this.required = required;
+        this.args = args;
+    }
+
     public Question(Integer questionId, Integer templateId, String type, String stem, String description, Boolean required, String args) {
         this.questionId = questionId;
         this.templateId = templateId;
