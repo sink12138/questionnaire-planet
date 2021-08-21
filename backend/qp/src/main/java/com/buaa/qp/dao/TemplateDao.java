@@ -8,4 +8,8 @@ public interface TemplateDao {
     Integer insert(Template template);
 
     Integer update(Template template);
+
+    void updateReleased(Template template);
+
+    void updateDeleted(Template template);
 }

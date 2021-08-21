@@ -8,6 +8,7 @@ import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.ArrayList;
 
 @Service
@@ -19,17 +20,19 @@ public class TemplateServiceImpl implements TemplateService {
     private QuestionDao questionDao;
 
     @Override
-    public void submitTemplate(Template template, ArrayList<Question> questions) {
+    public Integer submitTemplate(Template template, ArrayList<Question> questions) {
         templateDao.insert(template);
         Integer templateId = template.getTemplateId();
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
         }
+        return templateId;
     }
 
     @Override
     public void modifyTemplate(Template template, ArrayList<Question> questions) {
+        template.setDuration(new Time(0));
         templateDao.update(template);
         Integer templateId = template.getTemplateId();
         questionDao.deleteByTid(templateId);

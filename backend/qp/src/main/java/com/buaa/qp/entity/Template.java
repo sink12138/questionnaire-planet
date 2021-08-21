@@ -42,18 +42,25 @@ public class Template {
 
     }
 
-    public Template(String title, String description, String password, Integer owner) {
+    public Template(String type, Integer owner, String title, String description, String password) {
+        this.type = type;
+        this.owner = owner;
         this.title = title;
         this.description = description;
         this.password = password;
-        this.owner = owner;
     }
 
-    public Template(Integer templateId, String title, String description, String password, Integer owner) {
+    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, Time duration) {
         this.templateId = templateId;
+        this.type = type;
+        this.owner = owner;
         this.title = title;
         this.description = description;
         this.password = password;
-        this.owner = owner;
+        this.released = released;
+        this.deleted = deleted;
+        this.creationTime = creationTime;
+        this.releaseTime = releaseTime;
+        this.duration = duration;
     }
 }

@@ -169,15 +169,16 @@ public class TemplateController {
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 
-            Template template = new Template(title, description, password, accountId);
+            Template template = new Template("normal", accountId, title, description, password);
             if (templateId == 0) {
-                templateService.submitTemplate(template, questions);
+                templateId = templateService.submitTemplate(template, questions);
             }
             else {
                 template.setTemplateId(templateId);
                 templateService.modifyTemplate(template, questions);
             }
             map.put("success", true);
+            map.put("templateId", templateId);
         }
         catch (LoginVerificationException | ParameterFormatException exc) {
             map.put("success", false);

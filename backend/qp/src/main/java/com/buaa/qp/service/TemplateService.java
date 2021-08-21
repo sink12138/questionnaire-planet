@@ -6,7 +6,7 @@ import com.buaa.qp.entity.Template;
 import java.util.ArrayList;
 
 public interface TemplateService {
-    void submitTemplate(Template template, ArrayList<Question> questions);
+    Integer submitTemplate(Template template, ArrayList<Question> questions);
 
     void modifyTemplate(Template template, ArrayList<Question> questions);
 }

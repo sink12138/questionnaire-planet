@@ -7,9 +7,33 @@
     </insert>
     <update id="update" parameterType="Template">
         update template
-        set title = #{title}, description = #{description}, password = #{password},
-            released = #{released}, deleted = #{deleted}, release_time = #{releaseTime},
-            duration = #{duration}
+        <set>
+            title = #{title},
+            description = #{description},
+            password = #{password},
+            <if test="duration != null">
+                duration = #{duration},
+            </if>
+        </set>
+        where template_id = #{templateId}
+    </update>
+    <update id="updateReleased" parameterType="Template">
+        update template
+        <set>
+            released = #{released},
+            <if test="released == false">
+                duration = addtime(duration, timediff(now(), release_time),
+                releaseTime = null,
+            </if>
+            <if test="released == true">
+                releaseTime = now(),
+            </if>
+        </set>
+        where template_id = #{templateId}
+    </update>
+    <update id="updateDeleted" parameterType="Template">
+        update template
+        set deleted = #{deleted}
         where template_id = #{templateId}
     </update>
 </mapper>
