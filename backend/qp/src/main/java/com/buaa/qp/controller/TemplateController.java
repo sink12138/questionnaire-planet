@@ -50,9 +50,9 @@ public class TemplateController {
                 templateId = (Integer) requestMap.get("templateId");
                 title = (String) requestMap.get("title");
                 description = (String) requestMap.get("description");
-                if (description.isEmpty()) description = null;
+                if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
-                if (password.isEmpty()) password = null;
+                if (password != null && password.isEmpty()) password = null;
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException cce) {
@@ -76,11 +76,14 @@ public class TemplateController {
                     questionType = (String) questionMap.get("type");
                     questionStem = (String) questionMap.get("stem");
                     questionDescription = (String) questionMap.get("description");
+                    if (questionDescription != null && questionDescription.isEmpty()) questionDescription = null;
                     questionRequired = (Boolean) questionMap.get("required");
                 }
                 catch (ClassCastException cce) {
                     throw new ParameterFormatException();
                 }
+                if (questionType == null || questionStem == null || questionRequired == null)
+                    throw new ParameterFormatException();
                 Map<String, Object> argsMap = new HashMap<>();
                 switch (questionType) {
                     case "choice":
@@ -183,10 +186,9 @@ public class TemplateController {
         catch (Exception exception) {
             exception.printStackTrace();
             map.put("success", false);
-            map.put("message", exception.toString());
+            map.put("message", "操作失败");
         }
         return map;
     }
-
 
 }

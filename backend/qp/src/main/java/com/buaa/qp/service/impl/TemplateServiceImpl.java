@@ -20,7 +20,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void submitTemplate(Template template, ArrayList<Question> questions) {
-        Integer templateId = templateDao.insert(template);
+        templateDao.insert(template);
+        Integer templateId = template.getTemplateId();
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
