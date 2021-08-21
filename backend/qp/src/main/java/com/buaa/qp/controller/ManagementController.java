@@ -1,10 +1,9 @@
 package com.buaa.qp.controller;
 
+import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
-import com.buaa.qp.exception.LoginVerificationException;
-import com.buaa.qp.exception.ExtraMessageException;
-import com.buaa.qp.exception.ParameterFormatException;
-import com.buaa.qp.exception.RepetitiveOperationException;
+import com.buaa.qp.exception.*;
+import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,10 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class ManagementController {
@@ -25,6 +21,9 @@ public class ManagementController {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    private AccountService accountService;
 
     @PostMapping("/all")
     public Map<String, Object> all() {
@@ -166,4 +165,176 @@ public class ManagementController {
         return map;
     }
 
+    @PostMapping("/clone")
+    public Map<String, Object> clone(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+            Integer templateId;
+
+            // Parameter checks
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+            } catch (Exception e) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId < 0) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(templateId);
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                    throw new ParameterFormatException();
+            } else if (template.getDeleted())
+                throw new ExtraMessageException("无法操作已删除的问卷");
+
+            // clone
+            Template newTemplate = new Template(template.getType(), template.getOwner(),
+                    template.getTitle(), template.getDescription(), template.getPassword());
+            newTemplate.setCreationTime(new Date(System.currentTimeMillis()));
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            ArrayList<Question> newQuestions = new ArrayList<>();
+            for (Question question : questions) {
+                Question newQuestion = new Question(question.getType(), question.getStem(), question.getDescription(), question.getRequired(), question.getArgs());
+                newQuestions.add(newQuestion);
+            }
+            templateService.submitTemplate(newTemplate, newQuestions);
+
+            map.put("message", true);
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("/remove")
+    public Map<String, Object> remove(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+            Integer templateId;
+
+            // Parameter checks
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+            } catch (Exception e) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId < 0) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(templateId);
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            } else if (template.getDeleted()) {
+                throw new RepetitiveOperationException();
+            }
+
+            templateService.removeTemplate(templateId, true);
+            map.put("message", true);
+
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException | RepetitiveOperationException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("delete")
+    public Map<String, Object> delete(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = accountService.getAccountBySession(request.getSession()).getAccountId();
+            Integer templateId;
+
+            // Parameter checks
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+            } catch (Exception e) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId < 0) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(templateId);
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            } else if (!template.getDeleted()) {
+                throw new ExtraMessageException("无法删除不在回收站的问卷");
+            }
+
+            templateService.deleteTemplate(templateId);
+            map.put("message", true);
+
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("/recover")
+    public Map<String, Object> recover(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = accountService.getAccountBySession(request.getSession()).getAccountId();
+            Integer templateId;
+
+            // Parameter checks
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+            } catch (Exception e) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId < 0) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(templateId);
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            } else if (!template.getDeleted()) {
+                throw new ExtraMessageException("无法回收未删除的问卷");
+            }
+
+            templateService.removeTemplate(templateId, false);
+            map.put("message", true);
+
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
 }

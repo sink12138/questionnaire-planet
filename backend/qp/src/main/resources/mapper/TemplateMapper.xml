@@ -44,4 +44,7 @@
         set deleted = #{deleted}
         where template_id = #{templateId}
     </update>
+    <delete id="delete" parameterType="Integer">
+        delete from question where template_id = #{templateId}
+    </delete>
 </mapper>

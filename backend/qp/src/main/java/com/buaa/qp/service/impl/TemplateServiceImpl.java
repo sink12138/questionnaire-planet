@@ -59,4 +59,23 @@ public class TemplateServiceImpl implements TemplateService {
         template.setReleased(release);
         templateDao.updateReleased(template);
     }
+
+    @Override
+    public void removeTemplate(Integer templateId, Boolean remove) {
+        Template template = new Template();
+        template.setTemplateId(templateId);
+        template.setDeleted(remove);
+        templateDao.updateDeleted(template);
+    }
+
+    @Override
+    public ArrayList<Question> getQuestionsByTid(Integer templateId) {
+        return questionDao.selectByTid(templateId);
+    }
+
+    @Override
+    public void deleteTemplate(Integer templateId) {
+        questionDao.deleteByTid(templateId);
+        templateDao.delete(templateId);
+    }
 }

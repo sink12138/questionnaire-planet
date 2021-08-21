@@ -11,5 +11,5 @@ public interface QuestionDao {
 
     Integer insert(Question question);
 
-    Integer deleteByTid(Integer templateId);
+    void deleteByTid(Integer templateId);
 }

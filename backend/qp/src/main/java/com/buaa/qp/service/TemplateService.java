@@ -15,4 +15,10 @@ public interface TemplateService {
     void modifyTemplate(Template template, ArrayList<Question> questions);
 
     void releaseTemplate(Integer templateId, Boolean release);
+
+    void removeTemplate(Integer templateId, Boolean remove);
+
+    ArrayList<Question> getQuestionsByTid(Integer templateId);
+
+    void deleteTemplate(Integer templateId);
 }

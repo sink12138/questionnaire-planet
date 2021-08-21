@@ -18,4 +18,6 @@ public interface TemplateDao {
     void updateReleased(Template template);
 
     void updateDeleted(Template template);
+
+    void delete(Integer templateId);
 }
