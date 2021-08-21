@@ -110,6 +110,9 @@ public class AccountServiceImpl implements AccountService {
     @Value("${check.code-bits}")
     private Integer CODE_BITS;
 
+    @Value("${check.ip-address}")
+    private String IP_ADDRESS;
+
     private void basicSetting(MimeMessage mimeMessage, String subject, String toAddress, String process) throws MessagingException {
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setSubject("问卷星球 | " + subject);
@@ -143,9 +146,6 @@ public class AccountServiceImpl implements AccountService {
             this.accountId = accountId;
             this.email = email;
         }
-
-        @Value("${check.ip-address}")
-        private String IP_ADDRESS;
 
         @SneakyThrows
         @Override
