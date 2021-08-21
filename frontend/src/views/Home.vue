@@ -3,11 +3,11 @@
     <el-container>
       <el-header>
         <router-link to="/">
-            <div class="logo">
-              <Logo></Logo>
-              <div class="web-title">问卷星球</div>
-            </div>
-          </router-link>
+          <div class="logo">
+            <Logo></Logo>
+            <div class="web-title">问卷星球</div>
+          </div>
+        </router-link>
         <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
@@ -60,8 +60,8 @@
 import logo from "../components/svg-logo.vue"
 export default {
   components: {
-        'Logo': logo
-    },
+    'Logo': logo
+  },
   data() {
     return {
       username:"",
