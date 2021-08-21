@@ -10,6 +10,7 @@ const Vote = () => import("../views/Vote.vue")
 const Apply = () => import("../views/Apply.vue")
 const Exam = () => import("../views/Exam.vue")
 const Register = () => import("../views/Register.vue")
+const Preview = () => import("../views/Preview.vue")
 
 Vue.use(VueRouter)
 
@@ -60,6 +61,11 @@ const routes = [
     path: '/exam/new',
     name: 'Exam',
     component: Exam
+  },
+  {
+    path: '/preview',
+    name: 'Preview',
+    component: Preview
   }
 ]
 

@@ -287,25 +287,31 @@ export default {
         questions: [
           {
             type: "0",
-            required: false,
+            required: "",
             questionName: "",
             questionSummary: "",
             max: 2,
             min: 1,
             height: 1,
             width: 100,
-            answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
+            answers: [
+              { value: "", scores: 0 },
+              { value: "", scores: 0 },
+            ],
           },
           {
             type: "0",
-            required: false,
+            required: "",
             questionName: "",
             questionSummary: "",
             max: 2,
             min: 1,
             height: 1,
             width: 100,
-            answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
+            answers: [
+              { value: "", scores: 0 },
+              { value: "", scores: 0 },
+            ],
           },
         ],
       },
@@ -367,7 +373,10 @@ export default {
         min: 1,
         height: 1,
         width: 100,
-        answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
+        answers: [
+          { value: "", scores: 0 },
+          { value: "", scores: 0 },
+        ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
     },
@@ -378,18 +387,19 @@ export default {
     addSubmit() {
       this.$refs.modelForm.validate((valid) => {
         if (valid) {
+          console.log("保存中");
           let templateQuestions = [];
           let quest = {};
           let question = {};
           let x = {};
-          for (question in this.modelForm.questions){
+          for (question in this.modelForm.questions) {
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
             quest.required = question.required;
-            switch (question.type){
+            switch (question.type) {
               case 0:
                 quest.type = "choice";
-                for (x in question.answers){
+                for (x in question.answers) {
                   quest.choices.push(x.value);
                 }
                 break;
@@ -397,7 +407,7 @@ export default {
                 quest.type = "multi-choice";
                 quest.max = question.max;
                 quest.min = question.min;
-                for (x in question.answers){
+                for (x in question.answers) {
                   quest.choices.push(x.value);
                 }
                 break;
@@ -408,14 +418,14 @@ export default {
                 break;
               case 3:
                 quest.type = "grade";
-                for (x in question.answers){
+                for (x in question.answers) {
                   quest.choices.push(x.value);
                   quest.scores.push(x.scores);
                 }
                 break;
               case 4:
                 quest.type = "dropdown";
-                for (x in question.answers){
+                for (x in question.answers) {
                   quest.choices.push(x.value);
                 }
                 break;
@@ -424,7 +434,7 @@ export default {
           }
           this.$axios({
             method: "post",
-            url: "http://139.224.50.146/normal/submit",
+            url: "http://139.224.50.146:80/apis/normal/submit",
             data: JSON.stringify({
               templateId: this.templateId,
               title: this.modelForm.title,
@@ -436,6 +446,7 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.templateId = response.data.templateId;
                 this.$message({
                   message: "问卷保存成功！",
                   type: "success",
@@ -451,12 +462,37 @@ export default {
             }
           );
           console.log(this.modelForm.questions);
+          console.log("保存成功!");
         }
       });
     },
     publishQuestion() {
       this.addSubmit();
-      console.log("上传成功!");
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146:80/apis/release",
+        data: JSON.stringify({
+          templateId: this.templateId,
+        }),
+      }).then(
+        (response) => {
+          console.log(response);
+          if (response.data.success == true) {
+            this.$message({
+              message: "问卷发布成功！",
+              type: "success",
+            });
+          } else {
+            this.$message({
+              message: response.data.message,
+            });
+          }
+        },
+        (err) => {
+          alert(err);
+        }
+      );
+      console.log("发布成功!");
     },
   },
 };
