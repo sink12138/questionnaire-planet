@@ -42,7 +42,7 @@
         else {
           this.$axios({
             method: "post",
-            url: "http://http://139.224.50.146/apis/register",
+            url: "http://139.224.50.146/apis/register",
             data: JSON.stringify(this.fromData),
           })
             .then((res) => {
