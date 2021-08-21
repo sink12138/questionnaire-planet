@@ -424,7 +424,7 @@ export default {
           }
           this.$axios({
             method: "post",
-            url: "http://82.156.190.251:80/apis/normal/submit",
+            url: "http://139.224.50.146/normal/submit",
             data: JSON.stringify({
               templateId: this.templateId,
               title: this.modelForm.title,
