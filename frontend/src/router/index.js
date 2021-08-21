@@ -48,11 +48,6 @@ const routes = [
     component: Login
   },
   {
-    path: '/about',
-    name: 'About',
-    component: About
-  },
-  {
     path: '/normal/new',
     name: 'Normal',
     component: Normal
