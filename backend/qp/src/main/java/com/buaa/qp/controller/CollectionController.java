@@ -116,6 +116,7 @@ public class CollectionController {
                 questionMaps.add(questionMap);
             }
             map.put("success", true);
+            map.put("type", template.getType());
             map.put("title", template.getTitle());
             String dsc = template.getDescription();
             String pwd = template.getPassword();
