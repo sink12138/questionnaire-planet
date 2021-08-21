@@ -1,15 +1,29 @@
 <template>
   <div class="home">
     <el-container>
-      <el-header>
-        <div class="header">
-          <router-link to="/">
+      <el-header style="text-align:right">
+        <router-link to="/">
             <div class="logo">
               <Logo></Logo>
               <div class="web-title">问卷星球</div>
             </div>
           </router-link>
-        </div>
+        <el-button type="success" @click="dialogFormVisible = true">Login</el-button>
+
+        <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
+          <el-form>
+            <el-form-item label="用户名" :label-width="formLabelWidth">
+              <el-input v-model="username" autocomplete="off" style="width: 300px"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth">
+              <el-input v-model="password" autocomplete="off" show-password style="width: 300px"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="dialogFormVisible = false; login">登 录</el-button>
+          </div>
+        </el-dialog>
       </el-header>
       <el-container>
         <el-aside style="width: 200px">
@@ -44,9 +58,23 @@
 <script>
 import logo from "../components/svg-logo.vue"
 export default {
-    components: {
+  components: {
         'Logo': logo
+    },
+  data() {
+    return {
+      username:"",
+      password:"",
+      dialogFormVisible: false,
+      formLabelWidth: '100px'
     }
+  },
+  methods: {
+    login: function() {
+      console.log(2)
+      return this.username, this.password
+    }
+  }
 }
 </script>
 
