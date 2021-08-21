@@ -86,8 +86,6 @@ export default {
           this.$message({
             message: "登录成功！",
           });
-          sessionStorage.setItem("email", this.formData.email);
-          sessionStorage.setItem("password", this.formData.password);
         } else {
           alert(res.data.message);
         }
