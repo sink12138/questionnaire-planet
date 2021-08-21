@@ -38,8 +38,6 @@ const routes = [
     ]
   },
   {
-<<<<<<< HEAD
-=======
     path: '/register',
     name: 'Register',
     component: Register
@@ -55,7 +53,6 @@ const routes = [
     component: About
   },
   {
->>>>>>> master
     path: '/normal/new',
     name: 'Normal',
     component: Normal
