@@ -5,10 +5,10 @@
 
     <el-form style="display:block; margin:3px 300px" inline="false">
       <el-form-item label="用户名" :label-width="formLabelWidth">
-        <el-input v-model="fromData.username" autocomplete="off" style="width: 300px" placeholder="请输入用户名"></el-input>
+        <el-input v-model="formData.username" autocomplete="off" style="width: 300px" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item label="密码" :label-width="formLabelWidth">
-        <el-input v-model="fromData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
+        <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
       </el-form-item>
       <el-form-item label="确认密码" :label-width="formLabelWidth">
         <el-input v-model="password1" autocomplete="off" show-password style="width: 300px" placeholder="请再次输入密码"></el-input>
@@ -25,7 +25,7 @@
   export default {
     data() {
       return {
-        fromData: {
+        formData: {
           username:"",
           password:"",
           email:""
@@ -36,18 +36,18 @@
     },
     methods: {
       register: function(){
-        if(this.fromData.password != this.password1) {
+        if(this.formData.password != this.password1) {
           alert("两次密码输入不一致")
         }
         else {
           this.$axios({
             method: "post",
             url: "http://139.224.50.146/apis/register",
-            data: JSON.stringify(this.fromData),
+            data: JSON.stringify(this.formData),
           })
             .then((res) => {
               console.log(res);
-              console.log(this.fromData);
+              console.log(this.formData);
               if (res.data.success == false) {
                 this.$message({
                   showClose: true,
