@@ -75,7 +75,6 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void deleteTemplate(Integer templateId) {
         questionDao.deleteByTid(templateId);
-        //debug
-        System.err.println(templateDao.deleteByTid(templateId));
+        templateDao.deleteByTid(templateId);
     }
 }

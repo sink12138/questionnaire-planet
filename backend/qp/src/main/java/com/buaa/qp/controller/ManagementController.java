@@ -296,7 +296,8 @@ public class ManagementController {
             templateService.deleteTemplate(templateId);
             map.put("message", true);
 
-        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+        } catch (LoginVerificationException | ParameterFormatException |
+                ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
@@ -336,7 +337,8 @@ public class ManagementController {
             templateService.removeTemplate(templateId, false);
             map.put("message", true);
 
-        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+        } catch (LoginVerificationException | ParameterFormatException |
+                ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
