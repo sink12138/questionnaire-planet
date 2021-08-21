@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 
-const About = () => import("../views/About.vue")
 const Questionnaire = () => import("../views/Questionnaire.vue")
 const History = () => import("../views/History.vue")
 const Recycle = () => import("../views/Recycle.vue")
@@ -35,11 +34,6 @@ const routes = [
         component: Recycle
       }
     ]
-  },
-  {
-    path: '/about',
-    name: 'About',
-    component: About
   },
   {
     path: '/normal/new',
