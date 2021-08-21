@@ -14,8 +14,8 @@
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form>
-            <el-form-item label="用户名" :label-width="formLabelWidth">
-              <el-input v-model="fromData.username" autocomplete="off" style="width: 300px"></el-input>
+            <el-form-item label="电子邮箱" :label-width="formLabelWidth">
+              <el-input v-model="fromData.email" autocomplete="off" style="width: 300px"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth">
               <el-input v-model="fromData.password" autocomplete="off" show-password style="width: 300px"></el-input>
@@ -67,7 +67,7 @@ export default {
   data() {
     return {
       fromData: {
-        username:"",
+        email:"",
         password:""
       },
       dialogFormVisible: false,
