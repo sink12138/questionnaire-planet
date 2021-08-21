@@ -3,12 +3,14 @@
     <el-container>
       <el-header>
         <router-link to="/">
-            <div class="logo">
-              <Logo></Logo>
-              <div class="web-title">问卷星球</div>
-            </div>
-          </router-link>
-        <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+          <div class="logo">
+            <Logo></Logo>
+            <div class="web-title">问卷星球</div>
+          </div>
+        </router-link>
+        <div>
+          <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+        </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form>
@@ -21,7 +23,7 @@
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false; login">登 录</el-button>
+            <el-button type="primary" @click="login">登 录</el-button>
             <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
           </div>
         </el-dialog>
@@ -72,7 +74,7 @@ export default {
   },
   methods: {
     login: function() {
-      console.log(2)
+      this.dialogFormVisible = false;
       return this.username, this.password
     }
   }
