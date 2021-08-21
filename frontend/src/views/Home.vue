@@ -85,6 +85,7 @@ export default {
         if (res.data.success == true) {
           this.$message({
             message: "登录成功！",
+            type: "success",
           });
         } else {
           alert("error");
