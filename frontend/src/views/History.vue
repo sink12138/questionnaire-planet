@@ -8,7 +8,7 @@
         <el-row>
           <el-col
             :span="4"
-            v-for="item in allQuest"
+            v-for="item in allQuest.slice((current_page-1)*pagesize,current_page*pagesize)"
             :key="item.templateId"
             :offset="1"
           >
