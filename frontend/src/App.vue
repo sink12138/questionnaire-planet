@@ -8,6 +8,10 @@
   </div>
 </template>
 
+<script>
+
+</script>
+
 <style>
 #app {
   font-family: 微软雅黑;

@@ -3,34 +3,44 @@
       <div class="banner">
           <div class="type create_by_normal">
               <div class="inner">
-                  <div class="type_show"></div>
-                  <h2 class="title">创建普通问卷</h2>
-                  <h3 class="subtitle">创建包含单选、多选、填空、评分等题型的问卷</h3>
-                  <router-link to="/normal/new">开始</router-link>
+                    <div class="type_show">
+                        <question-pic></question-pic>
+                    </div>
+                    <h2 class="title">创建普通问卷</h2>
+                    <h3 class="subtitle">创建包含单选、多选等题型的问卷</h3>
+                    <router-link to="/normal/new">
+                        <el-button>开始</el-button>
+                    </router-link>
               </div>
           </div>
           <div class="type create_by_vote">
               <div class="inner">
-                  <div class="type_show"></div>
-                  <h2 class="title">创建投票问卷</h2>
-                  <h3 class="subtitle">创建包含投票功能的问卷</h3>
-                  <router-link to="/vote/new">开始</router-link>
+                    <div class="type_show">
+                        <question-pic></question-pic>
+                    </div>
+                    <h2 class="title">创建投票问卷</h2>
+                    <h3 class="subtitle">创建包含投票功能的问卷</h3>
+                    <router-link to="/vote/new">开始</router-link>
               </div>
           </div>
           <div class="type create_by_apply">
               <div class="inner">
-                  <div class="type_show"></div>
-                  <h2 class="title">创建报名问卷</h2>
-                  <h3 class="subtitle">创建限制选项选择人数的问卷</h3>
-                  <router-link to="/apply/new">开始</router-link>
+                    <div class="type_show">
+                        <question-pic></question-pic>
+                    </div>
+                    <h2 class="title">创建报名问卷</h2>
+                    <h3 class="subtitle">创建限制选项选择人数的问卷</h3>
+                    <router-link to="/apply/new">开始</router-link>
               </div>
           </div>
           <div class="type create_by_exam">
               <div class="inner">
-                  <div class="type_show"></div>
-                  <h2 class="title">创建考试问卷</h2>
-                  <h3 class="subtitle">创建规定时间自动提交的问卷</h3>
-                  <router-link to="/exam/new">开始</router-link>
+                    <div class="type_show">
+                        <question-pic></question-pic>
+                    </div>
+                    <h2 class="title">创建考试问卷</h2>
+                    <h3 class="subtitle">创建规定时间自动提交的问卷</h3>
+                    <router-link to="/exam/new">开始</router-link>
               </div>
           </div>
       </div>
@@ -39,8 +49,11 @@
 </template>
 
 <script>
+import svg from "../components/svg.vue"
 export default {
-
+    components: {
+        'question-pic': svg
+    }
 }
 </script>
 
@@ -60,6 +73,9 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.type_show {
+    margin-top: -100px;
 }
 .title {
     margin-top: 10px;
