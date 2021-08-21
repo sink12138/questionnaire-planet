@@ -89,8 +89,8 @@
                 }"
               >
                 <el-radio-group v-model="item.required">
-                  <el-radio label="true">是</el-radio>
-                  <el-radio label="false">否</el-radio>
+                  <el-radio label=true>是</el-radio>
+                  <el-radio label=false>否</el-radio>
                 </el-radio-group>
               </el-form-item>
               <!-- 问题题目 -->
@@ -287,7 +287,7 @@ export default {
         questions: [
           {
             type: "0",
-            required: false,
+            required: "",
             questionName: "",
             questionSummary: "",
             max: 2,
@@ -301,7 +301,7 @@ export default {
           },
           {
             type: "0",
-            required: false,
+            required: "",
             questionName: "",
             questionSummary: "",
             max: 2,
@@ -387,6 +387,7 @@ export default {
     addSubmit() {
       this.$refs.modelForm.validate((valid) => {
         if (valid) {
+          console.log("保存中");
           let templateQuestions = [];
           let quest = {};
           let question = {};
@@ -433,7 +434,7 @@ export default {
           }
           this.$axios({
             method: "post",
-            url: "http://139.224.50.146/normal/submit",
+            url: "http://139.224.50.146:80/apis/normal/submit",
             data: JSON.stringify({
               templateId: this.templateId,
               title: this.modelForm.title,
@@ -461,6 +462,7 @@ export default {
             }
           );
           console.log(this.modelForm.questions);
+          console.log("保存成功!");
         }
       });
     },
@@ -468,7 +470,7 @@ export default {
       this.addSubmit();
       this.$axios({
         method: "post",
-        url: "http://139.224.50.146/release",
+        url: "http://139.224.50.146:80/apis/release",
         data: JSON.stringify({
           templateId: this.templateId,
         }),
