@@ -7,7 +7,6 @@ import com.buaa.qp.entity.Template;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.sql.Time;
 import java.util.ArrayList;
 
@@ -76,6 +75,7 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void deleteTemplate(Integer templateId) {
         questionDao.deleteByTid(templateId);
-        templateDao.delete(templateId);
+        //debug
+        System.err.println(templateDao.deleteByTid(templateId));
     }
 }

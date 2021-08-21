@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.sql.Time;
 import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 
 @RestController
 public class ManagementController {
@@ -28,7 +27,7 @@ public class ManagementController {
     @Autowired
     private AccountService accountService;
 
-    @PostMapping("/all")
+    @GetMapping("/all")
     public Map<String, Object> all() {
         Map<String, Object> map = new HashMap<>();
         try {
@@ -97,8 +96,11 @@ public class ManagementController {
                 throw new ParameterFormatException();
 
             Template template = templateService.getTemplate(templateId);
-            if (!template.getOwner().equals(accountId))
-                throw new LoginVerificationException();
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            }
 
             // Repetition checks
             if (template.getReleased())
@@ -146,8 +148,11 @@ public class ManagementController {
                 throw new ParameterFormatException();
 
             Template template = templateService.getTemplate(templateId);
-            if (!template.getOwner().equals(accountId))
-                throw new LoginVerificationException();
+            if (template == null) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            }
 
             // Other checks
             if (!template.getReleased())
@@ -200,7 +205,6 @@ public class ManagementController {
             // clone
             Template newTemplate = new Template(template.getType(), template.getOwner(),
                     template.getTitle(), template.getDescription(), template.getPassword());
-            newTemplate.setCreationTime(new Date(System.currentTimeMillis()));
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Question> newQuestions = new ArrayList<>();
             for (Question question : questions) {

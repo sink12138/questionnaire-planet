@@ -41,7 +41,7 @@ admin:
   password: 114514
 
 check:
-  ip-address : http://localhost:8090
+  ip-address : http://139.224.50.146:8090
   valid-time: 600000
   code-bits: 32
 

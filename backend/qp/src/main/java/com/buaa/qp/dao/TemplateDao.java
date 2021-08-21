@@ -2,7 +2,6 @@ package com.buaa.qp.dao;
 
 import com.buaa.qp.entity.Template;
 import org.apache.ibatis.annotations.Mapper;
-
 import java.util.ArrayList;
 
 @Mapper
@@ -19,5 +18,5 @@ public interface TemplateDao {
 
     void updateDeleted(Template template);
 
-    void delete(Integer templateId);
+    int deleteByTid(Integer templateId);
 }
