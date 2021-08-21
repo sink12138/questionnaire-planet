@@ -7,16 +7,15 @@ import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.exception.RepetitiveOperationException;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 public class ManagementController {
@@ -26,7 +25,7 @@ public class ManagementController {
     @Autowired
     private TemplateService templateService;
 
-    @PostMapping("/all")
+    @GetMapping("/all")
     public Map<String, Object> all() {
         Map<String, Object> map = new HashMap<>();
         try {
@@ -43,13 +42,15 @@ public class ManagementController {
                     templateMap.put("templateId", result.getTemplateId());
                     templateMap.put("type", result.getType());
                     templateMap.put("title", result.getTitle());
-                    templateMap.put("creationTime", result.getCreationTime().toString());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                    sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+                    templateMap.put("creationTime", sdf.format(result.getCreationTime()));
                     boolean released = result.getReleased();
                     templateMap.put("released", released);
                     Time duration = result.getDuration();
                     if (released) {
                         Date releaseTime = result.getReleaseTime();
-                        templateMap.put("releaseTime", releaseTime.toString());
+                        templateMap.put("releaseTime", sdf.format(releaseTime));
                         duration = new Time(duration.getTime() + System.currentTimeMillis() - releaseTime.getTime());
                     }
                     templateMap.put("duration", duration.toString());
