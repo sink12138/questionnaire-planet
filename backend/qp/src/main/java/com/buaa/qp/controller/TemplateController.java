@@ -2,18 +2,19 @@ package com.buaa.qp.controller;
 
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
+import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
+import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +23,6 @@ import java.util.Map;
 public class TemplateController {
     @Autowired
     private HttpServletRequest request;
-
-    @Autowired
-    private HttpServletResponse response;
 
     @Autowired
     private TemplateService templateService;
@@ -65,6 +63,18 @@ public class TemplateController {
             if (questionMaps.isEmpty())
                 throw new ParameterFormatException();
             ArrayList<Question> questions = new ArrayList<>();
+
+            if (templateId > 0) {
+                Template template = templateService.getTemplate(templateId);
+                if (template == null)
+                    throw new ObjectNotFoundException();
+                if (!template.getOwner().equals(accountId))
+                    throw new LoginVerificationException();
+                if (template.getReleased())
+                    throw new ExtraMessageException("已发布的问卷不能编辑");
+                if (template.getDeleted())
+                    throw new ExtraMessageException("已删除的问卷不能编辑");
+            }
 
             // Parameter checks of questions
             for (Map<String, Object> questionMap : questionMaps) {
@@ -180,7 +190,7 @@ public class TemplateController {
             map.put("success", true);
             map.put("templateId", templateId);
         }
-        catch (LoginVerificationException | ParameterFormatException exc) {
+        catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         }
@@ -191,5 +201,4 @@ public class TemplateController {
         }
         return map;
     }
-
 }
