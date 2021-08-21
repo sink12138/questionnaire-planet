@@ -62,8 +62,8 @@
 import logo from "../components/svg-logo.vue"
 export default {
   components: {
-        'Logo': logo
-    },
+    'Logo': logo
+  },
   data() {
     return {
       fromData: {
