@@ -44,6 +44,7 @@
           placeholder="可为空"
         />
       </el-form-item>
+      <el-form-item> 可通过拖拽题目改变顺序</el-form-item>
       <div>
         <el-collapse v-model="activeNames">
           <vuedraggable
@@ -88,8 +89,8 @@
                 }"
               >
                 <el-radio-group v-model="item.required">
-                  <el-radio label="true">是</el-radio>
-                  <el-radio label="false">否</el-radio>
+                  <el-radio label=true>是</el-radio>
+                  <el-radio label=false>否</el-radio>
                 </el-radio-group>
               </el-form-item>
               <!-- 问题题目 -->
@@ -278,33 +279,33 @@ export default {
       activeNames: [0, 1],
       template: {},
       rules: {},
+      templateId: 0,
       modelForm: {
-        templateId: 0,
         title: "新的问卷",
         description: "",
         password: "",
         questions: [
           {
             type: "0",
-            required: "false",
+            required: false,
             questionName: "",
             questionSummary: "",
             max: 2,
             min: 1,
             height: 1,
             width: 100,
-            answers: [{ value: "" }, { value: "" }],
+            answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
           },
           {
             type: "0",
-            required: "false",
+            required: false,
             questionName: "",
             questionSummary: "",
             max: 2,
             min: 1,
             height: 1,
             width: 100,
-            answers: [{ value: "" }, { value: "" }],
+            answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
           },
         ],
       },
@@ -359,14 +360,14 @@ export default {
       // 新增题目
       this.modelForm.questions.push({
         type: "0",
-        required: "false",
+        required: false,
         questionName: "",
         questionSummary: "",
         max: 2,
         min: 1,
         height: 1,
         width: 100,
-        answers: [{ value: "" }, { value: "" }],
+        answers: [{ value: "" , scores: 0}, { value: "" , scores: 0}],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
     },
@@ -377,6 +378,78 @@ export default {
     addSubmit() {
       this.$refs.modelForm.validate((valid) => {
         if (valid) {
+          let templateQuestions = [];
+          let quest = {};
+          let question = {};
+          let x = {};
+          for (question in this.modelForm.questions){
+            quest.stem = question.questionName;
+            quest.description = question.questionSummary;
+            quest.required = question.required;
+            switch (question.type){
+              case 0:
+                quest.type = "choice";
+                for (x in question.answers){
+                  quest.choices.push(x.value);
+                }
+                break;
+              case 1:
+                quest.type = "multi-choice";
+                quest.max = question.max;
+                quest.min = question.min;
+                for (x in question.answers){
+                  quest.choices.push(x.value);
+                }
+                break;
+              case 2:
+                quest.type = "filling";
+                quest.height = question.height;
+                quest.width = question.width;
+                break;
+              case 3:
+                quest.type = "grade";
+                for (x in question.answers){
+                  quest.choices.push(x.value);
+                  quest.scores.push(x.scores);
+                }
+                break;
+              case 4:
+                quest.type = "dropdown";
+                for (x in question.answers){
+                  quest.choices.push(x.value);
+                }
+                break;
+            }
+            templateQuestions.push(quest);
+          }
+          this.$axios({
+            method: "post",
+            url: "http://82.156.190.251:80/apis/normal/submit",
+            data: JSON.stringify({
+              templateId: this.templateId,
+              title: this.modelForm.title,
+              description: this.modelForm.description,
+              password: this.modelForm.password,
+              questions: templateQuestions,
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
+                });
+              } else {
+                this.$message({
+                  message: response.data.message,
+                });
+              }
+            },
+            (err) => {
+              alert(err);
+            }
+          );
           console.log(this.modelForm.questions);
         }
       });
