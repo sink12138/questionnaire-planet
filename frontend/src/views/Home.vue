@@ -8,20 +8,22 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+        <div>
+          <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+        </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form>
             <el-form-item label="用户名" :label-width="formLabelWidth">
-              <el-input v-model="username" autocomplete="off" style="width: 300px"></el-input>
+              <el-input v-model="fromData.username" autocomplete="off" style="width: 300px"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth">
-              <el-input v-model="password" autocomplete="off" show-password style="width: 300px"></el-input>
+              <el-input v-model="fromData.password" autocomplete="off" show-password style="width: 300px"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false; login">登 录</el-button>
+            <el-button type="primary" @click="login">登 录</el-button>
             <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
           </div>
         </el-dialog>
@@ -64,16 +66,33 @@ export default {
   },
   data() {
     return {
-      username:"",
-      password:"",
+      fromData: {
+        username:"",
+        password:""
+      },
       dialogFormVisible: false,
       formLabelWidth: '100px'
     }
   },
   methods: {
     login: function() {
-      console.log(2)
-      return this.username, this.password
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146/apis/login",
+        data: JSON.stringify(this.formData),
+      }).then((res) => {
+        if (res.data.success == true) {
+          console.log(this.formData);
+          this.$message({
+            message: "登录成功！",
+          });
+          sessionStorage.setItem("email", this.formData.email);
+          sessionStorage.setItem("password", this.formData.password);
+        } else {
+          alert(res.data.message);
+        }
+        console.log(res);
+      });
     }
   }
 }
