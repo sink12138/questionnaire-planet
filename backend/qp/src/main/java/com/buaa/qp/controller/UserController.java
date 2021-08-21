@@ -46,11 +46,9 @@ public class UserController {
                 Account newAccount = new Account(email, username, password, false);
                 accountService.addAccount(newAccount);
                 accountService.sendCheckEmail(newAccount.getAccountId(), email);
-            }
-            else if (account.getVerified()) {
+            } else if (account.getVerified()) {
                 throw new RepetitiveOperationException();
-            }
-            else {
+            } else {
                 if (password == null || !accountService.isPasswordValid(password)) {
                     throw new ParameterFormatException();
                 }
@@ -173,7 +171,7 @@ public class UserController {
             } catch (Exception e) {
                 throw new ParameterFormatException();
             }
-            if (password == null || !accountService.isPasswordValid(password)) {
+            if (password == null || !accountService.isPasswordValid(password) || username == null) {
                 throw new ParameterFormatException();
             }
             Account newAccountInfos = new Account(account.getEmail(), username, password, true);
