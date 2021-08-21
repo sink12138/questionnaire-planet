@@ -81,8 +81,8 @@ export default {
         url: "http://139.224.50.146/apis/login",
         data: JSON.stringify(this.formData),
       }).then((res) => {
+        console.log(this.formData);
         if (res.data.success == true) {
-          console.log(this.formData);
           this.$message({
             message: "登录成功！",
           });
