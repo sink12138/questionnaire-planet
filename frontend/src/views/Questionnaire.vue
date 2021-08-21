@@ -50,6 +50,7 @@
                 </div>
             </div>
         </div>
+        <!--
         <vue-seamless-scroll
         :data="listData"
         :class-option="classOption"
@@ -61,17 +62,18 @@
             </li>
             </ul>
         </vue-seamless-scroll>
+        -->
     <router-view></router-view>
   </div>
 </template>
 
 <script>
 import svg from "../components/svg-questionnaire.vue"
-import vueSeamlessScroll from 'vue-seamless-scroll'
+//import vueSeamlessScroll from 'vue-seamless-scroll'
 export default {
     components: {
         'question-pic': svg,
-        vueSeamlessScroll
+        //vueSeamlessScroll
     },
     data () {
       return {
