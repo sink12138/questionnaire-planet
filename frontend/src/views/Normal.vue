@@ -103,12 +103,12 @@
                         trigger: 'change',
                       }"
                     >
-                      <el-radio-group v-model="item.type">
-                        <el-radio label="0">单选题</el-radio>
-                        <el-radio label="1">多选题</el-radio>
-                        <el-radio label="2">填空题</el-radio>
-                        <el-radio label="3">评分题</el-radio>
-                        <el-radio label="4">下拉题</el-radio>
+                      <el-radio-group v-model="item.type" class="question-type">
+                        <el-radio label="0" border>单选题</el-radio>
+                        <el-radio label="1" border>多选题</el-radio>
+                        <el-radio label="2" border>填空题</el-radio>
+                        <el-radio label="3" border>评分题</el-radio>
+                        <el-radio label="4" border>下拉题</el-radio>
                       </el-radio-group>
                     </el-form-item>
                     <!-- 是否必填 -->
@@ -160,90 +160,102 @@
                         placeholder="请填写问题描述"
                       />
                     </el-form-item>
-                    <!-- 最大选项 -->
-                    <el-form-item
-                      v-show="item.type == 1"
-                      :prop="`questions.${index}.max`"
-                      label="最大选项"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请填写最大选项个数',
-                          trigger: 'blur',
-                        },
-                        { validator: isNum, trigger: 'blur' },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="item.max"
-                        style="width: 125px"
-                        clearable
-                        placeholder="请填写最大选项个数"
-                      />
-                    </el-form-item>
-                    <!-- 最小选项 -->
-                    <el-form-item
-                      v-show="item.type == 1"
-                      :prop="`questions.${index}.min`"
-                      label="最小选项"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请填写最小选项个数',
-                          trigger: 'blur',
-                        },
-                        { validator: isNum, trigger: 'blur' },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="item.min"
-                        style="width: 125px"
-                        clearable
-                        placeholder="请填写最小选项个数"
-                      />
-                    </el-form-item>
-                    <!-- 高度 -->
-                    <el-form-item
-                      v-show="item.type == 2"
-                      :prop="`questions.${index}.height`"
-                      label="填空框高度（行）"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请填写填空框高度',
-                          trigger: 'blur',
-                        },
-                        { validator: isNum, trigger: 'blur' },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="item.height"
-                        style="width: 125px"
-                        clearable
-                        placeholder="请填写填空框高度"
-                      />
-                    </el-form-item>
-                    <!-- 宽度 -->
-                    <el-form-item
-                      v-show="item.type == 2"
-                      :prop="`questions.${index}.width`"
-                      label="填空框宽度（px）"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请填写填空框宽度',
-                          trigger: 'blur',
-                        },
-                        { validator: isNum, trigger: 'blur' },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="item.width"
-                        style="width: 125px"
-                        clearable
-                        placeholder="请填写填空框宽度"
-                      />
-                    </el-form-item>
+                    <el-row>
+                      <!-- 最小选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 1"
+                          :prop="`questions.${index}.min`"
+                          label="最小选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最小选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.min"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最小选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 最大选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 1"
+                          :prop="`questions.${index}.max`"
+                          label="最大选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最大选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.max"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最大选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                    <el-row>
+                      <!-- 高度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 2"
+                          :prop="`questions.${index}.height`"
+                          label="填空框高度（行）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框高度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.height"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框高度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 宽度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 2"
+                          :prop="`questions.${index}.width`"
+                          label="宽度（px）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框宽度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.width"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框宽度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
                     <!-- 答案 -->
                     <el-form-item
                       v-for="(opt, idx) in item.answers"
@@ -264,9 +276,9 @@
                       <el-input
                         v-model.trim="opt.scores"
                         v-show="item.type == 3"
-                        style="width: 125px"
+                        style="width: 60px;margin-left: 10px"
                         clearable
-                        placeholder="请输入评分"
+                        placeholder="..."
                       />
                       <el-button
                         style="margin-left: 20px"
@@ -274,10 +286,10 @@
                         >删除</el-button
                       >
                     </el-form-item>
-                    <el-form-item>
-                      <el-button v-show="item.type != 2" @click="addDomain(index)">新增选项</el-button>
-                      <el-button @click="copyQuestion(index)">复制题目</el-button>
-                      <el-button @click="removeQuestion(index)">删除题目</el-button>
+                    <el-form-item label="编辑题目">
+                      <el-button icon="el-icon-circle-plus" v-show="item.type != 2" @click="addDomain(index)">新增选项</el-button>
+                      <el-button icon="el-icon-s-order" @click="copyQuestion(index)">复制题目</el-button>
+                      <el-button icon="el-icon-delete-solid" @click="removeQuestion(index)">删除题目</el-button>
                     </el-form-item>
                   </el-collapse-item>
                 </vuedraggable>
@@ -530,6 +542,7 @@ export default {
 }
 .el-main {
   width: 1200px;
+  text-align: left;
 }
 .editor {
   position: fixed;
@@ -580,6 +593,7 @@ a:hover {
 }
 .basic {
   width: 1000px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -588,6 +602,12 @@ a:hover {
   font-family: 仿宋;
   font-size: 20px;
   font-weight: bolder;
+}
+.question-type .el-radio{
+  height: 35px;
+  width: 80px;
+  margin: 0;
+  padding: 9px 9px 6px 6px;
 }
 .questions {
   width: 600px;
