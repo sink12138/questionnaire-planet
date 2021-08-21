@@ -112,7 +112,7 @@ public class AccountServiceImpl implements AccountService {
 
     private void basicSetting(MimeMessage mimeMessage, String subject, String toAddress, String process) throws MessagingException {
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setSubject("OPS | " + subject);
+        helper.setSubject("问卷星球 | " + subject);
         helper.setFrom(FROM_ADDRESS);
         helper.setTo(toAddress);
         helper.setSentDate(new Date());
@@ -151,15 +151,8 @@ public class AccountServiceImpl implements AccountService {
         @Override
         public void run() {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            String subject;
-            String action;
-            if (accountId == null) {
-                subject = "注册邮箱验证";
-                action = "注册";
-            } else {
-                subject = "更改邮箱验证";
-                action = "更改";
-            }
+            String subject = "注册邮箱验证";
+            String action = "注册";
             String code = generateCode(accountId);
             Check check = new Check(accountId, code, new Date());
             checkDao.insert(check);

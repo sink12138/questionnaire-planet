@@ -39,15 +39,26 @@ public class UserController {
                 throw new ParameterFormatException();
             }
             Account account = accountService.getAccountByEmail(email);
-            if (account != null) {
+            if (account == null) {
+                if (password == null || !accountService.isPasswordValid(password)) {
+                    throw new ParameterFormatException();
+                }
+                Account newAccount = new Account(email, username, password, false);
+                accountService.addAccount(newAccount);
+                accountService.sendCheckEmail(newAccount.getAccountId(), email);
+            }
+            else if (account.getVerified()) {
                 throw new RepetitiveOperationException();
             }
-            if (password == null || !accountService.isPasswordValid(password)) {
-                throw new ParameterFormatException();
+            else {
+                if (password == null || !accountService.isPasswordValid(password)) {
+                    throw new ParameterFormatException();
+                }
+                account.setPassword(password);
+                account.setUsername(username);
+                accountService.modifyInfos(account);
+                accountService.sendCheckEmail(account.getAccountId(), email);
             }
-            Account newAccount = new Account(email, username, password, false);
-            accountService.addAccount(newAccount);
-            accountService.sendCheckEmail(newAccount.getAccountId(), email);
             map.put("success", true);
         } catch (ParameterFormatException | RepetitiveOperationException e) {
             map.put("success", false);
@@ -68,6 +79,7 @@ public class UserController {
         try {
             Account account = accountService.checkCode(code);
             account.setVerified(true);
+            accountService.modifyInfos(account);
             httpServletRequest.setAttribute("email", account.getEmail());
             return new ModelAndView("CheckSuccess");
         } catch (ObjectNotFoundException e) {
