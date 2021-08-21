@@ -212,7 +212,6 @@ public class ManagementController {
                 newQuestions.add(newQuestion);
             }
             templateService.submitTemplate(newTemplate, newQuestions);
-
             map.put("message", true);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
