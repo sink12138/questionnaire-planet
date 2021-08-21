@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import svg from "../components/svg.vue"
+import svg from "../components/svg-questionnaire.vue"
 export default {
     components: {
         'question-pic': svg

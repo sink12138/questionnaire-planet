@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import logo from "../components/logo.vue"
+import logo from "../components/svg-logo.vue"
 export default {
     components: {
         'Logo': logo
