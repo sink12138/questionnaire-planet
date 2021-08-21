@@ -1,5 +1,6 @@
 package com.buaa.qp.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
@@ -8,7 +9,6 @@ import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -175,7 +175,7 @@ public class TemplateController {
                     default:
                         throw new ParameterFormatException();
                 }
-                String args = new JSONObject(argsMap).toString();
+                String args = JSON.toJSONString(map);
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 

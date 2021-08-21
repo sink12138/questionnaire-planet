@@ -31,7 +31,6 @@
             released = #{released},
             <if test="released == false">
                 duration = addtime(duration, timediff(now(), release_time)),
-                release_time = null,
             </if>
             <if test="released == true">
                 release_time = now(),
