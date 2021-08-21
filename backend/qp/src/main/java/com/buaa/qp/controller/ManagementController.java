@@ -212,7 +212,7 @@ public class ManagementController {
                 newQuestions.add(newQuestion);
             }
             templateService.submitTemplate(newTemplate, newQuestions);
-            map.put("message", true);
+            map.put("success", true);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
@@ -253,7 +253,7 @@ public class ManagementController {
             }
 
             templateService.removeTemplate(templateId, true);
-            map.put("message", true);
+            map.put("success", true);
 
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException | RepetitiveOperationException exc) {
             map.put("success", false);
@@ -266,7 +266,7 @@ public class ManagementController {
         return map;
     }
 
-    @PostMapping("delete")
+    @PostMapping("/delete")
     public Map<String, Object> delete(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
         try {
@@ -293,7 +293,7 @@ public class ManagementController {
             }
 
             templateService.deleteTemplate(templateId);
-            map.put("message", true);
+            map.put("success", true);
 
         } catch (LoginVerificationException | ParameterFormatException |
                 ObjectNotFoundException | ExtraMessageException exc) {
@@ -334,7 +334,7 @@ public class ManagementController {
             }
 
             templateService.removeTemplate(templateId, false);
-            map.put("message", true);
+            map.put("success", true);
 
         } catch (LoginVerificationException | ParameterFormatException |
                 ObjectNotFoundException | ExtraMessageException exc) {
