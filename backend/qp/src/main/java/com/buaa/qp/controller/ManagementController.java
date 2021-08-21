@@ -211,8 +211,9 @@ public class ManagementController {
                 Question newQuestion = new Question(question.getType(), question.getStem(), question.getDescription(), question.getRequired(), question.getArgs());
                 newQuestions.add(newQuestion);
             }
-            templateService.submitTemplate(newTemplate, newQuestions);
+            Integer newTemplateId = templateService.submitTemplate(newTemplate, newQuestions);
             map.put("success", true);
+            map.put("newTemplateId", newTemplateId);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
