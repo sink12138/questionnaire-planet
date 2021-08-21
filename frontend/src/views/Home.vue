@@ -1,10 +1,37 @@
 <template>
   <div class="home">
-    <h1>主页</h1>
-    <div id="nav">
-      <router-link to="/"><button class="homepage">问卷星球</button></router-link> |
-      <router-link to="/login"><button class="login">登录</button></router-link> /
-      <router-link to="/register"><button class="register">注册</button></router-link>
-    </div>
+    <el-container>
+      <el-header>Header</el-header>
+      <el-container>
+        <el-aside>
+          <el-menu
+            default-active="this.$route.path"
+            class="el-menu-vertical-demo"
+            @open="handleOpen"
+            @close="handleClose"
+            router>
+            <el-menu-item index="/questionnaire">
+              <i class="el-icon-circle-plus"></i>
+              <span slot="title">新建问卷</span>
+            </el-menu-item>
+            <el-menu-item index="/history">
+              <i class="el-icon-s-order"></i>
+              <span slot="title">历史问卷</span>
+            </el-menu-item>
+            <el-menu-item index="/recycle">
+              <i class="el-icon-delete-solid"></i>
+              <span slot="title">回收站</span>
+            </el-menu-item>
+          </el-menu>
+        </el-aside>
+        <el-main>
+          <router-view></router-view>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
+
+<script>
+
+</script>
