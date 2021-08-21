@@ -2,12 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.buaa.qp.dao.TemplateDao">
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(owner, title, description, password)
-        values (#{owner}, #{title}, #{description}, #{password})
+        insert into template(type, owner, title, description, password, creation_time)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now())
     </insert>
     <update id="update" parameterType="Template">
         update template
-        set title = #{title}, description = #{description}, password = #{password}
-        where template_id = #{templatteId}
+        set title = #{title}, description = #{description}, password = #{password},
+            released = #{released}, deleted = #{deleted}, release_time = #{releaseTime},
+            duration = #{duration}
+        where template_id = #{templateId}
     </update>
 </mapper>
