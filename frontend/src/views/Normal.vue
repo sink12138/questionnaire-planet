@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="hello">
     <el-form
       ref="modelForm"
@@ -388,3 +389,17 @@ export default {
   },
 };
 </script>
+=======
+  <span>Normal</span>
+</template>
+
+<script>
+export default {
+
+}
+</script>
+
+<style>
+
+</style>
+>>>>>>> origin/frontend
