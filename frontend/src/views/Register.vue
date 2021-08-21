@@ -47,6 +47,7 @@
           })
             .then((res) => {
               console.log(res);
+              console.log(this.fromData);
               if (res.data.success == false) {
                 this.$message({
                   showClose: true,
