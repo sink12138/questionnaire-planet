@@ -9,8 +9,8 @@ const Normal = () => import("../views/Normal.vue")
 const Vote = () => import("../views/Vote.vue")
 const Apply = () => import("../views/Apply.vue")
 const Exam = () => import("../views/Exam.vue")
-const Login = () => import("../components/Login.vue")
-const Register = () => import("../components/Register.vue")
+const Register = () => import("../views/Register.vue")
+const Preview = () => import("../views/Preview.vue")
 
 Vue.use(VueRouter)
 
@@ -43,11 +43,6 @@ const routes = [
     component: Register
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: Login
-  },
-  {
     path: '/normal/new',
     name: 'Normal',
     component: Normal
@@ -66,6 +61,11 @@ const routes = [
     path: '/exam/new',
     name: 'Exam',
     component: Exam
+  },
+  {
+    path: '/preview',
+    name: 'Preview',
+    component: Preview
   }
 ]
 

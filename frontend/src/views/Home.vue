@@ -2,14 +2,31 @@
   <div class="home">
     <el-container>
       <el-header>
-        <div class="header">
-          <router-link to="/">
-            <div class="logo">
-              <Logo></Logo>
-              <div class="web-title">问卷星球</div>
-            </div>
-          </router-link>
+        <router-link to="/">
+          <div class="logo">
+            <Logo></Logo>
+            <div class="web-title">问卷星球</div>
+          </div>
+        </router-link>
+        <div>
+          <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
         </div>
+
+        <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
+          <el-form>
+            <el-form-item label="电子邮箱" :label-width="formLabelWidth">
+              <el-input v-model="formData.email" autocomplete="off" style="width: 300px"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" :label-width="formLabelWidth">
+              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px"></el-input>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="login">登 录</el-button>
+            <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
+          </div>
+        </el-dialog>
       </el-header>
       <el-container>
         <el-aside style="width: 200px">
@@ -44,9 +61,39 @@
 <script>
 import logo from "../components/svg-logo.vue"
 export default {
-    components: {
-        'Logo': logo
+  components: {
+    'Logo': logo
+  },
+  data() {
+    return {
+      formData: {
+        email:"",
+        password:""
+      },
+      dialogFormVisible: false,
+      formLabelWidth: '100px'
     }
+  },
+  methods: {
+    login: function() {
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146/apis/login",
+        data: JSON.stringify(this.formData),
+      }).then((res) => {
+        console.log(this.formData);
+        if (res.data.success == true) {
+          this.$message({
+            message: "登录成功！",
+            type: "success",
+          });
+        } else {
+          alert("error");
+        }
+        console.log(res);
+      });
+    }
+  }
 }
 </script>
 
