@@ -119,10 +119,10 @@
           .catch((error) => {
             console.log(error);
           });
+      },
+      goBack: function(){
+        this.$router.push('/')
       }
-    },
-    goBack: function(){
-      this.$router.push('/')
     }
   }
 </script>
