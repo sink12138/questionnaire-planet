@@ -18,10 +18,10 @@
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
             <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-              <el-input v-model="formData.email" autocomplete="off" style="width: 300px"></el-input>
+              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px"></el-input>
+              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -128,7 +128,7 @@ export default {
           });
           this.dialogFormVisible = false;
         } else {
-          alert("error");
+          alert("用户名或密码错误！");
         }
         console.log(res);
       });
@@ -146,6 +146,13 @@ export default {
       this.$message({
         message: "退出登录成功！",
       });
+    }
+  },
+  directives: {
+    focus: {
+      inserted: function(el) {
+        el.querySelector('input').focus();
+      }
     }
   }
 }
