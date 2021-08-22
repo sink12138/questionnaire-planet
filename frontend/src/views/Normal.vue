@@ -24,6 +24,7 @@
             </div>
             <div class="publish">
               <el-button @click="publishQuestion" type="primary">发布问卷</el-button>
+              
             </div>
           </div>
         </el-aside>
@@ -36,6 +37,13 @@
             label-width="150px"
           >
             <div class="basic">
+              <vue-qr ref="Qrcode"
+              :text="qrData.text"
+              :logoSrc="qrData.logo">
+              </vue-qr>
+              <el-button @click="copyShareLink" :data-clipboard-text="qrData.text">
+                复制二维码
+              </el-button>
               <!-- 问卷题目 -->
               <el-form-item
                 label="问卷题目"
@@ -306,10 +314,13 @@
 <script>
 import logo from "../components/svg-logo.vue"
 import vuedraggable from "vuedraggable";
+import VueQr from "vue-qr"
+import Clipboard from "clipboard"
 export default {
   name: "HelloWorld",
   components: {
     vuedraggable,
+    VueQr,
     'Logo': logo
   },
   data() {
@@ -353,7 +364,11 @@ export default {
           },
         ],
       },
-    };
+      qrData: {
+        text: window.location.host+"/questionnaire/"+this.templateId,
+        logo: require('../assets/logo.png')
+      }
+   };
   },
   methods: {
     isNum: (rule, value, callback) => {
@@ -532,6 +547,18 @@ export default {
       );
       console.log("发布成功!");
     },
+    async copyShareLink() {
+      let clipboard = new Clipboard('.tag-copy')
+      console.log(clipboard)
+      await clipboard.on('success', () => {
+        alert('Copy Success')
+        clipboard.destroy()
+      })
+      clipboard.on('error', () => {
+        alert('Copy error')
+        clipboard.destroy()
+      })
+    }
   },
 };
 </script>
