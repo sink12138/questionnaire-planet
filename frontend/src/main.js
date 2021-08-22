@@ -13,7 +13,6 @@ axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 
-
 new Vue({
   router,
   store,
