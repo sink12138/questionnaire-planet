@@ -10,4 +10,6 @@ public interface AnswerService {
     void deleteAnswersByTid(Integer templateId);
 
     void submitAnswer(Answer answer);
+
+    int countAnswers(Integer templateId);
 }

@@ -12,4 +12,6 @@ public interface AnswerDao {
     void insert(Answer answer);
 
     ArrayList<Answer> selectByTid(Integer templateId);
+
+    Integer selectCountByTid(Integer templateId);
 }

@@ -11,4 +11,7 @@
     <select id="selectByTid" parameterType="Integer" resultType="Answer">
         select * from answer where template_id = #{templateId}
     </select>
+    <select id="selectCountByTid" parameterType="Integer" resultType="Integer">
+        select count(*) from answer where template_id = #{templateId}
+    </select>
 </mapper>

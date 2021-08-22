@@ -4,6 +4,7 @@ import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.*;
 import com.buaa.qp.service.AccountService;
+import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,9 @@ public class ManagementController {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private AnswerService answerService;
+
     @GetMapping("/all")
     public Map<String, Object> all(@RequestParam(value = "removed", required = false) String removedStr) {
         Map<String, Object> map = new HashMap<>();
@@ -42,7 +46,8 @@ public class ManagementController {
             for (Template result : results) {
                 if (result.getDeleted() == removed) {
                     Map<String, Object> templateMap = new HashMap<>();
-                    templateMap.put("templateId", result.getTemplateId());
+                    Integer templateId = result.getTemplateId();
+                    templateMap.put("templateId", templateId);
                     templateMap.put("type", result.getType());
                     templateMap.put("title", result.getTitle());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -57,6 +62,7 @@ public class ManagementController {
                         duration = new Time(duration.getTime() + System.currentTimeMillis() - releaseTime.getTime());
                     }
                     templateMap.put("duration", duration.toString());
+                    templateMap.put("answerCount", answerService.countAnswers(templateId));
                     templates.add(templateMap);
                 }
             }

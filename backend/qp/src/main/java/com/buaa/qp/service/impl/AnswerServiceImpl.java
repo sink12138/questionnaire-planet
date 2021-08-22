@@ -27,4 +27,10 @@ public class AnswerServiceImpl implements AnswerService {
     public void submitAnswer(Answer answer) {
         answerDao.insert(answer);
     }
+
+    @Override
+    public int countAnswers(Integer templateId) {
+        return answerDao.selectCountByTid(templateId);
+    }
+
 }
