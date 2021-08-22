@@ -13,8 +13,8 @@
           <div v-if="this.$store.state.isLogin == false">
             <el-button type="success" @click="dialogFormVisible = true" class="butt1">登录/注册</el-button>
           </div>
-          <div v-else>
-            <el-button type="success" @click="logout" class="butt2">退出登录</el-button>
+          <div v-else class="butt2">
+            <el-button type="success" @click="logout">退出登录</el-button>
             <el-button type="success" @click="topersonal">个人中心</el-button>
           </div>
         </div>
