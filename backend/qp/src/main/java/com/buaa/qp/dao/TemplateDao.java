@@ -10,8 +10,6 @@ public interface TemplateDao {
 
     ArrayList<Template> selectByOwner(Integer owner);
 
-    ArrayList<Template> selectDeletedByOwner(Integer owner);
-
     Integer insert(Template template);
 
     Integer update(Template template);

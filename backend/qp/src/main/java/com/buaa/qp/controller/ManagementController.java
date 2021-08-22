@@ -37,10 +37,10 @@ public class ManagementController {
             if (removedStr == null) removed = false;
             else removed = Boolean.parseBoolean(removedStr);
 
-            ArrayList<Template> results = templateService.getMyTemplates(accountId, removed);
+            ArrayList<Template> results = templateService.getMyTemplates(accountId);
             ArrayList<Map<String, Object>> templates = new ArrayList<>();
             for (Template result : results) {
-                if (!result.getDeleted()) {
+                if (result.getDeleted() == removed) {
                     Map<String, Object> templateMap = new HashMap<>();
                     templateMap.put("templateId", result.getTemplateId());
                     templateMap.put("type", result.getType());
