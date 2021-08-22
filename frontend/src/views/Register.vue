@@ -89,7 +89,7 @@
     },
     methods: {
       register: function(){
-        this.$refs.ruleForm.validate((valid) => {
+        this.$refs.formData.validate((valid) => {
           if (valid) {
             var registerdata = {
               username: this.formData.username,
