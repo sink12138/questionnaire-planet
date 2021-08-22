@@ -9,12 +9,12 @@
           </div>
         </router-link>
 
-        <div class="butt">
+        <div>
           <div v-if="this.$store.state.isLogin == false">
-            <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+            <el-button type="success" @click="dialogFormVisible = true" class="butt1">登录/注册</el-button>
           </div>
           <div v-else>
-            <el-button type="success" @click="logout">退出登录</el-button>
+            <el-button type="success" @click="logout" class="butt2">退出登录</el-button>
             <el-button type="success" @click="topersonal">个人中心</el-button>
           </div>
         </div>
@@ -177,11 +177,17 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.butt {
+.butt1 {
   display: inline-flex;
   float: right;
   position: relative;
   left: 73%;
+}
+.butt2 {
+  display: inline-flex;
+  float: right;
+  position: relative;
+  left: 63%;
 }
 .web-title {
   margin-left: 15px;
