@@ -76,6 +76,9 @@
                   收集时长:{{ item.duration }}
                 </time>
               </div>
+              <div class="time">
+                <strong>收集数量:</strong>{{ item.answerCount }}
+              </div>
               <div class="bottom clearfix">
                 <el-button-group>
                   <el-button

@@ -194,6 +194,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          console.log(this.answers)
           this.$axios({
               method: "post",
               url: "http://139.224.50.146:80/apis/answer",
