@@ -11,10 +11,10 @@
         <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
       </el-form-item>
       <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-        <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱"></el-input>
+        <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" :disabled="true"></el-input>
       </el-form-item>
     </el-form>
-    <el-button type="primary" @click="register" style="display:block;margin:5px 5px 5px 750px">注册</el-button>
+    <el-button type="primary" @click="modify" style="display:block;margin:5px 5px 5px 750px">修改信息</el-button>
   </div>
 </template>
 
@@ -94,6 +94,41 @@ export default {
         this.formData.password = res.data.password;
       });
   },
+  methods: {
+    goBack: function(){
+      this.$router.push('/')
+    },
+    modify: function(){
+      var modifydata = {
+          username: this.formData.username,
+          password: this.formData.password,
+        };
+
+        this.$axios({
+          method: "post",
+          url: "http://139.224.50.146/apis/home/modify",
+          data: JSON.stringify(modifydata),
+        })
+          .then((res) => {
+            console.log(res);
+            if (res.data.success == false) {
+              this.$message({
+                showClose: true,
+                message: res.data.message,
+               });
+            } else {
+              this.$message({
+                showClose: true,
+                message: "信息修改成功",
+                 type: "success",
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    }
+  }
 }
 </script>
 
