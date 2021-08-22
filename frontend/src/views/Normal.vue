@@ -491,13 +491,14 @@ export default {
         if (valid) {
           console.log("保存中");
           console.log(this.modelForm.questions);
-          let templateQuestions = [];
-          let quest = {};
-          let question = {};
-          let x = {};
-          let i = 0;
-          let j = 0;
+          var templateQuestions = [];
+          var quest = new Map();
+          var question = new Map();
+          var x = {};
+          var i = 0;
+          var j = 0;
           for (i in this.modelForm.questions) {
+            quest = new Map();
             question = this.modelForm.questions[i];
             console.log(question);
             quest.stem = question.questionName;
@@ -549,6 +550,7 @@ export default {
             }
             console.log(quest);
             templateQuestions.push(quest);
+            console.log(templateQuestions);
           }
           this.$axios({
             method: "post",

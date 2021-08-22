@@ -408,13 +408,14 @@ export default {
           this.modelForm.title = response.data.title;
           this.modelForm.description = response.data.description;
           this.modelForm.password = response.data.password;
-          let question = {};
-          let item = {};
-          let i = 0;
-          let j = 0;
-          let x = "";
-          let y = 0;
+          var question = {};
+          var item = {};
+          var i = 0;
+          var j = 0;
+          var x = "";
+          var y = 0;
           for (i in response.data.questions) {
+            question = new Map();
             item = response.data.questions[i];
             question.questionName = item.stem;
             question.questionSummary = item.description;
@@ -544,13 +545,14 @@ export default {
         if (valid) {
           console.log("保存中");
           console.log(this.modelForm.questions);
-          let templateQuestions = [];
-          let quest = {};
-          let question = {};
-          let x = {};
-          let i = 0;
-          let j = 0;
+          var templateQuestions = [];
+          var quest = new Map();
+          var question = new Map();
+          var x = {};
+          var i = 0;
+          var j = 0;
           for (i in this.modelForm.questions) {
+            quest = new Map();
             question = this.modelForm.questions[i];
             console.log(question);
             quest.stem = question.questionName;
@@ -602,12 +604,13 @@ export default {
             }
             console.log(quest);
             templateQuestions.push(quest);
+            console.log(templateQuestions);
           }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/normal/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               password: this.modelForm.password,

@@ -67,6 +67,9 @@
               <div class="time">
                 <time> <strong>收集时长:</strong>{{ item.duration }} </time>
               </div>
+              <div class="time">
+                <strong>收集数量:</strong>{{ item.answerCount }}
+              </div>
               <div class="bottom clearfix">
                 <div v-if="item.released == true">已发布</div>
                 <div v-else>未发布</div>
