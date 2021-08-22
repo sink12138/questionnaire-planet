@@ -44,7 +44,7 @@
               current_page * pagesize
             )"
             :key="item.templateId"
-            style="margin: 0;padding: 0;border: 0;"
+            style="margin: 0; padding: 0; border: 0"
           >
             <div class="card">
               <div class="title">
@@ -56,24 +56,16 @@
                 <question-pic></question-pic>
               </div>
               <div class="time">
-                <time>
-                  <strong>创建时间:</strong>{{ item.creationTime }}
-                </time>
+                <time> <strong>创建时间:</strong>{{ item.creationTime }} </time>
               </div>
               <div class="time" v-if="item.releaseTime != ''">
-                <time>
-                  <strong>发布时间:</strong>{{ item.releaseTime }}
-                </time>
+                <time> <strong>发布时间:</strong>{{ item.releaseTime }} </time>
               </div>
               <div class="time" v-else>
-                <time>
-                  <strong>发布时间:</strong>未曾发布
-                </time>
+                <time> <strong>发布时间:</strong>未曾发布 </time>
               </div>
               <div class="time">
-                <time>
-                  <strong>收集时长:</strong>{{ item.duration }}
-                </time>
+                <time> <strong>收集时长:</strong>{{ item.duration }} </time>
               </div>
               <div class="bottom clearfix">
                 <div v-if="item.released == true">已发布</div>
@@ -81,8 +73,8 @@
                 <el-button
                   type="text"
                   class="button"
-                  @click="edit(item)"
-                  icon="el-icon-edit-outline"
+                  @click="adjust(item)"
+                  icon="el-icon-edit"
                 ></el-button>
                 <el-button
                   type="text"
@@ -109,6 +101,15 @@
                     <i class="el-icon-more"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
+                        type="text"
+                        class="button"
+                        @click="edit(item)"
+                        icon="el-icon-edit-outline"
+                        >编辑</el-button
+                      >
+                    </el-dropdown-item>
                     <el-dropdown-item
                       ><el-button
                         type="text"
@@ -263,6 +264,30 @@ export default {
         }
       }
       this.total = this.searchQue.length;
+    },
+    adjust(item) {
+      if (item.released == false) {
+        this.quest = item.templateId;
+        console.log(this.quest);
+        this.$router.push("/adjust?templateId=" + this.quest);
+      } else {
+        this.$message({
+          message: "问卷已发布！",
+        });
+      }
+    },
+    edit(item) {
+      if (item.type == "normal") {
+        if (item.released == false) {
+          this.quest = item.templateId;
+          console.log(this.quest);
+          this.$router.push("/normal/edit?templateId=" + this.quest);
+        } else {
+          this.$message({
+            message: "问卷已发布！",
+          });
+        }
+      }
     },
     release(item) {
       this.$axios({
