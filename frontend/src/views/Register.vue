@@ -5,7 +5,7 @@
 
     <el-form style="display:block; margin:3px 300px" :inline="false" :rules="rules" ref="formData" :model="formData">
       <el-form-item label="用户名" :label-width="formLabelWidth" prop="username">
-        <el-input v-model="formData.username" autocomplete="off" style="width: 300px" placeholder="请输入用户名"></el-input>
+        <el-input v-model="formData.username" autocomplete="off" style="width: 300px" placeholder="请输入用户名" v-focus></el-input>
       </el-form-item>
       <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
         <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
@@ -108,6 +108,7 @@
                 showClose: true,
                 message: res.data.message,
                });
+               alert("请填入合适的信息后再试。")
             } else {
               this.$message({
                 showClose: true,
@@ -122,6 +123,13 @@
       },
       goBack: function(){
         this.$router.push('/')
+      }
+    },
+    directives: {
+      focus: {
+        inserted: function(el) {
+          el.querySelector('input').focus();
+        }
       }
     }
   }
