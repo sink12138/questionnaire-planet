@@ -1,165 +1,161 @@
 <template>
   <div class="reviewer">
-    <div>
-      <h1>您的所有问卷如下</h1>
-    </div>
-    <div class="search">
-      <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <el-button><i class="el-icon-s-operation"></i></el-button>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="creationTime()"
-              >创建时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="releaseTime()"
-              >发布时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="duration()"
-              >持续时间</el-button
-            ></el-dropdown-item
-          >
-        </el-dropdown-menu>
-      </el-dropdown>
-      <el-input
-        v-model.trim="search"
-        style="width: 250px"
-        clearable
-        placeholder="请输入要搜索的问卷"
-      />
-      <el-button icon="el-icon-search" circle @click="searchQuest"></el-button>
+    <div class="top">
+      <div class="page-title">
+        您的所有问卷如下
+      </div>
+      <div class="search">
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link">
+            <el-button><i class="el-icon-s-operation"></i></el-button>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item
+              ><el-button type="text" class="button" @click="creationTime()"
+                >创建时间</el-button
+              ></el-dropdown-item
+            >
+            <el-dropdown-item
+              ><el-button type="text" class="button" @click="releaseTime()"
+                >发布时间</el-button
+              ></el-dropdown-item
+            >
+            <el-dropdown-item
+              ><el-button type="text" class="button" @click="duration()"
+                >持续时间</el-button
+              ></el-dropdown-item
+            >
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-input
+          v-model.trim="search"
+          style="width: 250px"
+          clearable
+          placeholder="请输入要搜索的问卷"
+        />
+        <el-button icon="el-icon-search" @click="searchQuest"></el-button>
+      </div>
     </div>
     <div class="questionnaire">
-      <div style="margin-left: 1%; margin-right: 1%">
-        <el-row>
-          <el-col
-            :span="6"
-            v-for="item in searchQue.slice(
-              (current_page - 1) * pagesize,
-              current_page * pagesize
-            )"
-            :key="item.templateId"
-            style="margin: 0; padding: 0; border: 0"
-          >
+      <div class="list" style="margin-left: 1%; margin-right: 1%">
+        <div
+        class="cards"
+        v-for="item in searchQue.slice(
+          (current_page - 1) * pagesize,
+          current_page * pagesize
+        )"
+        :key="item.templateId">
+          <el-card shadow="hover">
             <div class="card">
-              <div class="title">
-                <span>
-                  <strong>{{ item.title }}</strong>
-                </span>
-              </div>
-              <div class="type_show">
-                <question-pic></question-pic>
+              <div class="banner">
+                <div class="title">
+                  <div v-if="item.released == true">{{ item.title }}(已发布)</div>
+                  <div v-else>{{ item.title }}(未发布)</div>
+                </div>
+                <div class="type_show">
+                  <question-pic></question-pic>
+                </div>
               </div>
               <div class="time">
-                <time> <strong>创建时间:</strong>{{ item.creationTime }} </time>
+                <time>
+                  创建时间:{{ item.creationTime }}
+                </time>
               </div>
               <div class="time" v-if="item.releaseTime != ''">
-                <time> <strong>发布时间:</strong>{{ item.releaseTime }} </time>
+                <time>
+                  发布时间:{{ item.releaseTime }}
+                </time>
               </div>
               <div class="time" v-else>
-                <time> <strong>发布时间:</strong>未曾发布 </time>
+                <time>
+                  发布时间:未曾发布
+                </time>
               </div>
               <div class="time">
-                <time> <strong>收集时长:</strong>{{ item.duration }} </time>
+                <time>
+                  收集时长:{{ item.duration }}
+                </time>
               </div>
               <div class="time">
                 <strong>收集数量:</strong>{{ item.answerCount }}
               </div>
               <div class="bottom clearfix">
-                <div v-if="item.released == true">已发布</div>
-                <div v-else>未发布</div>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="adjust(item)"
-                  icon="el-icon-edit"
-                ></el-button>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="statistics(item)"
-                  icon="el-icon-pie-chart"
-                ></el-button>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="release(item)"
-                  icon="el-icon-video-play"
-                  v-if="item.released == false"
-                ></el-button>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="close(item)"
-                  icon="el-icon-video-pause"
-                  v-else
-                ></el-button>
-                <el-dropdown trigger="click">
-                  <span class="el-dropdown-link">
-                    <i class="el-icon-more"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button
-                        type="text"
-                        class="button"
-                        @click="edit(item)"
-                        icon="el-icon-edit-outline"
-                        >编辑</el-button
+                <el-button-group>
+                  <el-button
+                    type="text"
+                    class="button"
+                    @click="edit(item)"
+                    icon="el-icon-edit-outline"
+                  ></el-button>
+                  <el-button
+                    type="text"
+                    class="button"
+                    @click="statistics(item)"
+                    icon="el-icon-pie-chart"
+                  ></el-button>
+                  <el-button
+                    type="text"
+                    class="button"
+                    @click="release(item)"
+                    icon="el-icon-video-play"
+                    v-if="item.released == false"
+                  ></el-button>
+                  <el-button
+                    type="text"
+                    class="button"
+                    @click="close(item)"
+                    icon="el-icon-video-pause"
+                    v-else
+                  ></el-button>
+                  <el-dropdown>
+                    <el-button type="text" icon="el-icon-more" style="color: black"></el-button>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item
+                        ><el-button
+                          type="text"
+                          class="button"
+                          @click="remove(item)"
+                          icon="el-icon-delete"
+                          >删除</el-button
+                        ></el-dropdown-item
                       >
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="remove(item)"
-                        icon="el-icon-delete"
-                        >删除</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="clone(item)"
-                        icon="el-icon-document-copy"
-                        >复制</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="preview(item)"
-                        icon="el-icon-view"
-                        >预览</el-button
-                      ></el-dropdown-item
-                    >
-                  </el-dropdown-menu>
-                </el-dropdown>
+                      <el-dropdown-item
+                        ><el-button
+                          type="text"
+                          class="button"
+                          @click="clone(item)"
+                          icon="el-icon-document-copy"
+                          >复制</el-button
+                        ></el-dropdown-item
+                      >
+                      <el-dropdown-item
+                        ><el-button
+                          type="text"
+                          class="button"
+                          @click="preview(item)"
+                          icon="el-icon-view"
+                          >预览</el-button
+                        ></el-dropdown-item
+                      >
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </el-button-group>
               </div>
             </div>
-          </el-col>
-        </el-row>
-        <div style="margin-left: 35%">
-          <!-- 该div是做分页的 -->
-          <div class="block">
-            <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="current_page"
-              :page-sizes="[4, 8, 12, 16]"
-              :page-size="pagesize"
-              layout="total, sizes, prev, pager, next"
-              :total="total"
-            >
-            </el-pagination>
-          </div>
+          </el-card>
+        </div>
+        <!-- 该div是做分页的 -->
+        <div class="block">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="current_page"
+            :page-sizes="[4, 8, 12, 16]"
+            :page-size="pagesize"
+            layout="total, sizes, prev, pager, next"
+            :total="total"
+          >
+          </el-pagination>
         </div>
       </div>
     </div>
@@ -178,9 +174,136 @@ export default {
       quest: 0,
       current_page: 1,
       total: 0,
-      pagesize: 8,
+      pagesize: 12,
       searchQue: [],
-      allQuest: [],
+      allQuest: [
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        },
+        {
+          duration: "00:00:00",
+          creationTime: "2021-08-21 21:00",
+          releaseTime: "2021-08-21 21:00",
+          templateId: 1,
+          type: "normal",
+          title: "测试问卷",
+          released: false,
+        }
+      ],
     };
   },
   created() {
@@ -407,26 +530,70 @@ export default {
 </script>
 
 <style scoped>
+.top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.page-title {
+  font-weight: bolder;
+  font-size: 24px;
+  flex-grow: 50;
+}
+.search {
+  flex-grow: 1;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+}
+.cards {
+  width: 16%;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
 .card {
   display: flex;
-  background-color: rgba(46, 140, 219, 0.94);
   flex-direction: column;
   align-items: center;
-  height: 300px;
+  background-color: rgba(233, 233, 233, 0.5);
+}
+.banner {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-color: rgba(71, 157, 230, 0.94);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  zoom: 1;
+}
+.el-card /deep/.el-card__body {
+  padding: 0;
 }
 .time {
   align-self: flex-start;
+  font-size: 14px;
   margin: 0;
+  margin-top: 5px;
 }
 .type_show {
   margin-top: 0px;
-  height: 200px;
-  width: 100px;
 }
 .title {
-  margin-top: 0px;
+  margin-bottom: 10px;
 }
 .button {
   color: black;
+}
+.clearfix .el-button {
+  width: 45px;
+}
+.block {
+  position: absolute;
+  bottom: 5px;
+  left: 40%;
 }
 </style>

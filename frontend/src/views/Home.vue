@@ -10,8 +10,17 @@
         </router-link>
 
         <div>
-          <div v-if="this.$store.state.isLogin == false">
-            <el-button type="primary" round @click="dialogFormVisible = true" class="butt1">登录/注册</el-button>
+          <div v-if="this.$store.state.isLogin == false" class="butt1">
+            <el-dropdown>
+              <el-button class="user" icon="el-icon-user" style="font-size:30px">
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <router-link to="/">
+                  <el-dropdown-item>主页</el-dropdown-item>
+                </router-link>
+                <el-dropdown-item @click.native="dialogFormVisible = true">登录/注册</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
           <div v-else class="butt2">
             <el-dropdown>
@@ -29,8 +38,6 @@
             </el-dropdown>
           </div>
         </div>
-        
-
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
             <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">

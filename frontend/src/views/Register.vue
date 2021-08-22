@@ -114,6 +114,7 @@
                 message: "注册完毕，请查看邮箱验证账号",
                  type: "success",
               });
+              this.$router.push('/')
             }
           })
           .catch((error) => {
