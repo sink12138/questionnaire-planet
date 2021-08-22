@@ -11,6 +11,7 @@ const Apply = () => import("../views/Apply.vue")
 const Exam = () => import("../views/Exam.vue")
 const Register = () => import("../views/Register.vue")
 const Preview = () => import("../views/Preview.vue")
+const Personal = () => import("../views/Personal.vue")
 
 Vue.use(VueRouter)
 
@@ -66,6 +67,11 @@ const routes = [
     path: '/preview',
     name: 'Preview',
     component: Preview
+  },
+  {
+    path: '/home',
+    name: 'Personal',
+    component: Personal
   }
 ]
 
@@ -74,5 +80,15 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-
+/*路由拦截：请登录后操作。避免繁琐开发，先注释着。
+router.beforeEach((to, from, next) => {
+  if(sessionStorage.getItem("isLogin") === true || to.path === "/" || to.path === "/register") {
+    next();
+  }
+  else {
+    next("/");
+    alert("请登录后操作");
+  }
+})
+*/
 export default router
