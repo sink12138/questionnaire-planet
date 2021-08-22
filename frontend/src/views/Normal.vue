@@ -1,278 +1,316 @@
 <template>
-  <div class="hello">
-    <el-form
-      ref="modelForm"
-      :rule="rules"
-      :model="modelForm"
-      label-position="right"
-      label-width="150px"
-    >
-      <!-- 问卷题目 -->
-      <el-form-item
-        label="问卷题目"
-        :rules="{
-          required: true,
-        }"
-      >
-        <el-input
-          v-model="modelForm.title"
-          style="width: 258px"
-          clearable
-          placeholder="请填写问卷题目"
-        />
-      </el-form-item>
-      <!-- 问卷描述 -->
-      <el-form-item
-        label="问卷描述"
-        :rules="{
-          required: true,
-        }"
-      >
-        <el-input
-          v-model="modelForm.description"
-          style="width: 258px"
-          clearable
-          placeholder="请填写问卷描述"
-        />
-      </el-form-item>
-      <!-- 问卷密码 -->
-      <el-form-item label="问卷密码">
-        <el-input
-          v-model="modelForm.password"
-          style="width: 258px"
-          clearable
-          placeholder="可为空"
-        />
-      </el-form-item>
-      <el-form-item> 可通过拖拽题目改变顺序</el-form-item>
-      <div>
-        <el-collapse v-model="activeNames">
-          <vuedraggable
-            v-model="modelForm.questions"
-            class="wrapper"
-            @end="end"
+  <div class="normal">
+    <el-container>
+      <el-container>
+        <el-aside width="200px">
+          <div class="editor">
+            <router-link to="/">
+              <div class="logo">
+                <Logo></Logo>
+                <div class="web-title">问卷星球</div>
+              </div>
+            </router-link>
+            <div class="info">
+              拖拽题目以改变顺序
+            </div>
+            <div class="editor-add">
+              <el-button @click="addQuestion">新增题目</el-button>
+            </div>
+            <div class="editor-save">
+              <el-button @click="addSubmit()">保存问卷</el-button>
+            </div>
+            <div class="editor-reset">
+              <el-button @click="resetForm('modelForm')">重置</el-button>
+            </div>
+            <div class="publish">
+              <el-button @click="publishQuestion" type="primary">发布问卷</el-button>
+            </div>
+          </div>
+        </el-aside>
+        <el-main>
+          <el-form
+            ref="modelForm"
+            :rule="rules"
+            :model="modelForm"
+            label-position="right"
+            label-width="150px"
           >
-            <el-collapse-item
-              v-for="(item, index) in modelForm.questions"
-              :key="index"
-              :name="index"
-            >
-              <template slot="title">
-                第{{ index + 1 }}题,题目:{{ item.questionName }}
-              </template>
-              <!-- 问题类型 -->
+            <div class="basic">
+              <!-- 问卷题目 -->
               <el-form-item
-                :prop="`questions.${index}.type`"
-                :label="`问题${index + 1}类型`"
+                label="问卷题目"
                 :rules="{
                   required: true,
-                  message: '请选择问题类型',
-                  trigger: 'change',
-                }"
-              >
-                <el-radio-group v-model="item.type">
-                  <el-radio label="0">单选题</el-radio>
-                  <el-radio label="1">多选题</el-radio>
-                  <el-radio label="2">填空题</el-radio>
-                  <el-radio label="3">评分题</el-radio>
-                  <el-radio label="4">下拉题</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <!-- 是否必填 -->
-              <el-form-item
-                :prop="`questions.${index}.required`"
-                :label="`是否必填`"
-                :rules="{
-                  required: true,
-                  message: '请选择是否必填',
-                  trigger: 'change',
-                }"
-              >
-                <el-radio-group v-model="item.required">
-                  <el-radio label=true>是</el-radio>
-                  <el-radio label=false>否</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <!-- 问题题目 -->
-              <el-form-item
-                :prop="`questions.${index}.questionName`"
-                label="问题"
-                :rules="{
-                  required: true,
-                  message: '请填写问题',
-                  trigger: 'change',
                 }"
               >
                 <el-input
-                  v-model.trim="item.questionName"
+                  v-model="modelForm.title"
                   style="width: 258px"
                   clearable
-                  placeholder="请填写问题"
+                  placeholder="请填写问卷题目"
                 />
               </el-form-item>
-              <!-- 问题描述 -->
+              <!-- 问卷描述 -->
               <el-form-item
-                :prop="`questions.${index}.questionSummary`"
-                label="问题描述"
+                label="问卷描述"
                 :rules="{
                   required: true,
-                  message: '请填写问题描述',
-                  trigger: 'change',
                 }"
               >
                 <el-input
-                  v-model.trim="item.questionSummary"
+                  v-model="modelForm.description"
+                  style="width: 258px"
+                  type="textarea"
+                  :autosize="{minRows:2, maxRows:6}"
+                  placeholder="请填写问卷描述"
+                />
+              </el-form-item>
+              <!-- 问卷密码 -->
+              <el-form-item label="问卷密码">
+                <el-input
+                  v-model="modelForm.password"
                   style="width: 258px"
                   clearable
-                  placeholder="请填写问题描述"
+                  placeholder="可为空"
                 />
               </el-form-item>
-              <!-- 最大选项 -->
-              <el-form-item
-                v-show="item.type == 1"
-                :prop="`questions.${index}.max`"
-                label="最大选项"
-                :rules="[
-                  {
-                    required: true,
-                    message: '请填写最大选项个数',
-                    trigger: 'blur',
-                  },
-                  { validator: isNum, trigger: 'blur' },
-                ]"
-              >
-                <el-input
-                  v-model.trim="item.max"
-                  style="width: 125px"
-                  clearable
-                  placeholder="请填写最大选项个数"
-                />
-              </el-form-item>
-              <!-- 最小选项 -->
-              <el-form-item
-                v-show="item.type == 1"
-                :prop="`questions.${index}.min`"
-                label="最小选项"
-                :rules="[
-                  {
-                    required: true,
-                    message: '请填写最小选项个数',
-                    trigger: 'blur',
-                  },
-                  { validator: isNum, trigger: 'blur' },
-                ]"
-              >
-                <el-input
-                  v-model.trim="item.min"
-                  style="width: 125px"
-                  clearable
-                  placeholder="请填写最小选项个数"
-                />
-              </el-form-item>
-              <!-- 高度 -->
-              <el-form-item
-                v-show="item.type == 2"
-                :prop="`questions.${index}.height`"
-                label="填空框高度（行）"
-                :rules="[
-                  {
-                    required: true,
-                    message: '请填写填空框高度',
-                    trigger: 'blur',
-                  },
-                  { validator: isNum, trigger: 'blur' },
-                ]"
-              >
-                <el-input
-                  v-model.trim="item.height"
-                  style="width: 125px"
-                  clearable
-                  placeholder="请填写填空框高度"
-                />
-              </el-form-item>
-              <!-- 宽度 -->
-              <el-form-item
-                v-show="item.type == 2"
-                :prop="`questions.${index}.width`"
-                label="填空框宽度（px）"
-                :rules="[
-                  {
-                    required: true,
-                    message: '请填写填空框宽度',
-                    trigger: 'blur',
-                  },
-                  { validator: isNum, trigger: 'blur' },
-                ]"
-              >
-                <el-input
-                  v-model.trim="item.width"
-                  style="width: 125px"
-                  clearable
-                  placeholder="请填写填空框宽度"
-                />
-              </el-form-item>
-              <!-- 答案 -->
-              <el-form-item
-                v-for="(opt, idx) in item.answers"
-                v-show="item.type != 2"
-                :key="idx"
-                :label="`选项${idx + 1}`"
-                :prop="`questions.${index}.answers.${idx}.value`"
-                :rules="[
-                  { required: true, message: '请输入选项', trigger: 'blur' },
-                ]"
-              >
-                <el-input
-                  v-model.trim="opt.value"
-                  style="width: 258px"
-                  clearable
-                  placeholder="请输入选项"
-                />
-                <el-input
-                  v-model.trim="opt.scores"
-                  v-show="item.type == 3"
-                  style="width: 125px"
-                  clearable
-                  placeholder="请输入评分"
-                />
-                <el-button
-                  style="margin-left: 20px"
-                  @click.prevent="removeDomain(index, idx)"
-                  >删除</el-button
+            </div>
+            <div>
+              <el-collapse v-model="activeNames">
+                <vuedraggable
+                  v-model="modelForm.questions"
+                  class="wrapper"
+                  @end="end"
                 >
-              </el-form-item>
-              <el-form-item>
-                <el-button v-show="item.type != 2" @click="addDomain(index)"
-                  >新增选项</el-button
-                >
-                <el-button @click="copyQuestion(index)">复制题目</el-button>
-                <el-button @click="removeQuestion(index)">删除题目</el-button>
-              </el-form-item>
-            </el-collapse-item>
-          </vuedraggable>
-        </el-collapse>
-      </div>
-      <el-form-item>
-        <el-button @click="addQuestion">新增题目</el-button>
-        <el-button style="margin-top: 10px" @click="addSubmit()"
-          >保存问卷</el-button
-        >
-        <el-button @click="resetForm('modelForm')">重置</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="publishQuestion" type="primary">发布问卷</el-button>
-      </el-form-item>
-    </el-form>
+                  <el-collapse-item
+                    v-for="(item, index) in modelForm.questions"
+                    :key="index"
+                    :name="index"
+                    class="questions"
+                  >
+                    <template slot="title">
+                      <div class="question-title">
+                        第{{ index + 1 }}题,题目:{{ item.questionName }}
+                      </div>
+                    </template>
+                    <!-- 问题类型 -->
+                    <el-form-item
+                      :prop="`questions.${index}.type`"
+                      :label="`问题${index + 1}类型`"
+                      :rules="{
+                        required: true,
+                        message: '请选择问题类型',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-radio-group v-model="item.type" class="question-type">
+                        <el-radio label="0" border>单选题</el-radio>
+                        <el-radio label="1" border>多选题</el-radio>
+                        <el-radio label="2" border>填空题</el-radio>
+                        <el-radio label="3" border>评分题</el-radio>
+                        <el-radio label="4" border>下拉题</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <!-- 是否必填 -->
+                    <el-form-item
+                      :prop="`questions.${index}.required`"
+                      :label="`是否必填`"
+                      :rules="{
+                        required: true,
+                        message: '请选择是否必填',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-radio-group v-model="item.required">
+                        <el-radio label=true>是</el-radio>
+                        <el-radio label=false>否</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <!-- 问题题目 -->
+                    <el-form-item
+                      :prop="`questions.${index}.questionName`"
+                      label="问题"
+                      :rules="{
+                        required: true,
+                        message: '请填写问题',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-input
+                        v-model.trim="item.questionName"
+                        style="width: 258px"
+                        clearable
+                        placeholder="请填写问题"
+                      />
+                    </el-form-item>
+                    <!-- 问题描述 -->
+                    <el-form-item
+                      :prop="`questions.${index}.questionSummary`"
+                      label="问题描述"
+                      :rules="{
+                        required: true,
+                        message: '请填写问题描述',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-input
+                        v-model.trim="item.questionSummary"
+                        style="width: 258px"
+                        clearable
+                        placeholder="请填写问题描述"
+                      />
+                    </el-form-item>
+                    <el-row>
+                      <!-- 最小选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 1"
+                          :prop="`questions.${index}.min`"
+                          label="最小选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最小选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.min"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最小选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 最大选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 1"
+                          :prop="`questions.${index}.max`"
+                          label="最大选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最大选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.max"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最大选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                    <el-row>
+                      <!-- 高度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 2"
+                          :prop="`questions.${index}.height`"
+                          label="填空框高度（行）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框高度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.height"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框高度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 宽度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-show="item.type == 2"
+                          :prop="`questions.${index}.width`"
+                          label="宽度（px）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框宽度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model.trim="item.width"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框宽度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                    <!-- 答案 -->
+                    <el-form-item
+                      v-for="(opt, idx) in item.answers"
+                      v-show="item.type != 2"
+                      :key="idx"
+                      :label="`选项${idx + 1}`"
+                      :prop="`questions.${index}.answers.${idx}.value`"
+                      :rules="[
+                        { required: true, message: '请输入选项', trigger: 'blur' },
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.value"
+                        style="width: 258px"
+                        clearable
+                        placeholder="请输入选项"
+                      />
+                      <el-input
+                        v-model.trim="opt.scores"
+                        v-show="item.type == 3"
+                        style="width: 60px;margin-left: 10px"
+                        clearable
+                        placeholder="..."
+                      />
+                      <el-button
+                        style="margin-left: 20px"
+                        @click.prevent="removeDomain(index, idx)"
+                        >删除</el-button
+                      >
+                    </el-form-item>
+                    <el-form-item label="编辑题目">
+                      <el-button icon="el-icon-circle-plus" v-show="item.type != 2" @click="addDomain(index)">新增选项</el-button>
+                      <el-button icon="el-icon-s-order" @click="copyQuestion(index)">复制题目</el-button>
+                      <el-button icon="el-icon-delete-solid" @click="removeQuestion(index)">删除题目</el-button>
+                    </el-form-item>
+                  </el-collapse-item>
+                </vuedraggable>
+              </el-collapse>
+            </div>
+          </el-form>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
 
 <script>
+import logo from "../components/svg-logo.vue"
 import vuedraggable from "vuedraggable";
 export default {
   name: "HelloWorld",
   components: {
     vuedraggable,
+    'Logo': logo
   },
   data() {
     return {
@@ -497,3 +535,82 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.el-container {
+  text-align: center;
+}
+.el-main {
+  width: 1200px;
+  text-align: left;
+}
+.editor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #f3f3f3;
+  display: flex;
+  width: 200px;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  font-family: 仿宋;
+  font-size: 18px;
+  font-weight: bolder;
+}
+.logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+.web-title {
+  margin-left: 15px;
+  font-family: 仿宋;
+  font-weight: 800;
+  font-size: 26px;
+  position: relative;
+}
+.router-link-active {
+  text-decoration: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+a:hover {
+  color: rgba(46, 140, 219, 0.94);
+}
+.editor .el-button {
+  font-family: 仿宋;
+  height: 50px;
+  width: 120px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: bolder;
+  margin: 20px;
+}
+.basic {
+  width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.question-title {
+  font-family: 仿宋;
+  font-size: 20px;
+  font-weight: bolder;
+}
+.question-type .el-radio{
+  height: 35px;
+  width: 80px;
+  margin: 0;
+  padding: 9px 9px 6px 6px;
+}
+.questions {
+  width: 600px;
+  margin: 0 auto;
+}
+</style>
