@@ -108,7 +108,6 @@
                 showClose: true,
                 message: res.data.message,
                });
-               alert("请填入合适的信息后再试。")
             } else {
               this.$message({
                 showClose: true,

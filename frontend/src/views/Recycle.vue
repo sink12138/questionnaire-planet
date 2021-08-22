@@ -3,6 +3,37 @@
     <div>
       <h1>您已删除的问卷如下</h1>
     </div>
+    <div class="search">
+      <el-dropdown trigger="click">
+        <span class="el-dropdown-link">
+          <el-button><i class="el-icon-s-operation"></i></el-button>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item
+            ><el-button type="text" class="button" @click="creationTime()"
+              >创建时间</el-button
+            ></el-dropdown-item
+          >
+          <el-dropdown-item
+            ><el-button type="text" class="button" @click="releaseTime()"
+              >发布时间</el-button
+            ></el-dropdown-item
+          >
+          <el-dropdown-item
+            ><el-button type="text" class="button" @click="duration()"
+              >持续时间</el-button
+            ></el-dropdown-item
+          >
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-input
+        v-model.trim="search"
+        style="width: 250px"
+        clearable
+        placeholder="请输入要搜索的问卷"
+      />
+      <el-button icon="el-icon-search" circle @click="searchQuest"></el-button>
+    </div>
     <div class="questionnaire">
       <div style="margin-left: 1%; margin-right: 1%">
         <el-row>
@@ -98,63 +129,39 @@ export default {
   },
   data() {
     return {
+      search: "",
       current_page: 1,
       total: 0,
       pagesize: 8,
-      allQuest: [
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "2021-08-21 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "2021-08-21 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: true,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "2021-08-21 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "2021-08-21 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-      ],
+      allQuest: [],
+      searchQue: [],
     };
   },
   created() {
     this.convert();
-    this.total = this.allQuest.length;
+    this.searchQuest();
   },
   methods: {
+    convert: function () {
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/all",
+        params: {
+          removed: true,
+        },
+      }).then((res) => {
+        console.log(res);
+        if (res.data.templates.length != 0) {
+          this.allQuest = res.data.templates;
+        } else {
+          this.allQuest = [];
+        }
+        console.log(this.allQuest);
+        this.searchQue = this.allQuest;
+        console.log(this.searchQue);
+        this.total = this.searchQue.length;
+      });
+    },
     handleSizeChange: function (size) {
       this.pagesize = size;
     },
@@ -220,21 +227,59 @@ export default {
         }
       );
     },
-    convert: function () {
-      this.$axios({
-        method: "get",
-        url: "http://139.224.50.146:80/apis/all",
-        params: {
-          removed: true,
-        },
-      }).then((res) => {
-        if (res.data.templates != undefined) {
-          this.allQuest = res.data.templates;
+    creationTime() {
+      this.searchQue = this.searchQue.sort(function (a, b) {
+        if (a.creationTime < b.creationTime) {
+          return -1;
+        } else if (a.creationTime == b.creationTime) {
+          return 0;
         } else {
-          this.allQuest = [];
+          return 1;
         }
-        console.log(this.allQuest);
       });
+    },
+    releaseTime() {
+      this.searchQue = this.searchQue.sort(function (a, b) {
+        if (a.releaseTime < b.releaseTime) {
+          return -1;
+        } else if (a.releaseTime == b.releaseTime) {
+          return 0;
+        } else {
+          return 1;
+        }
+      });
+    },
+    duration() {
+      this.searchQue = this.searchQue.sort(function (a, b) {
+        if (a.duration < b.duration) {
+          return -1;
+        } else if (a.duration == b.duration) {
+          return 0;
+        } else {
+          return 1;
+        }
+      });
+    },
+    searchQuest() {
+      if (this.search == "") {
+        this.searchQue = this.allQuest;
+      } else {
+        this.searchQue = [];
+        let regStr = "";
+        // 初始化正则表达式
+        regStr = ".*" + this.search + ".*"; //跨字匹配
+        let reg = new RegExp(regStr);
+        console.log(reg);
+        for (let i = 0; i < this.allQuest.length; i++) {
+          let name = this.allQuest[i].title; //按照名字匹配
+          let regMatch = name.match(reg);
+          if (null !== regMatch) {
+            // 将匹配的数据放入结果列表中
+            this.searchQue.push(this.allQuest[i]);
+          }
+        }
+      }
+      this.total = this.searchQue.length;
     },
   },
 };

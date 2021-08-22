@@ -8,12 +8,17 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div v-if="this.$store.state.isLogin == false">
-          <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+
+        <div>
+          <div v-if="this.$store.state.isLogin == false">
+            <el-button type="success" @click="dialogFormVisible = true" class="butt1">登录/注册</el-button>
+          </div>
+          <div v-else class="butt2">
+            <el-button type="success" @click="logout">退出登录</el-button>
+            <el-button type="success" @click="topersonal">个人中心</el-button>
+          </div>
         </div>
-        <div v-else>
-          <el-button type="success" @click="logout">退出登录</el-button>
-        </div>
+        
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
@@ -146,6 +151,9 @@ export default {
       this.$message({
         message: "退出登录成功！",
       });
+    },
+    topersonal: function(){
+      this.$router.push("/personal")
     }
   },
   directives: {
@@ -168,6 +176,18 @@ export default {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+.butt1 {
+  display: inline-flex;
+  float: right;
+  position: relative;
+  left: 880px;
+}
+.butt2 {
+  display: inline-flex;
+  float: right;
+  position: relative;
+  left: 790px;
 }
 .web-title {
   margin-left: 15px;
