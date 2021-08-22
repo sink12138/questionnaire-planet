@@ -187,7 +187,7 @@ export default {
   display: inline-flex;
   float: right;
   position: relative;
-  left: 760px;
+  left: 790px;
 }
 .web-title {
   margin-left: 15px;
