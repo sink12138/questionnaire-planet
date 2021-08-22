@@ -69,7 +69,7 @@ const routes = [
     component: Preview
   },
   {
-    path: '/home',
+    path: '/personal',
     name: 'Personal',
     component: Personal
   }
