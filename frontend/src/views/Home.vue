@@ -18,8 +18,6 @@
             <el-button type="success" @click="topersonal">个人中心</el-button>
           </div>
         </div>
-        
-
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
             <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
