@@ -8,7 +8,10 @@
         <el-row>
           <el-col
             :span="4"
-            v-for="item in allQuest.slice((current_page-1)*pagesize,current_page*pagesize)"
+            v-for="item in allQuest.slice(
+              (current_page - 1) * pagesize,
+              current_page * pagesize
+            )"
             :key="item.templateId"
             :offset="1"
           >
@@ -81,24 +84,31 @@
                       </span>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item
-                          icon="el-icon-delete"
-                          @click="remove(item)"
-                          >删除</el-dropdown-item
+                          ><el-button
+                            type="text"
+                            class="button"
+                            @click="remove(item)"
+                            icon="el-icon-delete"
+                            >删除</el-button
+                          ></el-dropdown-item
                         >
                         <el-dropdown-item
-                          icon="el-icon-download"
-                          @click="exportQuest(item)"
-                          >导出</el-dropdown-item
+                          ><el-button
+                            type="text"
+                            class="button"
+                            @click="clone(item)"
+                            icon="el-icon-document-copy"
+                            >复制</el-button
+                          ></el-dropdown-item
                         >
                         <el-dropdown-item
-                          icon="el-icon-document-copy"
-                          @click="clone(item)"
-                          >复制</el-dropdown-item
-                        >
-                        <el-dropdown-item
-                          icon="el-icon-view"
-                          @click="preview(item)"
-                          >预览</el-dropdown-item
+                          ><el-button
+                            type="text"
+                            class="button"
+                            @click="preview(item)"
+                            icon="el-icon-view"
+                            >预览</el-button
+                          ></el-dropdown-item
                         >
                       </el-dropdown-menu>
                     </el-dropdown>
@@ -136,6 +146,7 @@ export default {
   },
   data() {
     return {
+      quest: 0,
       current_page: 1,
       total: 0,
       pagesize: 8,
@@ -269,31 +280,59 @@ export default {
       );
     },
     remove(item) {
-      this.$axios({
-        method: "post",
-        url: "http://139.224.50.146:80/apis/remove",
-        data: JSON.stringify({
-          templateId: item.templateId,
-        }),
-      }).then(
-        (response) => {
-          console.log(response);
-          if (response.data.success == true) {
-            this.$message({
-              message: "问卷已删除。",
-              type: "success",
-            });
-            location.reload();
-          }
-        },
-        (err) => {
-          alert(err);
-        }
-      );
+      this.$confirm("此操作将删除该问卷, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/remove",
+            data: JSON.stringify({
+              templateId: item.templateId,
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.$message({
+                  message: "问卷已删除。",
+                  type: "success",
+                });
+                location.reload();
+              }
+            },
+            (err) => {
+              alert(err);
+            }
+          );
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    preview(item) {
+      this.quest = item.templateId;
+      console.log(this.quest);
+      this.$router.push("/preview?templateId=" + this.quest);
     },
     convert: function () {
-      this.$axios.get("http://139.224.50.146:80/apis/all").then((res) => {
-        this.allQuest = res.data.templates;
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/all",
+        params: {
+          removed: false,
+        },
+      }).then((res) => {
+        if (res.data.templates != undefined) {
+          this.allQuest = res.data.templates;
+        } else {
+          this.allQuest = [];
+        }
         console.log(this.allQuest);
       });
     },
