@@ -24,7 +24,39 @@
             </div>
             <div class="publish">
               <el-button @click="publishQuestion" type="primary">发布问卷</el-button>
-              
+              <el-button @click="dialogVisible = true">Qrcode</el-button>
+              <el-dialog
+              :append-to-body="true"
+              title="分享问卷"
+              :visible.sync="dialogVisible"
+              width="30%"
+              :before-close="handleClose"
+              center>
+                <div class="share">
+                  <div>
+                    <vue-qr ref="Qrcode"
+                    :text="qrData.text"
+                    :logoSrc="qrData.logo">
+                    </vue-qr>
+                  </div>
+                  <div>
+                    <el-button
+                    style="margin: 10px"
+                    class="tag-copy"
+                    @click="copyShareLink" 
+                    :data-clipboard-text="qrData.text">
+                      复制链接
+                    </el-button>
+                    <a
+                    style="margin: 10px"
+                    :href="exportLink" 
+                    @click="downloadImg" 
+                    :download="downloadFilename">
+                      <el-button>下载二维码</el-button>
+                    </a>
+                  </div>
+                </div>
+              </el-dialog>
             </div>
           </div>
         </el-aside>
@@ -37,13 +69,6 @@
             label-width="150px"
           >
             <div class="basic">
-              <vue-qr ref="Qrcode"
-              :text="qrData.text"
-              :logoSrc="qrData.logo">
-              </vue-qr>
-              <el-button @click="copyShareLink" :data-clipboard-text="qrData.text">
-                复制二维码
-              </el-button>
               <!-- 问卷题目 -->
               <el-form-item
                 label="问卷题目"
@@ -367,7 +392,10 @@ export default {
       qrData: {
         text: window.location.host+"/questionnaire/"+this.templateId,
         logo: require('../assets/logo.png')
-      }
+      },
+      exportLink: '',
+      downloadFilename: '',
+      dialogVisible: false
    };
   },
   methods: {
@@ -535,6 +563,7 @@ export default {
               message: "问卷发布成功！",
               type: "success",
             });
+            this.dialogVisible = true;
           } else {
             this.$message({
               message: response.data.message,
@@ -558,7 +587,12 @@ export default {
         alert('Copy error')
         clipboard.destroy()
       })
-    }
+    },
+    downloadImg () {
+      let Qrcode = this.$refs.Qrcode
+      this.exportLink = Qrcode.$el.currentSrc
+      this.downloadFilename = 'Questionnaire'
+    },
   },
 };
 </script>
@@ -639,5 +673,11 @@ a:hover {
 .questions {
   width: 600px;
   margin: 0 auto;
+}
+.share {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 </style>
