@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.buaa.qp.dao.AnswerDao">
     <delete id="deleteByTid" parameterType="Integer">
-        delete from qp_database.answer where qp_database.answer.template_id = #{templateId}
+        delete from answer where template_id = #{templateId}
     </delete>
     <insert id="insert" parameterType="Answer" keyProperty="answerId" useGeneratedKeys="true">
-        insert into qp_database.answer(qp_database.answer.template_id, qp_database.answer.content, qp_database.answer.submit_time)
+        insert into answer(template_id, content, submit_time)
         values (#{templateId}, #{content}, now())
     </insert>
-    <select id="selectByTid" parameterType="Integer">
-        select * from qp_database.answer where template_id = #{templateId}
+    <select id="selectByTid" parameterType="Integer" resultType="Answer">
+        select * from answer where template_id = #{templateId}
     </select>
 </mapper>
