@@ -89,37 +89,46 @@
     },
     methods: {
       register: function(){
-        var registerdata = {
-          username: this.formData.username,
-          email: this.formData.email,
-          password: this.formData.password,
-        };
+        this.$refs.ruleForm.validate((valid) => {
+          if (valid) {
+            var registerdata = {
+              username: this.formData.username,
+              email: this.formData.email,
+              password: this.formData.password,
+            };
 
-        this.$axios({
-          method: "post",
-          url: "http://139.224.50.146/apis/register",
-          data: JSON.stringify(registerdata),
-        })
-          .then((res) => {
-            console.log(res);
-            console.log(registerdata);
-            if (res.data.success == false) {
-              this.$message({
-                showClose: true,
-                message: res.data.message,
-               });
-            } else {
-              this.$message({
-                showClose: true,
-                message: "注册完毕，请查看邮箱验证账号",
-                 type: "success",
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146/apis/register",
+              data: JSON.stringify(registerdata),
+            })
+              .then((res) => {
+                console.log(res);
+                console.log(registerdata);
+                if (res.data.success == false) {
+                  this.$message({
+                    showClose: true,
+                    message: res.data.message,
+                  });
+                } else {
+                  this.$message({
+                    showClose: true,
+                    message: "注册完毕，请查看邮箱验证账号",
+                    type: "success",
+                  });
+                  this.$router.push('/')
+                }
+              })
+              .catch((error) => {
+                console.log(error);
               });
-              this.$router.push('/')
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+          }
+          else {
+            console.log("error submit!!");
+            return false;
+          }
+        });
+        
       },
       goBack: function(){
         this.$router.push('/')
