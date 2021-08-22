@@ -8,8 +8,11 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div>
+        <div v-if="this.$store.state.isLogin == false">
           <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+        </div>
+        <div v-else>
+          <el-button type="success" @click="dialogFormVisible = true">退出登录</el-button>
         </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
@@ -99,6 +102,15 @@ export default {
       formLabelWidth: '100px'
     }
   },
+  mounted: function(){
+    if (sessionStorage.getItem("isLogin") == undefined)
+      sessionStorage.setItem("isLogin", false);
+    if (sessionStorage.getItem("isLogin") == true) {
+      this.$store.commit("login");
+    } else if (sessionStorage.getItem("isLogin") == false) {
+      this.$store.commit("logout");
+    }
+  },
   methods: {
     login: function() {
       this.$axios({
@@ -108,10 +120,13 @@ export default {
       }).then((res) => {
         console.log(this.formData);
         if (res.data.success == true) {
+          sessionStorage.setItem("isLogin", true);
+          this.$store.commit("login");
           this.$message({
             message: "登录成功！",
             type: "success",
           });
+          this.dialogFormVisible = false;
         } else {
           alert("error");
         }
