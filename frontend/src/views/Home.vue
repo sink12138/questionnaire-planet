@@ -13,11 +13,11 @@
         </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
-          <el-form>
-            <el-form-item label="电子邮箱" :label-width="formLabelWidth">
+          <el-form :model="formData" :rules="rules" ref="formData">
+            <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
               <el-input v-model="formData.email" autocomplete="off" style="width: 300px"></el-input>
             </el-form-item>
-            <el-form-item label="密码" :label-width="formLabelWidth">
+            <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
               <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px"></el-input>
             </el-form-item>
           </el-form>
@@ -65,10 +65,35 @@ export default {
     'Logo': logo
   },
   data() {
+    var checkEmail = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("邮箱不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+          if (value.length < 6 || value.length > 20) {
+            callback(new Error("请输入六至二十位"));
+          }
+    var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+      if (!this.formData.password.match(regx)) {
+        callback(new Error("请同时包含字母数字"));
+      }
+      callback();
+    }
+    };
     return {
       formData: {
         email:"",
         password:""
+      },
+      rules: {
+        email: [{ validator: checkEmail, trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
       },
       dialogFormVisible: false,
       formLabelWidth: '100px'
