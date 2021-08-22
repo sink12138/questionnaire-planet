@@ -1,78 +1,76 @@
 <template>
-  <div>
-    <div id="quest" ref="quest">
-      <div class="head">
-        <h1>
-          {{ title }}
-        </h1>
-        <h3>
-          {{ description }}
-        </h3>
-      </div>
-      <div class="question">
-        <div v-for="(item, index_question) in questions" :key="index_question">
-          <div class="question-title">
-            <div>第{{ index_question + 1 }}题,题目:{{ item.stem }}</div>
-            <a>题目描述：{{ item.description }}</a>
-          </div>
-          <div class="question-content">
-            <div v-if="item.type == 'choice'">
-              <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio :label="index">{{ i }}</el-radio>
-              </el-radio-group>
+  <el-container>
+    <el-aside width="200px">
+      <div class="export">
+      <el-button type="primary" class="button" @click="exportQuest()" icon="el-icon-download">导出</el-button>
+    </div>
+    </el-aside>
+    <el-main>
+      <div id="quest" ref="quest">
+        <div class="head">
+          <h1>
+            {{ title }}
+          </h1>
+          <h3>
+            {{ description }}
+          </h3>
+        </div>
+        <div class="question">
+          <div v-for="(item, index_question) in questions" :key="index_question">
+            <el-divider content-position="left" style="margin-top: 15px">第{{ index_question + 1 }}题</el-divider>
+            <div class="question-title">
+              <div class="stem">{{ item.stem }}</div>
+              <div class="description">{{ item.description }}</div>
             </div>
-            <div v-if="item.type == 'multi-choice'">
-              <el-checkbox-group
-              v-model="multi" 
-              v-for="(i, index) in item.choices"
-              :min = "item.min"
-              :max = "item.max"
-              :key="index" 
-              @change="multiChangeValue(index_question)">
-                <el-checkbox :label="index" border>{{ i }}</el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <div v-if="item.type == 'filling'">
-              <el-input
-              type="textarea"
-              class="input"
-              :rows="item.height"
-              :style="{'--width': item.width}"
-              placeholder="请输入内容"
-              v-model="answers[index_question]">
-              </el-input>
-            </div>
-            <div v-if="item.type == 'grade'">
-              <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio :label="index">{{ i }}({{item.scores[ index ]}})</el-radio>
-              </el-radio-group>
-            </div>
-            <div v-if="item.type == 'dropdown'">
-              <el-select v-model="answers[index_question]" clearable placeholder="请选择">
-                <el-option
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  :label="i"
-                  :value="index">
-                </el-option>
-              </el-select>
+            <div class="question-content">
+              <div v-if="item.type == 'choice'">
+                <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
+                  <el-radio class="option" :label="index">{{ i }}</el-radio>
+                </el-radio-group>
+              </div>
+              <div class="multi" v-if="item.type == 'multi-choice'">
+                <el-checkbox-group
+                v-model="multi" 
+                v-for="(i, index) in item.choices"
+                :min = "item.min"
+                :max = "item.max"
+                :key="index" 
+                @change="multiChangeValue(index_question)">
+                  <el-checkbox class="option" :label="index" border>{{ i }}</el-checkbox>
+                </el-checkbox-group>
+              </div>
+              <div v-if="item.type == 'filling'">
+                <el-input
+                type="textarea"
+                class="input"
+                :rows="item.height"
+                :style="{'--width': item.width}"
+                placeholder="请输入内容"
+                v-model="answers[index_question]">
+                </el-input>
+              </div>
+              <div v-if="item.type == 'grade'">
+                <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
+                  <el-radio class="option" :label="index">{{ i }}({{item.scores[ index ]}})</el-radio>
+                </el-radio-group>
+              </div>
+              <div v-if="item.type == 'dropdown'">
+                <el-select v-model="answers[index_question]" clearable placeholder="请选择">
+                  <el-option
+                    v-for="(i, index) in item.choices"
+                    :key="index"
+                    :label="i"
+                    :value="index">
+                  </el-option>
+                </el-select>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <br />
-    <div class="export">
-      <el-button
-        type="primary"
-        class="button"
-        @click="exportQuest()"
-        icon="el-icon-download"
-        >导出</el-button
-      >
-    </div>
-  </div>
+    </el-main>
+    
+  </el-container>
 </template>
 
 <script>
@@ -88,60 +86,60 @@ export default {
       questions: [
         {
           type: "choice",
-          stem: "1",
-          description: "testtesttesttesttest",
+          stem: "这题什么意思？",
+          description: "题目描述，题目描述，描述一下题目",
           required: true,
           choices: [
-            "hello","question","whats up"
+            "生异形","生瓜蛋子","What's up?","萨日朗"
           ],
         },
         {
           type: "choice",
-          stem: "666",
-          description: "testtesttesttesttest",
+          stem: "你的姓名？",
+          description: "",
           required: true,
           choices: [
-            "hello","question","whats up"
+            "华强","大鹏","有一个人"
           ],
         },
         {
           type: "multi-choice",
-          stem: "2",
-          description: "testtesttesttesttest",
+          stem: "哪些词形容你合适？",
+          description: "请用恰当的词来形容你",
           required: true,
           choices: [
-            "question","hello","whats up"
+            "沉鱼落雁","玉树临风","惊天动地"
           ],
           max: 2,
           min: 0,
         },
         {
           type: "filling",
-          stem: "3",
-          description: "testtesttesttesttest",
+          stem: "华强买的瓜多少钱一斤？",
+          description: "华强买瓜多少钱一斤？",
           required: true,
           height: 3,
-          width: '1000px',
+          width: '600px',
         },
         {
           type: "grade",
-          stem: "4",
-          description: "testtesttesttesttest",
+          stem: "瓜店老板态度怎样？",
+          description: "给态度打分",
           required: true,
           choices: [
             "good","very good","very very good"
           ],
           scores: [
-            1,2,3
+            10, 50, 100
           ]
         },
         {
           type: "dropdown",
-          stem: "5",
-          description: "testtesttesttesttest",
+          stem: "瓜是什么做的?",
+          description: "",
           required: true,
           choices: [
-            "hello","question","whats up"
+            "(C2H5O)n","Au","Fe"
           ]
         }
       ],
@@ -202,7 +200,42 @@ export default {
 </script>
 
 <style scoped>
+.question {
+  margin: 0 auto;
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.stem,
+.description {
+  margin: 20px;
+  font-family: 微软雅黑;
+}
+.stem {
+  font-size: 26px;
+  font-weight: bolder;
+}
+.description {
+  font-size: 18px;
+}
+.question-content {
+  margin: 25px;
+}
 .question-content .input {
   width: var(--width)
+}
+.multi {
+  display: flex;
+  flex-direction: row;
+}
+.option {
+  margin-left: 10px;
+  margin-right: 30px;
+}
+.export {
+  position: fixed;
+  left: 60px;
+  bottom: 60px;
 }
 </style>
