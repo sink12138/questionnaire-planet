@@ -12,7 +12,7 @@
           <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
         </div>
         <div v-else>
-          <el-button type="success" @click="dialogFormVisible = true">退出登录</el-button>
+          <el-button type="success" @click="logout">退出登录</el-button>
         </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
@@ -131,6 +131,20 @@ export default {
           alert("error");
         }
         console.log(res);
+      });
+    },
+    logout: function(){
+      sessionStorage.setItem("isLogin", false);
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146/apis/logout",
+      }).then((res) => {
+        console.log(res);
+      });
+      console.log("logout submit!");
+      this.$store.commit("logout");
+      this.$message({
+        message: "退出登录成功！",
       });
     }
   }
