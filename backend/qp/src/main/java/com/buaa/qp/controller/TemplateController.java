@@ -168,6 +168,22 @@ public class TemplateController {
                             throw new ParameterFormatException();
                         if (choices.size() < 2 || choices.size() != scores.size())
                             throw new ParameterFormatException();
+                        // Sort the two lists by scores
+                        for (int i = 0; i < scores.size(); ++i) {
+                            int min = i;
+                            for (int j = i + 1; j < scores.size(); ++j) {
+                                if (scores.get(j) < scores.get(min))
+                                    min = j;
+                            }
+                            if (min != i) {
+                                int tmpInt = scores.get(i);
+                                scores.set(i, scores.get(min));
+                                scores.set(min, tmpInt);
+                                String tmpStr = choices.get(i);
+                                choices.set(i, choices.get(min));
+                                choices.set(min, tmpStr);
+                            }
+                        }
                         argsMap.put("choices", choices);
                         argsMap.put("scores", scores);
                         break;
@@ -175,7 +191,7 @@ public class TemplateController {
                     default:
                         throw new ParameterFormatException();
                 }
-                String args = JSON.toJSONString(map);
+                String args = JSON.toJSONString(argsMap);
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 

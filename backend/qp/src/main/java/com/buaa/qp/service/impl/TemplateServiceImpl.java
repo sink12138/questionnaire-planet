@@ -1,5 +1,6 @@
 package com.buaa.qp.service.impl;
 
+import com.buaa.qp.dao.AnswerDao;
 import com.buaa.qp.dao.QuestionDao;
 import com.buaa.qp.dao.TemplateDao;
 import com.buaa.qp.entity.Question;
@@ -17,6 +18,9 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
     private QuestionDao questionDao;
+
+    @Autowired
+    private AnswerDao answerDao;
 
     @Override
     public Template getTemplate(Integer templateId) {
@@ -46,6 +50,7 @@ public class TemplateServiceImpl implements TemplateService {
         template.setDuration(new Time(-28800000));
         templateDao.update(template);
         Integer templateId = template.getTemplateId();
+        answerDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
         for (Question question : questions) {
             question.setTemplateId(templateId);
@@ -76,6 +81,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void deleteTemplate(Integer templateId) {
+        answerDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
         templateDao.deleteByTid(templateId);
     }

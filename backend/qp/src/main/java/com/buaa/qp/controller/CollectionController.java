@@ -1,22 +1,24 @@
 package com.buaa.qp.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
-import com.buaa.qp.service.QuestionService;
+import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
+import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class CollectionController {
@@ -27,7 +29,7 @@ public class CollectionController {
     private TemplateService templateService;
 
     @Autowired
-    private QuestionService questionService;
+    private AnswerService answerService;
 
     @GetMapping("/locked")
     public Map<String, Object> locked(@RequestBody Map<String, Object> requestMap) {
@@ -103,7 +105,7 @@ public class CollectionController {
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
 
-            ArrayList<Question> questions = questionService.getQuestions(templateId);
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
             for (Question question : questions) {
                 Map<String, Object> questionMap = new HashMap<>();
@@ -133,6 +135,116 @@ public class CollectionController {
             map.put("message", exc.toString());
         }
         catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("/answer")
+    public Map<String, Object> answer(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // General parameter checks
+            Integer templateId;
+            String password;
+            ArrayList<Object> answers;
+            ClassParser parser = new ClassParser();
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+                password = (String) requestMap.get("password");
+                answers = parser.toObjectList(requestMap.get("answers"));
+            }
+            catch (ClassCastException cce) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId <= 0)
+                throw new ParameterFormatException();
+            if (answers == null)
+                throw new ParameterFormatException();
+
+            if (password != null && password.isEmpty()) password = null;
+
+            // Existence checks
+            Template template = templateService.getTemplate(templateId);
+            if (template == null)
+                throw new ObjectNotFoundException();
+
+            // Authority checks
+            String pwd = template.getPassword();
+            if (!template.getReleased())
+                throw new ExtraMessageException("问卷可能已经关闭");
+            if (pwd != null && !pwd.equals(password))
+                throw new ExtraMessageException("密码错误");
+
+            // Detailed parameter checks
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            if (answers.size() < questions.size())
+                throw new ParameterFormatException();
+            for (int i = 0; i < answers.size(); ++i) {
+                Object answerObject = answers.get(i);
+                Question question = questions.get(i);
+                try {
+                    Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                    switch (question.getType()) {
+                        case "choice":
+                        case "dropdown":
+                        case "grade": {
+                            Integer choice = (Integer) answerObject;
+                            if (choice < 0) {
+                                if (question.getRequired()) {
+                                    throw new ParameterFormatException();
+                                }
+                                else
+                                    answers.set(i, -1);
+                            }
+                            else if (choice > parser.toStringList(argsMap.get("choices")).size() - 1)
+                                throw new ParameterFormatException();
+                            break;
+                        }
+                        case "multi-choice": {
+                            int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
+                            ArrayList<Integer> choices = parser.toIntegerList(answerObject);
+                            Set<Integer> choiceSet = new HashSet<>(choices);
+                            int size = choiceSet.size();
+                            if (size == 0) {
+                                if (question.getRequired())
+                                    throw new ParameterFormatException();
+                            }
+                            else if (size < (int) argsMap.get("min") || size > (int) argsMap.get("max"))
+                                throw new ParameterFormatException();
+                            for (Integer choice : choiceSet) {
+                                if (choice < 0 || choice > maxIndex)
+                                    throw new ParameterFormatException();
+                            }
+                            break;
+                        }
+                        case "filling": {
+                            String text = (String) answerObject;
+                            if (text.isEmpty() && question.getRequired())
+                                throw new ParameterFormatException();
+                            break;
+                        }
+                        default: {
+                            throw new Exception("Nested exception: unknown question type \""
+                                    + question.getType() + "\"");
+                        }
+                    }
+                }
+                catch (ClassCastException | NumberFormatException |
+                        NullPointerException exc) {
+                    throw new ParameterFormatException();
+                }
+            }
+            Answer answer = new Answer(templateId, JSON.toJSONString(answers));
+            answerService.submitAnswer(answer);
+            map.put("success", true);
+        }
+        catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
             exception.printStackTrace();
             map.put("success", false);
             map.put("message", "操作失败");

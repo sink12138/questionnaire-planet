@@ -5,12 +5,9 @@ import java.util.Map;
 
 public class ClassParser {
     public ArrayList<String> toStringList(Object object) throws ClassCastException {
-        if (object == null)
+        ArrayList<Object> objectList = toObjectList(object);
+        if (objectList == null)
             return null;
-        if (!(object instanceof ArrayList))
-            throw new ClassCastException();
-        @SuppressWarnings("unchecked")
-        ArrayList<Object> objectList = (ArrayList<Object>) object;
         ArrayList<String> stringList = new ArrayList<>();
         for (Object obj : objectList) {
             String str = obj.toString();
@@ -21,12 +18,9 @@ public class ClassParser {
     }
 
     public ArrayList<Integer> toIntegerList(Object object) throws ClassCastException, NumberFormatException {
-        if (object == null)
+        ArrayList<Object> objectList = toObjectList(object);
+        if (objectList == null)
             return null;
-        if (!(object instanceof ArrayList))
-            throw new ClassCastException();
-        @SuppressWarnings("unchecked")
-        ArrayList<Object> objectList = (ArrayList<Object>) object;
         ArrayList<Integer> integerList = new ArrayList<>();
         for (Object obj : objectList)
             integerList.add(Integer.parseInt(obj.toString()));
@@ -34,17 +28,24 @@ public class ClassParser {
     }
 
     public ArrayList<Map<String, Object>> toMapList(Object object) throws ClassCastException {
+        ArrayList<Object> objectList = toObjectList(object);
+        if (objectList == null)
+            return null;
+        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
+        for (Object obj : objectList) {
+            mapList.add(toMap(obj));
+        }
+        return mapList;
+    }
+
+    public ArrayList<Object> toObjectList(Object object) throws ClassCastException {
         if (object == null)
             return null;
         if (!(object instanceof ArrayList))
             throw new ClassCastException();
         @SuppressWarnings("unchecked")
         ArrayList<Object> objectList = (ArrayList<Object>) object;
-        ArrayList<Map<String, Object>> mapList = new ArrayList<>();
-        for (Object obj : objectList) {
-            mapList.add(toMap(obj));
-        }
-        return mapList;
+        return objectList;
     }
 
     public Map<String, Object> toMap(Object object) throws ClassCastException {
