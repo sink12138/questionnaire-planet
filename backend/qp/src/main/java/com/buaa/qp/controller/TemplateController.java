@@ -151,7 +151,7 @@ public class TemplateController {
                         if (width < 30) width = 30;
                         else if (width > 500) width = 500;
                         argsMap.put("height", height);
-                        argsMap.put("width", width);
+                        argsMap.put("width", width + "px");
                         break;
                     }
                     case "grade": {
