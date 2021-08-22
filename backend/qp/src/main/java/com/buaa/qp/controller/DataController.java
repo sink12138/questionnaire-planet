@@ -5,19 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
-import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
-import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,13 +67,17 @@ public class DataController {
                     if (answerContents.get(i) == null) {
                         answerInFormat.add("");
                     } else {
-                        Map<String, Object> argsMap = (Map<String, Object>) JSON.parse(current_question.getArgs());
+                        Map<String, Object> argsMap =  JSON.parseObject(current_question.getArgs());
                         switch (current_question.getType()) {
                             case "choice": {
-                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                                 Integer chIndex = (Integer) answerContents.get(i);
-                                String answerStr = (char) ((int) 'A' + chIndex) + "." + choices.get(chIndex);
-                                answerInFormat.add(answerStr);
+                                if (chIndex < 0) {
+                                    answerInFormat.add("");
+                                } else {
+                                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                                    String answerStr = (char) ((int) 'A' + chIndex) + "." + choices.get(chIndex);
+                                    answerInFormat.add(answerStr);
+                                }
                                 break;
                             }
                             case "multi-choice": {
@@ -87,14 +86,18 @@ public class DataController {
                                 ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
                                 StringBuilder stringBuilder = new StringBuilder();
                                 assert chIndexes != null;
-                                for (Integer j : chIndexes) {
-                                    stringBuilder.append((char) ((int) 'A' + j)).append(".").append(choices.get(j));
-                                    if (chIndexes.indexOf(j) != chIndexes.size() - 1) {
-                                        stringBuilder.append(";");
+                                if (chIndexes.isEmpty()) {
+                                    answerInFormat.add("");
+                                } else {
+                                    for (Integer j : chIndexes) {
+                                        stringBuilder.append((char) ((int) 'A' + j)).append(".").append(choices.get(j));
+                                        if (chIndexes.indexOf(j) != chIndexes.size() - 1) {
+                                            stringBuilder.append(";");
+                                        }
                                     }
+                                    String answerStr = stringBuilder.toString();
+                                    answerInFormat.add(answerStr);
                                 }
-                                String answerStr = stringBuilder.toString();
-                                answerInFormat.add(answerStr);
                                 break;
                             }
                             case "filling": {
@@ -104,15 +107,23 @@ public class DataController {
                             }
                             case "grade": {
                                 Integer chIndex = (Integer) answerContents.get(i);
-                                ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
-                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
-                                answerInFormat.add(choices.get(chIndex) + "(" + scores.get(chIndex) + ")");
+                                if (chIndex < 0) {
+                                    answerInFormat.add("");
+                                } else {
+                                    ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
+                                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                                    answerInFormat.add(choices.get(chIndex) + "(" + scores.get(chIndex) + ")");
+                                }
                                 break;
                             }
                             case "dropdown": {
                                 Integer chIndex = (Integer) answerContents.get(i);
-                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
-                                answerInFormat.add(choices.get(chIndex));
+                                if (chIndex < 0) {
+                                    answerInFormat.add("");
+                                } else {
+                                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                                    answerInFormat.add(choices.get(chIndex));
+                                }
                                 break;
                             }
                         }
