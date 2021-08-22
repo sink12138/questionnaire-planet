@@ -28,7 +28,7 @@ public class ManagementController {
     private AccountService accountService;
 
     @GetMapping("/all")
-    public Map<String, Object> all() {
+    public Map<String, Object> all(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks
@@ -36,7 +36,17 @@ public class ManagementController {
             if (accountId == null)
                 throw new LoginVerificationException();
 
-            ArrayList<Template> results = templateService.getMyTemplates(accountId);
+            // Parameter checks
+            Boolean removed;
+            try {
+                removed = (Boolean) requestMap.get("removed");
+            }
+            catch (ClassCastException cce) {
+                throw new ParameterFormatException();
+            }
+
+            if (removed == null) removed = false;
+            ArrayList<Template> results = templateService.getMyTemplates(accountId, removed);
             ArrayList<Map<String, Object>> templates = new ArrayList<>();
             for (Template result : results) {
                 if (!result.getDeleted()) {

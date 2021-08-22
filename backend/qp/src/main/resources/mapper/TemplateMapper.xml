@@ -7,7 +7,11 @@
     </select>
     <select id="selectByOwner" resultType="Template">
         select * from template
-        where owner = #{owner}
+        where owner = #{owner} and not deleted
+    </select>
+    <select id="selectDeletedByOwner" resultType="Template">
+        select * from template
+        where owner = #{owner} and deleted
     </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
         insert into template(type, owner, title, description, password, creation_time)

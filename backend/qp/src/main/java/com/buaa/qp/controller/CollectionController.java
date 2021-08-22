@@ -81,6 +81,8 @@ public class CollectionController {
             if (templateId == null || templateId <= 0)
                 throw new ParameterFormatException();
 
+            if (password != null && password.isEmpty()) password = null;
+
             // Existence checks
             Template template = templateService.getTemplate(templateId);
             if (template == null)

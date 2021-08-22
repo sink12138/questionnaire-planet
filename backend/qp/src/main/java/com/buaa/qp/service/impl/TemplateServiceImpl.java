@@ -24,7 +24,9 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public ArrayList<Template> getMyTemplates(Integer owner) {
+    public ArrayList<Template> getMyTemplates(Integer owner, boolean deleted) {
+        if (deleted)
+            return templateDao.selectDeletedByOwner(owner);
         return templateDao.selectByOwner(owner);
     }
 

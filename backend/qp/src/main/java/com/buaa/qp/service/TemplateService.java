@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public interface TemplateService {
     Template getTemplate(Integer templateId);
 
-    ArrayList<Template> getMyTemplates(Integer owner);
+    ArrayList<Template> getMyTemplates(Integer owner, boolean deleted);
 
     Integer submitTemplate(Template template, ArrayList<Question> questions);
 
