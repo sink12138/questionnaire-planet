@@ -202,8 +202,8 @@ public class TemplateController {
         return map;
     }
 
-    @PostMapping("/modify")
-    public Map<String, Object> modify(@RequestBody Map<String, Object> requestMap) {
+    @PostMapping("/adjust")
+    public Map<String, Object> adjust(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks
@@ -251,7 +251,7 @@ public class TemplateController {
             template.setTitle(title);
             template.setDescription(description);
             template.setPassword(password);
-            templateService.adjust(template);
+            templateService.adjustTemplate(template);
             map.put("success", true);
 
         } catch (LoginVerificationException | ExtraMessageException | ObjectNotFoundException

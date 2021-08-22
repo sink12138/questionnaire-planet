@@ -81,7 +81,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public void adjust(Template template) {
+    public void adjustTemplate(Template template) {
         templateDao.update(template);
     }
 }

@@ -22,5 +22,5 @@ public interface TemplateService {
 
     void deleteTemplate(Integer templateId);
 
-    void adjust(Template template);
+    void adjustTemplate(Template template);
 }
