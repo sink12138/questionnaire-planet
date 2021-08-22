@@ -1,6 +1,8 @@
 package com.buaa.qp.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ClassParser {
@@ -41,10 +43,10 @@ public class ClassParser {
     public ArrayList<Object> toObjectList(Object object) throws ClassCastException {
         if (object == null)
             return null;
-        if (!(object instanceof ArrayList))
+        if (!(object instanceof List))
             throw new ClassCastException();
         @SuppressWarnings("unchecked")
-        ArrayList<Object> objectList = (ArrayList<Object>) object;
+        ArrayList<Object> objectList = new ArrayList<>((List<Object>) object);
         return objectList;
     }
 
@@ -54,7 +56,7 @@ public class ClassParser {
         if (!(object instanceof Map))
             throw new ClassCastException();
         @SuppressWarnings("unchecked")
-        Map<String, Object> map = (Map<String, Object>) object;
+        Map<String, Object> map = new HashMap<>((Map<String, Object>) object);
         return map;
     }
 }
