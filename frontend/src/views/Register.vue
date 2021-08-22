@@ -14,7 +14,7 @@
         <el-input v-model="password1" autocomplete="off" show-password style="width: 300px" placeholder="请再次输入密码"></el-input>
       </el-form-item>
       <el-form-item label="电子邮箱" :label-width="formLabelWidth">
-        <el-input v-model="fromData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱"></el-input>
+        <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱"></el-input>
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="register" style="display:block;margin:5px 5px 5px 750px">注册</el-button>
