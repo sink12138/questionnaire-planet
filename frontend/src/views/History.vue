@@ -388,6 +388,30 @@ export default {
       }
       this.total = this.searchQue.length;
     },
+    adjust(item) {
+      if (item.released == false) {
+        this.quest = item.templateId;
+        console.log(this.quest);
+        this.$router.push("/adjust?templateId=" + this.quest);
+      } else {
+        this.$message({
+          message: "问卷已发布！",
+        });
+      }
+    },
+    edit(item) {
+      if (item.type == "normal") {
+        if (item.released == false) {
+          this.quest = item.templateId;
+          console.log(this.quest);
+          this.$router.push("/normal/edit?templateId=" + this.quest);
+        } else {
+          this.$message({
+            message: "问卷已发布！",
+          });
+        }
+      }
+    },
     release(item) {
       this.$axios({
         method: "post",
