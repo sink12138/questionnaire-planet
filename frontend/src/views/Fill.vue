@@ -195,7 +195,7 @@ export default {
           type: 'warning'
         }).then(() => {
           let submitData = JSON.stringify({
-            templateId: this.templateId,
+            templateId: parseInt(this.templateId),
             password: this.password,
             answers: this.answers
           })
