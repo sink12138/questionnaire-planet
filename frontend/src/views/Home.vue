@@ -181,13 +181,13 @@ export default {
   display: inline-flex;
   float: right;
   position: relative;
-  left: 73%;
+  left: 880px;
 }
 .butt2 {
   display: inline-flex;
   float: right;
   position: relative;
-  left: 63%;
+  left: 760px;
 }
 .web-title {
   margin-left: 15px;
