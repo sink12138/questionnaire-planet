@@ -201,4 +201,69 @@ public class TemplateController {
         }
         return map;
     }
+
+    @PostMapping("/modify")
+    public Map<String, Object> modify(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+
+            Integer templateId;
+            String title;
+            String description;
+            String password;
+
+            // Parameter checks of template
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+                title = (String) requestMap.get("title");
+                description = (String) requestMap.get("description");
+                password = (String) requestMap.get("password");
+            }
+            catch (ClassCastException cce) {
+                throw new ParameterFormatException();
+            }
+            if (password == null || description == null) {
+                throw new ParameterFormatException();
+            }
+            if (password.equals("")) {
+                password = null;
+            }
+            if (description.equals("")) {
+                description = null;
+            }
+            if (templateId == null || templateId < 0)
+                throw new ParameterFormatException();
+            if (title == null || title.isEmpty())
+                throw new ParameterFormatException();
+            Template template = templateService.getTemplate(templateId);
+            if (template == null)
+                throw new ObjectNotFoundException();
+            if (!template.getOwner().equals(accountId))
+                throw new LoginVerificationException();
+            if (template.getDeleted())
+                throw new ExtraMessageException("已删除的问卷不能编辑");
+            if (template.getReleased())
+                throw new ExtraMessageException("已发布的问卷不能编辑");
+            template.setTitle(title);
+            template.setDescription(description);
+            template.setPassword(password);
+            templateService.adjust(template);
+            map.put("success", true);
+
+        } catch (LoginVerificationException | ExtraMessageException | ObjectNotFoundException
+                | ParameterFormatException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
 }

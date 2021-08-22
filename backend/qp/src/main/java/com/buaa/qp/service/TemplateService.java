@@ -21,4 +21,6 @@ public interface TemplateService {
     ArrayList<Question> getQuestionsByTid(Integer templateId);
 
     void deleteTemplate(Integer templateId);
+
+    void adjust(Template template);
 }
