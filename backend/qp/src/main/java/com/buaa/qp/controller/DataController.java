@@ -252,4 +252,132 @@ public class DataController {
         }
         return answersInFormat;
     }
+
+    @GetMapping("/sum")
+    public Map<String, Object> sum(@RequestParam("templateId") Integer templateId) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // check login
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+            Template template = templateService.getTemplate(templateId);
+            if (template == null || template.getDeleted()) {
+                throw new ObjectNotFoundException();
+            } else if (!template.getOwner().equals(accountId)) {
+                throw new LoginVerificationException();
+            }
+            ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            ArrayList<Map<String, Object>> results = new ArrayList<>();
+            for (Question question : questions) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("stem", question.getStem());
+                if (!question.getType().equals("filling")) {
+                    Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                    for (int j = 0; j < choices.size(); j++) {
+                        if (question.getType().equals("choice") || question.getType().equals("multi-choice")) {
+                            result.put((char) ((int) 'A' + j) + "." + choices.get(j), 0);
+                        } else if (question.getType().equals("dropdown")) {
+                            result.put(choices.get(j), 0);
+                        } else {
+                            ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
+                            result.put(choices.get(j) + "(" + scores.get(j) + ")", 0);
+                        }
+                    }
+                }
+                if (question.getType().equals("grade")) {
+                    result.put("avg", 0.0);
+                }
+                results.add(result);
+            }
+            Map<Integer, Integer> sumMap = new HashMap<>(); // for calculate avg of grade question
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
+            for (int t = 1; t < answersInFormat.size(); t++) {
+                ArrayList<String> answerInFormat = answersInFormat.get(t);
+                for (int i = 0; i < answerInFormat.size() - 1; i++) {
+                    switch (questions.get(i).getType()) {
+                        case "multi-choice": {
+                            if (!answerInFormat.get(i + 1).equals("")) {
+                                Map<String, Object> argsMap = JSON.parseObject(questions.get(i).getArgs());
+                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                                String choiceStr = JSONArray.parseArray(answers.get(t - 1).getContent(), Object.class).get(i).toString();
+                                ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
+                                assert chIndexes != null;
+                                if (!chIndexes.isEmpty()) {
+                                    for (Integer j : chIndexes) {
+                                        String chStr = (char) ((int) 'A' + j) + "." + choices.get(j);
+                                        int number = (int) results.get(i).get(chStr);
+                                        number += 1;
+                                        results.get(i).put(chStr, number);
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case "choice": {
+                        }
+                        case "dropdown": {
+                            if (!answerInFormat.get(i + 1).equals("")) {
+                                String chStr = answerInFormat.get(i + 1);
+
+                                int number = (int) results.get(i).get(chStr);
+                                number += 1;
+                                results.get(i).put(chStr, number);
+                            }
+                            break;
+                        }
+                        case "grade": {
+                            if (!answerInFormat.get(i + 1).equals("")) {
+                                String chStr = answerInFormat.get(i + 1);
+                                int number = (int) results.get(i).get(chStr);
+                                number += 1;
+                                results.get(i).put(chStr, number);
+                            }
+                            int sumNum;
+                            if (sumMap.containsKey(i)) {
+                                sumNum = sumMap.get(i);
+                                sumNum += 1;
+                            } else {
+                                sumNum = 1;
+                            }
+                            Map<String, Object> argsMap = JSON.parseObject(questions.get(i).getArgs());
+                            ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
+                            Integer chIndex = (Integer) JSONArray.parseArray(answers.get(t - 1).getContent(), Object.class).get(i);
+                            sumMap.put(i, sumNum);
+                            Double originalAvg = (Double) results.get(i).get("avg");
+                            Double newAvg = ((originalAvg * (sumNum - 1)) + Double.parseDouble(scores.get(chIndex))) / sumNum;
+                            results.get(i).put("avg", newAvg);
+                            break;
+                        }
+                        case "filling": {
+                            if (!answerInFormat.get(i + 1).equals("")) {
+                                if (results.get(i).containsKey(answerInFormat.get(i + 1))) {
+                                    int number = (int) results.get(i).get(answerInFormat.get(i + 1));
+                                    number += 1;
+                                    results.get(i).put(answerInFormat.get(i + 1), number);
+                                } else {
+                                    results.get(i).put(answerInFormat.get(i + 1), 1);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            map.put("results", results);
+            map.put("success", true);
+
+        } catch (LoginVerificationException | ObjectNotFoundException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
 }
