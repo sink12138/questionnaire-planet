@@ -411,7 +411,7 @@ export default {
         ],
       },
       qrData: {
-        text: window.location.host + "/questionnaire/" + this.templateId,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
