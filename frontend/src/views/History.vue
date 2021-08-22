@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import svg from "../components/svg-questionnaire.vue";
+import svg from "../components/svg-history.vue";
 export default {
   components: {
     "question-pic": svg,
