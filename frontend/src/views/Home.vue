@@ -10,8 +10,17 @@
         </router-link>
 
         <div>
-          <div v-if="this.$store.state.isLogin == false">
-            <el-button type="primary" round @click="dialogFormVisible = true" class="butt1">登录/注册</el-button>
+          <div v-if="this.$store.state.isLogin == false" class="butt1">
+            <el-dropdown>
+              <el-button class="user" icon="el-icon-user" style="font-size:30px">
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <router-link to="/">
+                  <el-dropdown-item>主页</el-dropdown-item>
+                </router-link>
+                <el-dropdown-item @click.native="dialogFormVisible = true">登录/注册</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </div>
           <div v-else class="butt2">
             <el-dropdown>
