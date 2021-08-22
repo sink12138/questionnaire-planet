@@ -183,69 +183,34 @@ export default {
       total: 0,
       pagesize: 8,
       searchQue: [],
-      allQuest: [
-        {
-          duration: "00:00:00",
-          creationTime: "2021-05-21 17:27",
-          releaseTime: "2021-08-11 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "",
-          templateId: 1,
-          type: "normal",
-          title: "例题",
-          released: false,
-        },
-        {
-          duration: "00:00:30",
-          creationTime: "2021-07-23 17:27",
-          releaseTime: "2021-08-24 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: true,
-        },
-        {
-          duration: "01:00:00",
-          creationTime: "2021-08-21 17:27",
-          releaseTime: "2021-08-21 19:27",
-          templateId: 1,
-          type: "normal",
-          title: "问卷",
-          released: false,
-        },
-        {
-          duration: "00:02:00",
-          creationTime: "2021-08-22 17:27",
-          releaseTime: "2021-08-21 18:27",
-          templateId: 1,
-          type: "normal",
-          title: "实验",
-          released: false,
-        },
-      ],
+      allQuest: [],
     };
   },
   created() {
     this.convert();
-    this.total = this.allQuest.length;
-    this.searchQue = this.allQuest.sort(function (a, b) {
-      if (a.releaseTime < b.releaseTime) {
-        return -1;
-      } else if (a.releaseTime == b.releaseTime) {
-        return 0;
-      } else {
-        return 1;
-      }
-    });
+    this.searchQuest();
   },
   methods: {
+    convert: function () {
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/all",
+        params: {
+          removed: false,
+        },
+      }).then((res) => {
+        console.log(res);
+        if (res.data.templates.length != 0) {
+          this.allQuest = res.data.templates;
+        } else {
+          this.allQuest = [];
+        }
+        console.log(this.allQuest);
+        this.searchQue = this.allQuest;
+        console.log(this.searchQue);
+        this.total = this.searchQue.length;
+      });
+    },
     handleSizeChange: function (size) {
       this.pagesize = size;
     },
@@ -304,6 +269,7 @@ export default {
           }
         }
       }
+      this.total = this.searchQue.length;
     },
     release(item) {
       this.$axios({
@@ -414,26 +380,6 @@ export default {
       this.quest = item.templateId;
       console.log(this.quest);
       this.$router.push("/preview?templateId=" + this.quest);
-    },
-    convert: function () {
-      this.$axios({
-        method: "get",
-        url: "http://139.224.50.146:80/apis/all",
-        params: {
-          removed: false,
-        },
-        paramsSerializer: function (params) {
-          return this.$qs.stringify(params, { arrayFormat: "indices" });
-        },
-        responseTpe: "blob",
-      }).then((res) => {
-        if (res.data.templates != undefined) {
-          this.allQuest = res.data.templates;
-        } else {
-          this.allQuest = [];
-        }
-        console.log(this.allQuest);
-      });
     },
   },
 };
