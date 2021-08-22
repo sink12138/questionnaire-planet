@@ -12,10 +12,7 @@ import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -32,17 +29,19 @@ public class CollectionController {
     private AnswerService answerService;
 
     @GetMapping("/locked")
-    public Map<String, Object> locked(@RequestBody Map<String, Object> requestMap) {
+    public Map<String, Object> locked(@RequestParam(value = "templateId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
-        Integer templateId;
         try {
             // Parameter checks
+            int templateId;
+            if (idStr == null)
+                throw new ParameterFormatException();
             try {
-                templateId = (Integer) requestMap.get("templateId");
+                templateId = Integer.parseInt(idStr);
             } catch (Exception e) {
                 throw new ParameterFormatException();
             }
-            if (templateId == null || templateId < 0) {
+            if (templateId < 0) {
                 throw new ParameterFormatException();
             }
             Template template = templateService.getTemplate(templateId);
@@ -66,21 +65,21 @@ public class CollectionController {
     }
 
     @GetMapping("/details")
-    public Map<String, Object> details(@RequestBody Map<String, Object> requestMap) {
+    public Map<String, Object> details(@RequestParam(value = "templateId", required = false) String idStr,
+                                       @RequestParam(value = "password", required = false) String password) {
         Map<String, Object> map = new HashMap<>();
         try {
-            Integer templateId;
-            String password;
-
             // Parameter checks
+            int templateId;
+            if (idStr == null)
+                throw new ParameterFormatException();
             try {
-                templateId = (Integer) requestMap.get("templateId");
-                password = (String) requestMap.get("password");
+                templateId = Integer.parseInt(idStr);
             }
-            catch (ClassCastException cce) {
+            catch (NumberFormatException nfe) {
                 throw new ParameterFormatException();
             }
-            if (templateId == null || templateId <= 0)
+            if (templateId <= 0)
                 throw new ParameterFormatException();
 
             if (password != null && password.isEmpty()) password = null;

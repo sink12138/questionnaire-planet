@@ -6,10 +6,7 @@ import com.buaa.qp.exception.*;
 import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Time;
@@ -28,7 +25,7 @@ public class ManagementController {
     private AccountService accountService;
 
     @GetMapping("/all")
-    public Map<String, Object> all(@RequestBody Map<String, Object> requestMap) {
+    public Map<String, Object> all(@RequestParam(value = "removed", required = false) String removedStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks
@@ -36,16 +33,10 @@ public class ManagementController {
             if (accountId == null)
                 throw new LoginVerificationException();
 
-            // Parameter checks
-            Boolean removed;
-            try {
-                removed = (Boolean) requestMap.get("removed");
-            }
-            catch (ClassCastException cce) {
-                throw new ParameterFormatException();
-            }
+            boolean removed;
+            if (removedStr == null) removed = false;
+            else removed = Boolean.parseBoolean(removedStr);
 
-            if (removed == null) removed = false;
             ArrayList<Template> results = templateService.getMyTemplates(accountId, removed);
             ArrayList<Map<String, Object>> templates = new ArrayList<>();
             for (Template result : results) {
