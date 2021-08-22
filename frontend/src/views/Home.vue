@@ -8,17 +8,20 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div>
+        <div v-if="this.$store.state.isLogin == false">
           <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
+        </div>
+        <div v-else>
+          <el-button type="success" @click="logout">退出登录</el-button>
         </div>
 
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
-          <el-form>
-            <el-form-item label="电子邮箱" :label-width="formLabelWidth">
-              <el-input v-model="formData.email" autocomplete="off" style="width: 300px"></el-input>
+          <el-form :model="formData" :rules="rules" ref="formData">
+            <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
+              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
             </el-form-item>
-            <el-form-item label="密码" :label-width="formLabelWidth">
-              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px"></el-input>
+            <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
+              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -65,13 +68,47 @@ export default {
     'Logo': logo
   },
   data() {
+    var checkEmail = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("邮箱不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+          if (value.length < 6 || value.length > 20) {
+            callback(new Error("请输入六至二十位"));
+          }
+    var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+      if (!this.formData.password.match(regx)) {
+        callback(new Error("请同时包含字母数字"));
+      }
+      callback();
+    }
+    };
     return {
       formData: {
         email:"",
         password:""
       },
+      rules: {
+        email: [{ validator: checkEmail, trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
+      },
       dialogFormVisible: false,
       formLabelWidth: '100px'
+    }
+  },
+  mounted: function(){
+    if (sessionStorage.getItem("isLogin") == undefined)
+      sessionStorage.setItem("isLogin", false);
+    if (sessionStorage.getItem("isLogin") == true) {
+      this.$store.commit("login");
+    } else if (sessionStorage.getItem("isLogin") == false) {
+      this.$store.commit("logout");
     }
   },
   methods: {
@@ -83,15 +120,39 @@ export default {
       }).then((res) => {
         console.log(this.formData);
         if (res.data.success == true) {
+          sessionStorage.setItem("isLogin", true);
+          this.$store.commit("login");
           this.$message({
             message: "登录成功！",
             type: "success",
           });
+          this.dialogFormVisible = false;
         } else {
-          alert("error");
+          alert("用户名或密码错误！");
         }
         console.log(res);
       });
+    },
+    logout: function(){
+      sessionStorage.setItem("isLogin", false);
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146/apis/logout",
+      }).then((res) => {
+        console.log(res);
+      });
+      console.log("logout submit!");
+      this.$store.commit("logout");
+      this.$message({
+        message: "退出登录成功！",
+      });
+    }
+  },
+  directives: {
+    focus: {
+      inserted: function(el) {
+        el.querySelector('input').focus();
+      }
     }
   }
 }
