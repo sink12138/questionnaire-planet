@@ -253,6 +253,10 @@ export default {
   },
   methods: {
     save() {
+      if(this.modelForm.password == undefined){
+        this.modelForm.password = "";
+      }
+      console.log(this.modelForm.password);
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/adjust",
