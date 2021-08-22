@@ -1,120 +1,110 @@
 <template>
   <div class="reviewer">
-    <div>
-      <h1>您的所有问卷如下</h1>
-    </div>
     <div class="questionnaire">
       <div style="margin-left: 1%; margin-right: 1%">
         <el-row>
           <el-col
-            :span="4"
+            :span="6"
             v-for="item in allQuest.slice(
               (current_page - 1) * pagesize,
               current_page * pagesize
             )"
             :key="item.templateId"
-            :offset="1"
+            style="margin: 0;padding: 0;border: 0;"
           >
-            <div style="margin-top: 15px">
-              <el-card :body-style="{ padding: '0px' }">
-                <div class="card">
-                  <br />
-                  <div class="title">
-                    <span
-                      ><strong>{{ item.title }}</strong></span
-                    ><br />
-                  </div>
-                  <br />
-                  <div class="type_show">
-                    <question-pic></question-pic>
-                  </div>
-                  <br />
-                  <span
-                    ><time class="time"
-                      ><strong>创建时间:</strong>{{ item.creationTime }}</time
-                    ></span
-                  ><br />
-                  <span v-if="item.releaseTime != ''"
-                    ><time class="time"
-                      ><strong>发布时间:</strong>{{ item.releaseTime }}</time
-                    ></span
-                  >
-                  <span v-else
-                    ><time class="time"
-                      ><strong>发布时间:</strong>未曾发布</time
-                    ></span
-                  ><br />
-                  <span
-                    ><time class="time"
-                      ><strong>收集时长:</strong>{{ item.duration }}</time
-                    ></span
-                  ><br />
-                  <div class="bottom clearfix">
-                    <div v-if="item.released == true">已发布</div>
-                    <div v-else>未发布</div>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="edit(item)"
-                      icon="el-icon-edit-outline"
-                    ></el-button>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="statistics(item)"
-                      icon="el-icon-pie-chart"
-                    ></el-button>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="release(item)"
-                      icon="el-icon-video-play"
-                      v-if="item.released == false"
-                    ></el-button>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="close(item)"
-                      icon="el-icon-video-pause"
-                      v-else
-                    ></el-button>
-                    <el-dropdown trigger="click">
-                      <span class="el-dropdown-link">
-                        <i class="el-icon-more"></i>
-                      </span>
-                      <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item
-                          ><el-button
-                            type="text"
-                            class="button"
-                            @click="remove(item)"
-                            icon="el-icon-delete"
-                            >删除</el-button
-                          ></el-dropdown-item
-                        >
-                        <el-dropdown-item
-                          ><el-button
-                            type="text"
-                            class="button"
-                            @click="clone(item)"
-                            icon="el-icon-document-copy"
-                            >复制</el-button
-                          ></el-dropdown-item
-                        >
-                        <el-dropdown-item
-                          ><el-button
-                            type="text"
-                            class="button"
-                            @click="preview(item)"
-                            icon="el-icon-view"
-                            >预览</el-button
-                          ></el-dropdown-item
-                        >
-                      </el-dropdown-menu>
-                    </el-dropdown>
-                  </div>
-                </div>
-              </el-card>
+            <div class="card">
+              <div class="title">
+                <span>
+                  <strong>{{ item.title }}</strong>
+                </span>
+              </div>
+              <div class="type_show">
+                <question-pic></question-pic>
+              </div>
+              <div class="time">
+                <time>
+                  <strong>创建时间:</strong>{{ item.creationTime }}
+                </time>
+              </div>
+              <div class="time" v-if="item.releaseTime != ''">
+                <time>
+                  <strong>发布时间:</strong>{{ item.releaseTime }}
+                </time>
+              </div>
+              <div class="time" v-else>
+                <time>
+                  <strong>发布时间:</strong>未曾发布
+                </time>
+              </div>
+              <div class="time">
+                <time>
+                  <strong>收集时长:</strong>{{ item.duration }}
+                </time>
+              </div>
+              <div class="bottom clearfix">
+                <div v-if="item.released == true">已发布</div>
+                <div v-else>未发布</div>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="edit(item)"
+                  icon="el-icon-edit-outline"
+                ></el-button>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="statistics(item)"
+                  icon="el-icon-pie-chart"
+                ></el-button>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="release(item)"
+                  icon="el-icon-video-play"
+                  v-if="item.released == false"
+                ></el-button>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="close(item)"
+                  icon="el-icon-video-pause"
+                  v-else
+                ></el-button>
+                <el-dropdown trigger="click">
+                  <span class="el-dropdown-link">
+                    <i class="el-icon-more"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="remove(item)"
+                        icon="el-icon-delete"
+                        >删除</el-button
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="clone(item)"
+                        icon="el-icon-document-copy"
+                        >复制</el-button
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="preview(item)"
+                        icon="el-icon-view"
+                        >预览</el-button
+                      ></el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </div>
             </div>
           </el-col>
         </el-row>
@@ -340,12 +330,22 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .card {
+  display: flex;
   background-color: rgba(46, 140, 219, 0.94);
+  flex-direction: column;
+  align-items: center;
+  height: 300px;
+}
+.time {
+  align-self: flex-start;
+  margin: 0;
 }
 .type_show {
   margin-top: 0px;
+  height: 200px;
+  width: 100px;
 }
 .title {
   margin-top: 0px;
