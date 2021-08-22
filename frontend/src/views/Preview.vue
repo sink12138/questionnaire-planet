@@ -1,9 +1,18 @@
 <template>
   <el-container>
     <el-aside width="200px">
-      <div class="export">
-      <el-button type="primary" class="button" @click="exportQuest()" icon="el-icon-download">导出</el-button>
-    </div>
+      <div class="editor">
+        <router-link to="/">
+          <div class="logo">
+            <Logo></Logo>
+            <div class="web-title">问卷星球</div>
+          </div>
+        </router-link>
+        <div class="info">填写问卷的用户将看到右侧的界面</div>
+        <div class="export">
+          <el-button type="primary" class="button" @click="exportQuest()" icon="el-icon-download">导出</el-button>
+        </div>
+      </div>
     </el-aside>
     <el-main>
       <div id="quest" ref="quest">
@@ -74,7 +83,11 @@
 </template>
 
 <script>
+import logo from "../components/svg-logo.vue";
 export default {
+  components: {
+    'Logo': logo
+  },
   data() {
     return {
       templateId: 0,
@@ -200,6 +213,57 @@ export default {
 </script>
 
 <style scoped>
+.editor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #f3f3f3;
+  display: flex;
+  width: 200px;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  font-family: 仿宋;
+  font-size: 18px;
+  font-weight: bolder;
+}
+.logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+.web-title {
+  margin-left: 15px;
+  font-family: 仿宋;
+  font-weight: 800;
+  font-size: 26px;
+  position: relative;
+}
+.export {
+  position: fixed;
+  bottom: 60px;
+}
+.router-link-active {
+  text-decoration: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+a:hover {
+  color: rgba(46, 140, 219, 0.94);
+}
+.editor .el-button {
+  font-family: 仿宋;
+  height: 50px;
+  width: 120px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: bolder;
+  margin: 20px;
+}
 .question {
   margin: 0 auto;
   width: 800px;
@@ -232,10 +296,5 @@ export default {
 .option {
   margin-left: 10px;
   margin-right: 30px;
-}
-.export {
-  position: fixed;
-  left: 60px;
-  bottom: 60px;
 }
 </style>
