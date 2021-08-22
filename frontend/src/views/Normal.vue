@@ -10,9 +10,7 @@
                 <div class="web-title">问卷星球</div>
               </div>
             </router-link>
-            <div class="info">
-              拖拽题目以改变顺序
-            </div>
+            <div class="info">拖拽题目以改变顺序</div>
             <div class="editor-add">
               <el-button @click="addQuestion">新增题目</el-button>
             </div>
@@ -23,35 +21,42 @@
               <el-button @click="resetForm('modelForm')">重置</el-button>
             </div>
             <div class="publish">
-              <el-button @click="publishQuestion" type="primary">发布问卷</el-button>
+              <el-button @click="publishQuestion" type="primary"
+                >发布问卷</el-button
+              >
               <el-button @click="dialogVisible = true">Qrcode</el-button>
               <el-dialog
-              :append-to-body="true"
-              title="分享问卷"
-              :visible.sync="dialogVisible"
-              width="30%"
-              :before-close="handleClose"
-              center>
+                :append-to-body="true"
+                title="分享问卷"
+                :visible.sync="dialogVisible"
+                width="30%"
+                :before-close="handleClose"
+                center
+              >
                 <div class="share">
                   <div>
-                    <vue-qr ref="Qrcode"
-                    :text="qrData.text"
-                    :logoSrc="qrData.logo">
+                    <vue-qr
+                      ref="Qrcode"
+                      :text="qrData.text"
+                      :logoSrc="qrData.logo"
+                    >
                     </vue-qr>
                   </div>
                   <div>
                     <el-button
-                    style="margin: 10px"
-                    class="tag-copy"
-                    @click="copyShareLink" 
-                    :data-clipboard-text="qrData.text">
+                      style="margin: 10px"
+                      class="tag-copy"
+                      @click="copyShareLink"
+                      :data-clipboard-text="qrData.text"
+                    >
                       复制链接
                     </el-button>
                     <a
-                    style="margin: 10px"
-                    :href="exportLink" 
-                    @click="downloadImg" 
-                    :download="downloadFilename">
+                      style="margin: 10px"
+                      :href="exportLink"
+                      @click="downloadImg"
+                      :download="downloadFilename"
+                    >
                       <el-button>下载二维码</el-button>
                     </a>
                   </div>
@@ -94,7 +99,7 @@
                   v-model="modelForm.description"
                   style="width: 258px"
                   type="textarea"
-                  :autosize="{minRows:2, maxRows:6}"
+                  :autosize="{ minRows: 2, maxRows: 6 }"
                   placeholder="请填写问卷描述"
                 />
               </el-form-item>
@@ -155,8 +160,8 @@
                       }"
                     >
                       <el-radio-group v-model="item.required">
-                        <el-radio label=true>是</el-radio>
-                        <el-radio label=false>否</el-radio>
+                        <el-radio label="true">是</el-radio>
+                        <el-radio label="false">否</el-radio>
                       </el-radio-group>
                     </el-form-item>
                     <!-- 问题题目 -->
@@ -197,7 +202,7 @@
                       <!-- 最小选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-show="item.type == 1"
+                          v-if="item.type == 1"
                           :prop="`questions.${index}.min`"
                           label="最小选项"
                           :rules="[
@@ -220,7 +225,7 @@
                       <!-- 最大选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-show="item.type == 1"
+                          v-if="item.type == 1"
                           :prop="`questions.${index}.max`"
                           label="最大选项"
                           :rules="[
@@ -245,7 +250,7 @@
                       <!-- 高度 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-show="item.type == 2"
+                          v-if="item.type == 2"
                           :prop="`questions.${index}.height`"
                           label="填空框高度（行）"
                           :rules="[
@@ -268,7 +273,7 @@
                       <!-- 宽度 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-show="item.type == 2"
+                          v-if="item.type == 2"
                           :prop="`questions.${index}.width`"
                           label="宽度（px）"
                           :rules="[
@@ -290,39 +295,57 @@
                       </el-col>
                     </el-row>
                     <!-- 答案 -->
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      v-show="item.type != 2"
-                      :key="idx"
-                      :label="`选项${idx + 1}`"
-                      :prop="`questions.${index}.answers.${idx}.value`"
-                      :rules="[
-                        { required: true, message: '请输入选项', trigger: 'blur' },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="opt.value"
-                        style="width: 258px"
-                        clearable
-                        placeholder="请输入选项"
-                      />
-                      <el-input
-                        v-model.trim="opt.scores"
-                        v-show="item.type == 3"
-                        style="width: 60px;margin-left: 10px"
-                        clearable
-                        placeholder="..."
-                      />
-                      <el-button
-                        style="margin-left: 20px"
-                        @click.prevent="removeDomain(index, idx)"
-                        >删除</el-button
+                    <el-row v-if="item.type != 2">
+                      <el-form-item
+                        v-for="(opt, idx) in item.answers"
+                        :key="idx"
+                        :label="`选项${idx + 1}`"
+                        :prop="`questions.${index}.answers.${idx}.value`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入选项',
+                            trigger: 'blur',
+                          },
+                        ]"
                       >
-                    </el-form-item>
+                        <el-input
+                          v-model.trim="opt.value"
+                          style="width: 258px"
+                          clearable
+                          placeholder="请输入选项"
+                        />
+                        <el-input
+                          v-model.trim="opt.scores"
+                          v-show="item.type == 3"
+                          style="width: 60px; margin-left: 10px"
+                          clearable
+                          placeholder="..."
+                        />
+                        <el-button
+                          style="margin-left: 20px"
+                          @click.prevent="removeDomain(index, idx)"
+                          >删除</el-button
+                        >
+                      </el-form-item></el-row
+                    >
                     <el-form-item label="编辑题目">
-                      <el-button icon="el-icon-circle-plus" v-show="item.type != 2" @click="addDomain(index)">新增选项</el-button>
-                      <el-button icon="el-icon-s-order" @click="copyQuestion(index)">复制题目</el-button>
-                      <el-button icon="el-icon-delete-solid" @click="removeQuestion(index)">删除题目</el-button>
+                      <el-button
+                        icon="el-icon-circle-plus"
+                        v-show="item.type != 2"
+                        @click="addDomain(index)"
+                        >新增选项</el-button
+                      >
+                      <el-button
+                        icon="el-icon-s-order"
+                        @click="copyQuestion(index)"
+                        >复制题目</el-button
+                      >
+                      <el-button
+                        icon="el-icon-delete-solid"
+                        @click="removeQuestion(index)"
+                        >删除题目</el-button
+                      >
                     </el-form-item>
                   </el-collapse-item>
                 </vuedraggable>
@@ -337,16 +360,16 @@
 
 
 <script>
-import logo from "../components/svg-logo.vue"
+import logo from "../components/svg-logo.vue";
 import vuedraggable from "vuedraggable";
-import VueQr from "vue-qr"
-import Clipboard from "clipboard"
+import VueQr from "vue-qr";
+import Clipboard from "clipboard";
 export default {
   name: "HelloWorld",
   components: {
     vuedraggable,
     VueQr,
-    'Logo': logo
+    Logo: logo,
   },
   data() {
     return {
@@ -390,13 +413,13 @@ export default {
         ],
       },
       qrData: {
-        text: window.location.host+"/questionnaire/"+this.templateId,
-        logo: require('../assets/logo.png')
+        text: window.location.host + "/questionnaire/" + this.templateId,
+        logo: require("../assets/logo.png"),
       },
-      exportLink: '',
-      downloadFilename: '',
-      dialogVisible: false
-   };
+      exportLink: "",
+      downloadFilename: "",
+      dialogVisible: false,
+    };
   },
   methods: {
     isNum: (rule, value, callback) => {
@@ -447,7 +470,7 @@ export default {
       // 新增题目
       this.modelForm.questions.push({
         type: "0",
-        required: false,
+        required: "",
         questionName: "",
         questionSummary: "",
         max: 2,
@@ -469,48 +492,64 @@ export default {
       this.$refs.modelForm.validate((valid) => {
         if (valid) {
           console.log("保存中");
+          console.log(this.modelForm.questions);
           let templateQuestions = [];
           let quest = {};
           let question = {};
           let x = {};
-          for (question in this.modelForm.questions) {
+          let i = 0;
+          let j = 0;
+          for (i in this.modelForm.questions) {
+            question = this.modelForm.questions[i];
+            console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            quest.required = question.required;
+            if (question.required == "false") {
+              quest.required = false;
+            } else {
+              quest.required = true;
+            }
+            quest.choices = [];
             switch (question.type) {
-              case 0:
+              case "0":
                 quest.type = "choice";
-                for (x in question.answers) {
+                for (j in question.answers) {
+                  x = question.answers[j];
                   quest.choices.push(x.value);
                 }
                 break;
-              case 1:
+              case "1":
                 quest.type = "multi-choice";
-                quest.max = question.max;
-                quest.min = question.min;
-                for (x in question.answers) {
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
                   quest.choices.push(x.value);
                 }
                 break;
-              case 2:
+              case "2":
                 quest.type = "filling";
                 quest.height = question.height;
                 quest.width = question.width;
                 break;
-              case 3:
+              case "3":
                 quest.type = "grade";
-                for (x in question.answers) {
+                quest.scores = [];
+                for (j in question.answers) {
+                  x = question.answers[j];
                   quest.choices.push(x.value);
                   quest.scores.push(x.scores);
                 }
                 break;
-              case 4:
+              case "4":
                 quest.type = "dropdown";
-                for (x in question.answers) {
+                for (j in question.answers) {
+                  x = question.answers[j];
                   quest.choices.push(x.value);
                 }
                 break;
             }
+            console.log(quest);
             templateQuestions.push(quest);
           }
           this.$axios({
@@ -542,7 +581,6 @@ export default {
               alert(err);
             }
           );
-          console.log(this.modelForm.questions);
           console.log("保存成功!");
         }
       });
@@ -577,21 +615,21 @@ export default {
       console.log("发布成功!");
     },
     async copyShareLink() {
-      let clipboard = new Clipboard('.tag-copy')
-      console.log(clipboard)
-      await clipboard.on('success', () => {
-        alert('Copy Success')
-        clipboard.destroy()
-      })
-      clipboard.on('error', () => {
-        alert('Copy error')
-        clipboard.destroy()
-      })
+      let clipboard = new Clipboard(".tag-copy");
+      console.log(clipboard);
+      await clipboard.on("success", () => {
+        alert("Copy Success");
+        clipboard.destroy();
+      });
+      clipboard.on("error", () => {
+        alert("Copy error");
+        clipboard.destroy();
+      });
     },
-    downloadImg () {
-      let Qrcode = this.$refs.Qrcode
-      this.exportLink = Qrcode.$el.currentSrc
-      this.downloadFilename = 'Questionnaire'
+    downloadImg() {
+      let Qrcode = this.$refs.Qrcode;
+      this.exportLink = Qrcode.$el.currentSrc;
+      this.downloadFilename = "Questionnaire";
     },
   },
 };
@@ -664,7 +702,7 @@ a:hover {
   font-size: 20px;
   font-weight: bolder;
 }
-.question-type .el-radio{
+.question-type .el-radio {
   height: 35px;
   width: 80px;
   margin: 0;
