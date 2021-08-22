@@ -5,7 +5,9 @@ import Home from '../views/Home.vue'
 const Questionnaire = () => import("../views/Questionnaire.vue")
 const History = () => import("../views/History.vue")
 const Recycle = () => import("../views/Recycle.vue")
+const Adjust = () => import("../views/Adjust.vue")
 const Normal = () => import("../views/Normal.vue")
+const EditNormal = () => import("../views/EditNormal.vue")
 const Vote = () => import("../views/Vote.vue")
 const Apply = () => import("../views/Apply.vue")
 const Exam = () => import("../views/Exam.vue")
@@ -44,9 +46,19 @@ const routes = [
     component: Register
   },
   {
+    path: '/adjust',
+    name: 'Adjust',
+    component: Adjust
+  },
+  {
     path: '/normal/new',
     name: 'Normal',
     component: Normal
+  },
+  {
+    path: '/normal/edit',
+    name: 'EditNormal',
+    component: EditNormal
   },
   {
     path: '/vote/new',
