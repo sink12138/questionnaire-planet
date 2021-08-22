@@ -1,9 +1,7 @@
 <template>
   <div class="reviewer">
     <div class="top">
-      <div class="page-title">
-        您的所有问卷如下
-      </div>
+      <div class="page-title">您的所有问卷如下</div>
       <div class="search">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link">
@@ -39,17 +37,20 @@
     <div class="questionnaire">
       <div class="list" style="margin-left: 1%; margin-right: 1%">
         <div
-        class="cards"
-        v-for="item in searchQue.slice(
-          (current_page - 1) * pagesize,
-          current_page * pagesize
-        )"
-        :key="item.templateId">
+          class="cards"
+          v-for="item in searchQue.slice(
+            (current_page - 1) * pagesize,
+            current_page * pagesize
+          )"
+          :key="item.templateId"
+        >
           <el-card shadow="hover">
             <div class="card">
               <div class="banner">
                 <div class="title">
-                  <div v-if="item.released == true">{{ item.title }}(已发布)</div>
+                  <div v-if="item.released == true">
+                    {{ item.title }}(已发布)
+                  </div>
                   <div v-else>{{ item.title }}(未发布)</div>
                 </div>
                 <div class="type_show">
@@ -57,24 +58,16 @@
                 </div>
               </div>
               <div class="time">
-                <time>
-                  创建时间:{{ item.creationTime }}
-                </time>
+                <time> 创建时间:{{ item.creationTime }} </time>
               </div>
               <div class="time" v-if="item.releaseTime != ''">
-                <time>
-                  发布时间:{{ item.releaseTime }}
-                </time>
+                <time> 发布时间:{{ item.releaseTime }} </time>
               </div>
               <div class="time" v-else>
-                <time>
-                  发布时间:未曾发布
-                </time>
+                <time> 发布时间:未曾发布 </time>
               </div>
               <div class="time">
-                <time>
-                  收集时长:{{ item.duration }}
-                </time>
+                <time> 收集时长:{{ item.duration }} </time>
               </div>
               <div class="time">
                 <strong>收集数量:</strong>{{ item.answerCount }}
@@ -84,8 +77,8 @@
                   <el-button
                     type="text"
                     class="button"
-                    @click="edit(item)"
-                    icon="el-icon-edit-outline"
+                    @click="adjust(item)"
+                    icon="el-icon-edit"
                   ></el-button>
                   <el-button
                     type="text"
@@ -108,8 +101,22 @@
                     v-else
                   ></el-button>
                   <el-dropdown>
-                    <el-button type="text" icon="el-icon-more" style="color: black"></el-button>
+                    <el-button
+                      type="text"
+                      icon="el-icon-more"
+                      style="color: black"
+                    ></el-button>
                     <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item>
+                        <el-button
+                          type="text"
+                          class="button"
+                          @click="edit(item)"
+                          icon="el-icon-edit-outline"
+                          >编辑</el-button
+                        >
+                      </el-dropdown-item>
+
                       <el-dropdown-item
                         ><el-button
                           type="text"
@@ -302,7 +309,7 @@ export default {
           type: "normal",
           title: "测试问卷",
           released: false,
-        }
+        },
       ],
     };
   },
