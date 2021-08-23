@@ -1,7 +1,6 @@
 <template>
   <div class="reviewer">
     <div class="top">
-      <div class="page-title">您的所有问卷如下</div>
       <div class="search">
         <el-dropdown trigger="click">
           <span class="el-dropdown-link">
@@ -37,13 +36,12 @@
     <div class="questionnaire">
       <div class="list" style="margin-left: 1%; margin-right: 1%">
         <div
-          class="cards"
-          v-for="item in searchQue.slice(
-            (current_page - 1) * pagesize,
-            current_page * pagesize
-          )"
-          :key="item.templateId"
-        >
+        class="cards"
+        v-for="item in searchQue.slice(
+          (current_page - 1) * pagesize,
+          current_page * pagesize
+        )"
+        :key="item.templateId">
           <el-card shadow="hover">
             <div class="card">
               <div class="banner">
@@ -144,7 +142,13 @@
                         ></el-dropdown-item
                       >
                       <el-dropdown-item>
-                        <el-button @click="qr(item)">Qrcode</el-button>
+                        <el-button 
+                        type="text"
+                        class="button"
+                        @click="qr(item)"
+                        icon="el-icon-share">
+                        分享
+                        </el-button>
                         <el-dialog
                           :append-to-body="true"
                           title="分享问卷"
@@ -226,134 +230,7 @@ export default {
       pagesize: 12,
       searchQue: [],
       templateId: 0,
-      allQuest: [
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-        {
-          duration: "00:00:00",
-          creationTime: "2021-08-21 21:00",
-          releaseTime: "2021-08-21 21:00",
-          templateId: 1,
-          type: "normal",
-          title: "测试问卷",
-          released: false,
-        },
-      ],
+      allQuest: [],
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
@@ -641,17 +518,10 @@ export default {
 <style scoped>
 .top {
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 10px;
-}
-.page-title {
-  font-weight: bolder;
-  font-size: 24px;
-  flex-grow: 50;
-}
-.search {
-  flex-grow: 1;
 }
 .list {
   display: flex;
@@ -696,6 +566,12 @@ export default {
 }
 .button {
   color: black;
+}
+.share {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .clearfix .el-button {
   width: 45px;

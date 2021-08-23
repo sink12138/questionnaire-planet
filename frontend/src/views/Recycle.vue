@@ -1,8 +1,5 @@
 <template>
   <div class="reviewer">
-    <div>
-      <h1>您已删除的问卷如下</h1>
-    </div>
     <div class="search">
       <el-dropdown trigger="click">
         <span class="el-dropdown-link">
@@ -32,89 +29,79 @@
         clearable
         placeholder="请输入要搜索的问卷"
       />
-      <el-button icon="el-icon-search" circle @click="searchQuest"></el-button>
+      <el-button icon="el-icon-search" @click="searchQuest"></el-button>
     </div>
     <div class="questionnaire">
-      <div style="margin-left: 1%; margin-right: 1%">
-        <el-row>
-          <el-col
-            :span="4"
-            v-for="item in allQuest.slice(
-              (current_page - 1) * pagesize,
-              current_page * pagesize
-            )"
-            :key="item.templateId"
-            :offset="1"
-          >
-            <div style="margin-top: 15px">
-              <el-card :body-style="{ padding: '0px' }">
-                <div class="card">
-                  <br />
-                  <div class="title">
-                    <span
-                      ><strong>{{ item.title }}</strong></span
-                    ><br />
+      <div class="list" style="margin-left: 1%; margin-right: 1%">
+        <div
+        class="cards"
+        v-for="item in allQuest.slice(
+          (current_page - 1) * pagesize,
+          current_page * pagesize
+        )"
+        :key="item.templateId"
+        :offset="1">
+          <el-card shadow="hover">
+            <div class="card">
+              <div class="banner">
+                <div class="title">
+                  <div v-if="item.released == true">
+                    {{ item.title }}(已发布)
                   </div>
-                  <br />
-                  <div class="type_show">
-                    <question-pic></question-pic>
-                  </div>
-                  <br />
-                  <span
-                    ><time class="time"
-                      ><strong>创建时间:</strong>{{ item.creationTime }}</time
-                    ></span
-                  ><br />
-                  <span v-if="item.releaseTime != ''"
-                    ><time class="time"
-                      ><strong>发布时间:</strong>{{ item.releaseTime }}</time
-                    ></span
-                  >
-                  <span v-else
-                    ><time class="time"
-                      ><strong>发布时间:</strong>未曾发布</time
-                    ></span
-                  ><br />
-                  <span
-                    ><time class="time"
-                      ><strong>收集时长:</strong>{{ item.duration }}</time
-                    ></span
-                  ><br />
-                  <div class="bottom clearfix">
-                    <div v-if="item.released == true">已发布</div>
-                    <div v-else>未发布</div>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="deleteQuest(item)"
-                      icon="el-icon-delete-solid"
-                    ></el-button>
-                    <el-button
-                      type="text"
-                      class="button"
-                      @click="recover(item)"
-                      icon="el-icon-refresh"
-                    ></el-button>
-                  </div>
+                  <div v-else>{{ item.title }}(未发布)</div>
                 </div>
-              </el-card>
+                <div class="type_show">
+                  <question-pic></question-pic>
+                </div>
+              </div>
+              <div class="time">
+                <time> 创建时间:{{ item.creationTime }} </time>
+              </div>
+              <div class="time" v-if="item.releaseTime != ''">
+                <time> 发布时间:{{ item.releaseTime }} </time>
+              </div>
+              <div class="time" v-else>
+                <time> 发布时间:未曾发布 </time>
+              </div>
+              <div class="time">
+                <time> 收集时长:{{ item.duration }} </time>
+              </div>
+              <div class="time">
+                <strong>收集数量:</strong>{{ item.answerCount }}
+              </div>
+              <div class="bottom clearfix">
+                <div v-if="item.released == true">已发布</div>
+                <div v-else>未发布</div>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="deleteQuest(item)"
+                  icon="el-icon-delete-solid"
+                ></el-button>
+                <el-button
+                  type="text"
+                  class="button"
+                  @click="recover(item)"
+                  icon="el-icon-refresh"
+                ></el-button>
+              </div>
             </div>
-          </el-col>
-        </el-row>
-        <div style="margin-left: 35%">
-          <!-- 该div是做分页的 -->
-          <div class="block">
-            <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="current_page"
-              :page-sizes="[4, 8, 12, 16]"
-              :page-size="pagesize"
-              layout="total, sizes, prev, pager, next"
-              :total="total"
-            >
-            </el-pagination>
-          </div>
+          </el-card>
+        </div>
+      </div>
+      <div style="margin-left: 35%">
+        <!-- 该div是做分页的 -->
+        <div class="block">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="current_page"
+            :page-sizes="[4, 8, 12, 16]"
+            :page-size="pagesize"
+            layout="total, sizes, prev, pager, next"
+            :total="total"
+          >
+          </el-pagination>
         </div>
       </div>
     </div>
@@ -285,17 +272,57 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.list {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-flow: row wrap;
+}
+.cards {
+  width: 16%;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
 .card {
-  background-color: rgba(46, 140, 219, 0.94);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(233, 233, 233, 0.5);
+}
+.banner {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-color: rgba(71, 157, 230, 0.94);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  zoom: 1;
+}
+.el-card /deep/.el-card__body {
+  padding: 0;
+}
+.time {
+  align-self: flex-start;
+  font-size: 14px;
+  margin: 0;
+  margin-top: 5px;
 }
 .type_show {
   margin-top: 0px;
 }
 .title {
-  margin-top: 0px;
+  margin-bottom: 10px;
 }
 .button {
   color: black;
+}
+.clearfix .el-button {
+  width: 45px;
+}
+.block {
+  position: absolute;
+  bottom: 5px;
+  left: 40%;
 }
 </style>
