@@ -324,39 +324,57 @@
                     </el-row>
                     <!-- 答案 -->
                     <el-row v-if="item.type != 2">
-                      <el-form-item
-                        v-for="(opt, idx) in item.answers"
-                        :key="idx"
-                        :label="`选项${idx + 1}`"
-                        :prop="`questions.${index}.answers.${idx}.value`"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请输入选项',
-                            trigger: 'blur',
-                          },
-                        ]"
-                      >
-                        <el-input
-                          v-model.trim="opt.value"
-                          style="width: 258px"
-                          clearable
-                          placeholder="请输入选项"
-                        />
-                        <el-input
-                          v-model.trim="opt.scores"
-                          v-show="item.type == 3"
-                          style="width: 60px; margin-left: 10px"
-                          clearable
-                          placeholder="..."
-                        />
-                        <el-button
-                          style="margin-left: 20px"
-                          @click.prevent="removeDomain(index, idx)"
-                          >删除</el-button
-                        >
-                      </el-form-item></el-row
+                    <el-form-item
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`选项${idx + 1}`"
+                      :prop="`questions.${index}.answers.${idx}.value`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入选项',
+                          trigger: 'blur',
+                        },
+                      ]"
                     >
+                      <el-input
+                        v-model.trim="opt.value"
+                        style="width: 200px"
+                        clearable
+                        placeholder="请输入选项"
+                      />
+                      <el-button
+                        style="margin-left: 20px"
+                        @click.prevent="removeDomain(index, idx)"
+                        >删除</el-button
+                      >
+                    </el-form-item>
+                    <el-form-item
+                      v-show="item.type == 3"
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`第${idx + 1}项评分`"
+                      :prop="`questions.${index}.answers.${idx}.scores`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入评分',
+                          trigger: 'blur',
+                        },
+                        {
+                          validator: isNum,
+                          trigger: 'blur',
+                        }
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.scores"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入评分"
+                      />
+                    </el-form-item>
+                  </el-row>
                     <el-form-item label="编辑题目">
                       <el-button
                         icon="el-icon-circle-plus"
