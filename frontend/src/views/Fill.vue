@@ -37,7 +37,7 @@
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
     </div>
-    <div class="question">
+    <div class="question" v-if="submitted == false">
       <el-form
         :model="answers"
         :rules="rules"
@@ -179,8 +179,14 @@
         </div>
       </el-form>
     </div>
+    <div v-if="submitted == true">
+      <h3>{{ conclusion }}</h3>
+      
+    </div>
     <div class="submit">
-      <el-button @click="submit">提交问卷</el-button>
+      <el-button @click="submit()" v-if="submitted == false"
+        >提交问卷</el-button
+      >
     </div>
   </div>
 </template>
@@ -190,14 +196,17 @@ export default {
   data() {
     return {
       templateId: 0,
+      submitted: false,
       locked: false,
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      conclusion: "谢谢",
       remain: "无限制",
       password: "",
       dialogFormVisible: false,
       formLabelWidth: "100px",
+      results: [{stem:"题干",answers:['A','B'],counts:[12,25]}],
       questions: [
         {
           type: "choice",
@@ -298,6 +307,9 @@ export default {
   },
   mounted: function () {},
   methods: {
+    step: function (i) {
+      return "step" + i;
+    },
     goBack() {
       this.$router.push("/");
     },
@@ -358,21 +370,13 @@ export default {
                 (response) => {
                   console.log(response);
                   if (response.data.success == true) {
-                    this.$message({
-                      message: "提交成功！",
-                      type: "success",
-                    });
+                    this.submitted = true;
                     if (response.data.conclusion == undefined) {
-                      this.$message({
-                        message: "感谢您的提交!",
-                        type: "success",
-                      });
+                      this.conclusion = "感谢您的提交!";
                     } else {
-                      this.$message({
-                        message: response.data.conclusion,
-                        type: "success",
-                      });
+                      this.conclusion = response.data.conclusion;
                     }
+                    this.results = response.data.results;
                   } else {
                     this.$message({
                       message: response.data.message,
