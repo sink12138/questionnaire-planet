@@ -240,6 +240,7 @@ export default {
                   this.type = response.data.type;
                   this.description = response.data.description;
                   this.questions = response.data.questions;
+                  this.dialogFormVisible = false;
                 } else {
                   console.log(response.data.message);
                 }
@@ -270,15 +271,18 @@ export default {
         .then((response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.title = response.data.title;
-            this.type = response.data.type;
-            this.description = response.data.description;
-            this.password = response.data.password;
-            this.questions = response.data.questions;
-            this.dialogFormVisible = false;
+            if (response.data.password == this.password) {
+              this.title = response.data.title;
+              this.type = response.data.type;
+              this.description = response.data.description;
+              this.questions = response.data.questions;
+              this.dialogFormVisible = false;
+            }
+            else {
+              alert("问卷密码错误！")
+            }
           } else {
             console.log(response.data.message);
-            alert("问卷密码错误！")
           }
         })
         .catch((err) => console.log(err));
