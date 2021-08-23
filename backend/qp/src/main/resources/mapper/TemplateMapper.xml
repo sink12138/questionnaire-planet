@@ -9,9 +9,13 @@
         select * from template
         where owner = #{owner}
     </select>
+    <select id="selectQuotaById" resultType="Template">
+        select quota from template
+        where template_id = #{templateId}
+    </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(type, owner, title, description, password, creation_time, conclusion)
-        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion})
+        insert into template(type, owner, title, description, password, creation_time, conclusion, quota)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion}, #{quota})
     </insert>
     <update id="update" parameterType="Template">
         update template

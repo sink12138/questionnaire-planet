@@ -40,6 +40,8 @@ public class Template {
 
     private String conclusion;
 
+    private Integer quota;
+
     public Template() {
 
     }
@@ -51,6 +53,16 @@ public class Template {
         this.description = description;
         this.password = password;
         this.conclusion = conclusion;
+    }
+
+    public Template(String type, Integer owner, String title, String description, String password, String conclusion, Integer quota) {
+        this.type = type;
+        this.owner = owner;
+        this.title = title;
+        this.description = description;
+        this.password = password;
+        this.conclusion = conclusion;
+        this.quota = quota;
     }
 
     public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, Time duration) {

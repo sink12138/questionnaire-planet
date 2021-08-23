@@ -10,6 +10,8 @@ public interface TemplateDao {
 
     ArrayList<Template> selectByOwner(Integer owner);
 
+    Integer selectQuotaById(Integer templateId);
+
     Integer insert(Template template);
 
     Integer update(Template template);
