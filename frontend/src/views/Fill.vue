@@ -1,9 +1,24 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false">
+    <el-dialog
+      title="哎呀，问卷被加密了，请输入问卷密码！"
+      :visible.sync="dialogFormVisible"
+      style="text-align: left; width: 1050px; margin: auto"
+      :close-on-click-modal="false"
+    >
       <el-form :model="password">
-        <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
-          <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
+        <el-form-item
+          label="问卷密码"
+          :label-width="formLabelWidth"
+          prop="password"
+        >
+          <el-input
+            v-model="password"
+            autocomplete="off"
+            show-password
+            style="width: 300px"
+            placeholder="请输入问卷密码"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -56,7 +71,7 @@
               >
             </div>
             <div class="multi" v-if="item.type == 'multi-choice'">
-              至少选择{{item.min}}项
+              至少选择{{ item.min }}项
               <el-form-item
                 label="选项"
                 :rules="{
@@ -66,7 +81,7 @@
                 <el-checkbox-group
                   v-model="multi"
                   v-for="(i, index) in item.choices"
-                  :min=0
+                  :min="0"
                   :max="item.max"
                   :key="index"
                   @change="multiChangeValue(index_question)"
@@ -132,8 +147,31 @@
                     :label="i"
                     :value="index"
                   >
-                  </el-option> </el-select
-              ></el-form-item>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+            <div class="multi" v-if="item.type == 'vote'">
+              至少选择{{ item.min }}项
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-checkbox-group
+                  v-model="multi"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
             </div>
           </div>
         </div>
@@ -156,7 +194,7 @@ export default {
       description: "问卷描述",
       password: "",
       dialogFormVisible: false,
-      formLabelWidth: '100px',
+      formLabelWidth: "100px",
       questions: [
         {
           type: "choice",
@@ -225,8 +263,7 @@ export default {
           if (this.locked == true) {
             console.log(22);
             this.dialogFormVisible = true;
-          }
-          else {
+          } else {
             console.log(33);
             this.$axios({
               method: "get",
@@ -252,12 +289,8 @@ export default {
         }
       })
       .catch((err) => console.log(err));
-
-    
   },
-  mounted: function() {
-    
-  },
+  mounted: function () {},
   methods: {
     goBack() {
       this.$router.push("/");
@@ -277,9 +310,8 @@ export default {
               this.description = response.data.description;
               this.questions = response.data.questions;
               this.dialogFormVisible = false;
-            }
-            else {
-              alert("问卷密码错误！")
+            } else {
+              alert("问卷密码错误！");
             }
           } else {
             console.log(response.data.message);
