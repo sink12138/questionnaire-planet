@@ -90,12 +90,7 @@
               />
             </el-form-item>
             <!-- 问卷描述 -->
-            <el-form-item
-              label="问卷描述"
-              :rules="{
-                required: true,
-              }"
-            >
+            <el-form-item label="问卷描述">
               <el-input
                 v-model="modelForm.description"
                 style="width: 258px"
@@ -212,11 +207,6 @@
                   <el-form-item
                     :prop="`questions.${index}.questionSummary`"
                     label="问题描述"
-                    :rules="{
-                      required: true,
-                      message: '请填写问题描述',
-                      trigger: 'change',
-                    }"
                   >
                     <el-input
                       v-model.trim="item.questionSummary"
@@ -685,33 +675,143 @@ export default {
       this.$router.push("/preview?templateId=" + this.templateId);
     },
     publishQuestion() {
-      this.addSubmit();
-      this.$axios({
-        method: "post",
-        url: "http://139.224.50.146:80/apis/release",
-        data: JSON.stringify({
-          templateId: parseInt(this.templateId),
-        }),
-      }).then(
-        (response) => {
-          console.log(response);
-          if (response.data.success == true) {
-            this.$message({
-              message: "问卷发布成功！",
-              type: "success",
-            });
-            this.dialogVisible = true;
-          } else {
-            this.$message({
-              message: response.data.message,
-            });
+      this.$refs.modelForm.validate((valid) => {
+        if (valid) {
+          console.log("保存中");
+          console.log(this.modelForm.questions);
+          var templateQuestions = [];
+          var quest = new Map();
+          var question = new Map();
+          var x = {};
+          var i = 0;
+          var j = 0;
+          for (i in this.modelForm.questions) {
+            quest = new Map();
+            question = this.modelForm.questions[i];
+            console.log(question);
+            quest.stem = question.questionName;
+            quest.description = question.questionSummary;
+            if (question.required == "false") {
+              quest.required = false;
+            } else {
+              quest.required = true;
+            }
+            quest.choices = [];
+            switch (question.type) {
+              case "0":
+                quest.type = "choice";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "1":
+                quest.type = "multi-choice";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "2":
+                quest.type = "filling";
+                quest.height = question.height;
+                quest.width = question.width;
+                break;
+              case "3":
+                quest.type = "grade";
+                quest.scores = [];
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.scores.push(x.scores);
+                }
+                break;
+              case "4":
+                quest.type = "dropdown";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "5":
+                quest.type = "sign-up";
+                quest.quotas = [];
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.quotas.push(parseInt(x.number));
+                }
+                break;
+            }
+            console.log(quest);
+            templateQuestions.push(quest);
+            console.log(templateQuestions);
           }
-        },
-        (err) => {
-          alert(err);
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/submit",
+            data: JSON.stringify({
+              templateId: this.templateId,
+              title: this.modelForm.title,
+              description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
+              password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
+              type: "sign-up",
+              questions: templateQuestions,
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.templateId = response.data.templateId;
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
+                });
+                this.$axios({
+                  method: "post",
+                  url: "http://139.224.50.146:80/apis/release",
+                  data: JSON.stringify({
+                    templateId: parseInt(this.templateId),
+                  }),
+                }).then(
+                  (response) => {
+                    console.log(response);
+                    if (response.data.success == true) {
+                      this.$message({
+                        message: "问卷发布成功！",
+                        type: "success",
+                      });
+                      this.dialogVisible = true;
+                    } else {
+                      this.$message({
+                        message: response.data.message,
+                      });
+                    }
+                  },
+                  (err) => {
+                    alert(err);
+                  }
+                );
+                console.log("发布成功!");
+              } else {
+                this.$message({
+                  message: response.data.message,
+                });
+              }
+            },
+            (err) => {
+              alert(err);
+            }
+          );
+          console.log("保存成功!");
         }
-      );
-      console.log("发布成功!");
+      });
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");
