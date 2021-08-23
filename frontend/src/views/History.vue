@@ -470,6 +470,16 @@ export default {
             message: "问卷已发布！",
           });
         }
+      } else if (item.type == "vote") {
+        if (item.released == false) {
+          this.quest = item.templateId;
+          console.log(this.quest);
+          this.$router.push("/vote/edit?templateId=" + this.quest);
+        } else {
+          this.$message({
+            message: "问卷已发布！",
+          });
+        }
       }
     },
     release(item) {

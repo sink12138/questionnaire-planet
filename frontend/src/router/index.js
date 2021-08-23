@@ -9,6 +9,7 @@ const Adjust = () => import("../views/Adjust.vue")
 const Normal = () => import("../views/Normal.vue")
 const EditNormal = () => import("../views/EditNormal.vue")
 const Vote = () => import("../views/Vote.vue")
+const EditVote = () => import("../views/EditVote.vue")
 const Apply = () => import("../views/Apply.vue")
 const Exam = () => import("../views/Exam.vue")
 const Register = () => import("../views/Register.vue")
@@ -66,6 +67,11 @@ const routes = [
     path: '/vote/new',
     name: 'Vote',
     component: Vote
+  },
+  {
+    path: '/vote/edit',
+    name: 'EditVote',
+    component: EditVote
   },
   {
     path: '/apply/new',
