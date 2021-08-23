@@ -1,6 +1,12 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
+    <el-dialog
+      title="哎呀，问卷被加密了，请输入问卷密码！"
+      :visible.sync="dialogFormVisible"
+      style="text-align: left; width: 1050px; margin: auto"
+      :close-on-click-modal="false"
+      :before-close="goBack"
+    >
       <el-form :model="password">
         <el-form-item
           label="问卷密码"
@@ -29,6 +35,7 @@
       <h3>
         {{ description }}
       </h3>
+      <h3>问卷剩余{{ remain }}份</h3>
     </div>
     <div class="question">
       <el-form
@@ -187,6 +194,7 @@ export default {
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      remain: "无限制",
       password: "",
       dialogFormVisible: false,
       formLabelWidth: "100px",
@@ -273,6 +281,9 @@ export default {
                   this.description = response.data.description;
                   this.questions = response.data.questions;
                   this.dialogFormVisible = false;
+                  if (response.data.remain != undefined) {
+                    this.remain = response.data.remain;
+                  }
                 } else {
                   console.log(response.data.message);
                 }
@@ -351,6 +362,17 @@ export default {
                       message: "提交成功！",
                       type: "success",
                     });
+                    if (response.data.conclusion == undefined) {
+                      this.$message({
+                        message: "感谢您的提交!",
+                        type: "success",
+                      });
+                    } else {
+                      this.$message({
+                        message: response.data.conclusion,
+                        type: "success",
+                      });
+                    }
                   } else {
                     this.$message({
                       message: response.data.message,

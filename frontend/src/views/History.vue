@@ -501,6 +501,7 @@ export default {
             this.qrData.text =
               window.location.host + "/fill?templateId=" + this.templateId;
             this.dialogVisible = true;
+            item.released = true;
           }
         },
         (err) => {
