@@ -1,26 +1,53 @@
 <template>
-  <span>Exam</span>
+  <el-container>
+    <el-header>
+      <p>Exam</p>
+    </el-header>
+
+    <div class="timer">
+      <span>{{ times }}s</span>
+    </div>
+
+    <div>
+      <el-button type="primary" @click="submit">提交按钮(被点了{{ counter }}次)</el-button>
+      <el-button type="primary" @click="restart">点我重新计时！</el-button>
+    </div>
+  </el-container>
+  
 </template>
 
 <script>
 export default {
   data() {
     return {
-      
+      counter: 0,
+      times: 5,
     }
   },
-  /*页面打开3秒后则执行test方法，输出2333。可用于定时触发提交问卷事件。*/
   mounted: function(){
-    this.timer = setTimeout(this.test, 3000)
+    this.timer = setInterval(()=>{
+        this.times--
+        if(this.times===0){
+          this.submit();
+          clearInterval(this.timer);
+        }
+      },1000)
   },
   methods: {
-    test: function(){
-      console.log("2333")
+    submit() {
+      this.counter++;
+    },
+    restart() {
+      this.times = 5;
+      this.timer = setInterval(()=>{
+        this.times--
+        if(this.times===0){
+          this.submit();
+          clearInterval(this.timer);
+        }
+      },1000)
     }
   },
-  beforeDestroy() {
-    clearTimeout(this.timer);
-  }
 }
 </script>
 
