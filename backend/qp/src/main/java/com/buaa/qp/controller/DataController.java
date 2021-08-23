@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
@@ -28,10 +27,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 public class DataController {
@@ -67,7 +64,14 @@ public class DataController {
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
+            ArrayList<String> answerTimes = new ArrayList<>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+            for (Answer answer : answers) {
+                answerTimes.add(sdf.format(answer.getSubmitTime()));
+            }
             map.put("answers", answersInFormat);
+            map.put("answerTimes", answerTimes);
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
