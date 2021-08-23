@@ -19,6 +19,7 @@
             title = #{title},
             description = #{description},
             password = #{password},
+            conclusion = #{conclusion}
             <if test="duration != null">
                 duration = #{duration}
             </if>

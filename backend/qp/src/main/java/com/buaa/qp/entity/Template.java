@@ -38,6 +38,8 @@ public class Template {
 
     private Time duration;
 
+    private String conclusion;
+
     public Template() {
 
     }

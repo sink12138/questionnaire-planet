@@ -64,14 +64,19 @@ public class DataController {
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
-            ArrayList<String> answerTimes = new ArrayList<>();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-            for (Answer answer : answers) {
-                answerTimes.add(sdf.format(answer.getSubmitTime()));
+            ArrayList<Map<String, Object>> answerMaps = new ArrayList<>();
+            for (int i = 0; i < answers.size(); i++) {
+                Map<String, Object> answerMap = new HashMap<>();
+                answerMap.put("answerId", answers.get(i).getAnswerId());
+                answerMap.put("answerTime", sdf.format(answers.get(i).getSubmitTime()));
+                for (int j = 0; j < questions.size(); j ++) {
+                    answerMap.put(answersInFormat.get(0).get(j + 1), answersInFormat.get(i + 1).get(j + 1));
+                }
+                answerMaps.add(answerMap);
             }
-            map.put("answers", answersInFormat);
-            map.put("answerTimes", answerTimes);
+            map.put("answers", answerMaps);
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
@@ -197,7 +202,7 @@ public class DataController {
                     for (int j = 0; j < choices.size(); j++) {
                         if (question.getType().equals("choice") || question.getType().equals("multi-choice")) {
                             result.put((char) ((int) 'A' + j) + "." + choices.get(j), 0);
-                        } else if (question.getType().equals("dropdown")) {
+                        } else if (question.getType().equals("dropdown") || question.getType().equals("vote")) {
                             result.put(choices.get(j), 0);
                         } else {
                             ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
@@ -235,6 +240,8 @@ public class DataController {
                             break;
                         }
                         case "choice": {
+                        }
+                        case "vote": {
                         }
                         case "dropdown": {
                             if (!answerInFormat.get(i + 1).equals("")) {

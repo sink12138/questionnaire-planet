@@ -13,8 +13,8 @@ import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
+import java.net.InetAddress;
 import java.util.*;
 
 @RestController
@@ -28,7 +28,7 @@ public class CollectionController {
     @Autowired
     private AnswerService answerService;
 
-    @GetMapping("/locked")
+    @GetMapping("/attempt")
     public Map<String, Object> locked(@RequestParam(value = "templateId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
         try {
@@ -50,9 +50,17 @@ public class CollectionController {
             } else if (!template.getReleased()) {
                 throw new ExtraMessageException("问卷尚未发布, 无法访问");
             }
+            if (template.getType().equals("vote")) {
+                ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
+                InetAddress address = InetAddress.getLocalHost();
+                for (Answer answer : answers) {
+                    if (answer.getIp().equals(address)) {
+                        throw new ExtraMessageException("已填过问卷");
+                    }
+                }
+            }
             map.put("success", true);
             map.put("locked", template.getPassword() != null && !template.getPassword().equals(""));
-
         } catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
