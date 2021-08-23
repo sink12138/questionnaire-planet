@@ -26,7 +26,6 @@
             <el-button @click="publishQuestion" type="primary"
               >发布问卷</el-button
             >
-            <el-button @click="dialogVisible = true">Qrcode</el-button>
             <el-dialog
               :append-to-body="true"
               title="分享问卷"
