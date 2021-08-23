@@ -16,6 +16,7 @@ import jxl.write.Label;
 import jxl.write.Number;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
+import org.omg.PortableInterceptor.INACTIVE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -77,6 +78,12 @@ public class DataController {
                 answerMaps.add(answerMap);
             }
             map.put("answers", answerMaps);
+
+            ArrayList<String> stems = new ArrayList<>();
+            for (Question q: questions) {
+                stems.add(q.getStem());
+            }
+            map.put("stems", stems);
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
@@ -196,20 +203,26 @@ public class DataController {
             for (Question question : questions) {
                 Map<String, Object> result = new HashMap<>();
                 result.put("stem", question.getStem());
+                result.put("type", question.getType());
+                ArrayList<String> choicesInFormat = new ArrayList<>();
+                ArrayList<Integer> counts = new ArrayList<>();
                 if (!question.getType().equals("filling")) {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
                     ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                     for (int j = 0; j < choices.size(); j++) {
                         if (question.getType().equals("choice") || question.getType().equals("multi-choice")) {
-                            result.put((char) ((int) 'A' + j) + "." + choices.get(j), 0);
+                            choicesInFormat.add((char) ((int) 'A' + j) + "." + choices.get(j));
                         } else if (question.getType().equals("dropdown") || question.getType().equals("vote")) {
-                            result.put(choices.get(j), 0);
+                            choicesInFormat.add(choices.get(j));
                         } else {
                             ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
-                            result.put(choices.get(j) + "(" + scores.get(j) + ")", 0);
+                            choicesInFormat.add(choices.get(j) + "(" + scores.get(j) + ")");
                         }
+                        counts.add(0);
                     }
                 }
+                result.put("answers", choicesInFormat);
+                result.put("counts", counts);
                 if (question.getType().equals("grade")) {
                     result.put("avg", 0.0);
                 }
@@ -221,19 +234,20 @@ public class DataController {
                 ArrayList<String> answerInFormat = answersInFormat.get(t);
                 for (int i = 0; i < answerInFormat.size() - 1; i++) {
                     switch (questions.get(i).getType()) {
+                        case "vote": {
+                        }
                         case "multi-choice": {
                             if (!answerInFormat.get(i + 1).equals("")) {
-                                Map<String, Object> argsMap = JSON.parseObject(questions.get(i).getArgs());
-                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                                 String choiceStr = JSONArray.parseArray(answers.get(t - 1).getContent(), Object.class).get(i).toString();
                                 ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
                                 assert chIndexes != null;
                                 if (!chIndexes.isEmpty()) {
                                     for (Integer j : chIndexes) {
-                                        String chStr = (char) ((int) 'A' + j) + "." + choices.get(j);
-                                        int number = (int) results.get(i).get(chStr);
+                                        @SuppressWarnings("unchecked")
+                                        ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
+                                        Integer number = choiceCounts.get(j);
                                         number += 1;
-                                        results.get(i).put(chStr, number);
+                                        choiceCounts.set(j, number);
                                     }
                                 }
                             }
@@ -241,25 +255,21 @@ public class DataController {
                         }
                         case "choice": {
                         }
-                        case "vote": {
-                        }
                         case "dropdown": {
                             if (!answerInFormat.get(i + 1).equals("")) {
                                 String chStr = answerInFormat.get(i + 1);
-
-                                int number = (int) results.get(i).get(chStr);
+                                @SuppressWarnings("unchecked")
+                                ArrayList<String> choiceContents = (ArrayList<String>) results.get(i).get("answers");
+                                @SuppressWarnings("unchecked")
+                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
+                                int answerIndex = choiceContents.indexOf(chStr);
+                                int number = choiceCounts.get(answerIndex);
                                 number += 1;
-                                results.get(i).put(chStr, number);
+                                choiceCounts.set(answerIndex, number);
                             }
                             break;
                         }
                         case "grade": {
-                            if (!answerInFormat.get(i + 1).equals("")) {
-                                String chStr = answerInFormat.get(i + 1);
-                                int number = (int) results.get(i).get(chStr);
-                                number += 1;
-                                results.get(i).put(chStr, number);
-                            }
                             int sumNum;
                             if (sumMap.containsKey(i)) {
                                 sumNum = sumMap.get(i);
@@ -274,16 +284,29 @@ public class DataController {
                             Double originalAvg = (Double) results.get(i).get("avg");
                             Double newAvg = ((originalAvg * (sumNum - 1)) + Double.parseDouble(scores.get(chIndex))) / sumNum;
                             results.get(i).put("avg", newAvg);
+                            if (!answerInFormat.get(i + 1).equals("")) {
+                                @SuppressWarnings("unchecked")
+                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
+                                Integer number = choiceCounts.get(chIndex);
+                                number += 1;
+                                choiceCounts.set(chIndex, number);
+                            }
                             break;
                         }
                         case "filling": {
                             if (!answerInFormat.get(i + 1).equals("")) {
-                                if (results.get(i).containsKey(answerInFormat.get(i + 1))) {
-                                    int number = (int) results.get(i).get(answerInFormat.get(i + 1));
+                                @SuppressWarnings("unchecked")
+                                ArrayList<String> choiceContents = (ArrayList<String>) results.get(i).get("answers");
+                                @SuppressWarnings("unchecked")
+                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
+                                if (choiceContents.contains(answerInFormat.get(i + 1))) {
+                                    int answerIndex = choiceContents.indexOf(answerInFormat.get(i + 1));
+                                    int number = choiceCounts.get(answerIndex);
                                     number += 1;
-                                    results.get(i).put(answerInFormat.get(i + 1), number);
+                                    choiceCounts.set(answerIndex, number);
                                 } else {
-                                    results.get(i).put(answerInFormat.get(i + 1), 1);
+                                    choiceContents.add(answerInFormat.get(i + 1));
+                                    choiceCounts.add(1);
                                 }
                             }
                             break;
@@ -337,6 +360,8 @@ public class DataController {
                             }
                             break;
                         }
+                        case "vote":{
+                        }
                         case "multi-choice": {
                             ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                             String choiceStr = answerContents.get(i).toString();
@@ -347,7 +372,10 @@ public class DataController {
                                 answerInFormat.add("");
                             } else {
                                 for (Integer j : chIndexes) {
-                                    stringBuilder.append((char) ((int) 'A' + j)).append(".").append(choices.get(j));
+                                    if (current_question.getType().equals("multi-choice"))
+                                        stringBuilder.append((char) ((int) 'A' + j)).append(".").append(choices.get(j));
+                                    else
+                                        stringBuilder.append(choices.get(j));
                                     if (chIndexes.indexOf(j) != chIndexes.size() - 1) {
                                         stringBuilder.append(";");
                                     }

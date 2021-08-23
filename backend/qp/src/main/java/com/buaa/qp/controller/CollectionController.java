@@ -1,6 +1,7 @@
 package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
@@ -271,6 +272,48 @@ public class CollectionController {
             answerService.submitAnswer(answer);
             map.put("success", true);
             map.put("conclusion", template.getConclusion());
+
+            // vote results
+            if (template.getType().equals("vote")) {
+                ArrayList<Answer> allAnswers = answerService.getAnswersByTid(templateId);
+                ArrayList<Map<String, Object>> results = new ArrayList<>();
+                for (Question question : questions) {
+                    if (question.getType().equals("vote")) {
+                        Map<String, Object> result = new HashMap<>();
+                        ArrayList<String> answerContents = new ArrayList<>();
+                        ArrayList<Integer> answerCounts = new ArrayList<>();
+                        result.put("stem", question.getStem());
+                        Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                        ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                        for (String choice : choices) {
+                            answerContents.add(choice);
+                            answerCounts.add(0);
+                        }
+                        result.put("answer", answerContents);
+                        result.put("counts", answerCounts);
+                        results.add(result);
+                    }
+                }
+                for (Answer answerData: allAnswers) {
+                    int qIndex = 0;
+                    for (int i = 0; i < questions.size(); i++) {
+                        if (questions.get(i).getType().equals("vote")) {
+                            List<Object> answerContents = JSONArray.parseArray(answerData.getContent(), Object.class);
+                            String choiceStr = answerContents.get(i).toString();
+                            ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
+                            for (Integer j : chIndexes) {
+                                @SuppressWarnings("unchecked")
+                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(qIndex).get("counts");
+                                Integer number = choiceCounts.get(j);
+                                number += 1;
+                                choiceCounts.set(j, number);
+                            }
+                            qIndex ++;
+                        }
+                    }
+                }
+            map.put("results", results);
+            }
         }
         catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
