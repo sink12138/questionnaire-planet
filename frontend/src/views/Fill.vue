@@ -18,8 +18,18 @@
 
     <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible2" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
       <el-form :model="password">
-        <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
-          <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
+        <el-form-item
+          label="问卷密码"
+          :label-width="formLabelWidth"
+          prop="password"
+        >
+          <el-input
+            v-model="password"
+            autocomplete="off"
+            show-password
+            style="width: 300px"
+            placeholder="请输入问卷密码"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -35,8 +45,9 @@
       <h3>
         {{ description }}
       </h3>
+      <h3>问卷剩余{{ remain }}份</h3>
     </div>
-    <div class="question">
+    <div class="question" v-if="submitted == false">
       <el-form
         :model="answers"
         :rules="rules"
@@ -72,7 +83,7 @@
               >
             </div>
             <div class="multi" v-if="item.type == 'multi-choice'">
-              至少选择{{item.min}}项
+              至少选择{{ item.min }}项
               <el-form-item
                 label="选项"
                 :rules="{
@@ -82,7 +93,7 @@
                 <el-checkbox-group
                   v-model="multi"
                   v-for="(i, index) in item.choices"
-                  :min=0
+                  :min="0"
                   :max="item.max"
                   :key="index"
                   @change="multiChangeValue(index_question)"
@@ -148,15 +159,44 @@
                     :label="i"
                     :value="index"
                   >
-                  </el-option> </el-select
-              ></el-form-item>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </div>
+            <div class="multi" v-if="item.type == 'vote'">
+              至少选择{{ item.min }}项
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-checkbox-group
+                  v-model="multi"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
             </div>
           </div>
         </div>
       </el-form>
     </div>
+    <div v-if="submitted == true">
+      <h3>{{ conclusion }}</h3>
+      
+    </div>
     <div class="submit">
-      <el-button @click="submit">提交问卷</el-button>
+      <el-button @click="submit()" v-if="submitted == false"
+        >提交问卷</el-button
+      >
     </div>
   </div>
 </template>
@@ -187,11 +227,14 @@ export default {
     };
     return {
       templateId: 0,
+      submitted: false,
       locked: false,
       login: false,
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      conclusion: "谢谢",
+      remain: "无限制",
       password: "",
       formData: {
         email: "",
@@ -204,6 +247,7 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       formLabelWidth: '100px',
+      results: [{stem:"题干",answers:['A','B'],counts:[12,25]}],
       questions: [
         {
           type: "choice",
@@ -307,13 +351,12 @@ export default {
         }
       })
       .catch((err) => console.log(err));
-
-    
   },
-  mounted: function() {
-    
-  },
+  mounted: function () {},
   methods: {
+    step: function (i) {
+      return "step" + i;
+    },
     goBack() {
       this.$router.push("/");
     },
@@ -381,9 +424,8 @@ export default {
               this.description = response.data.description;
               this.questions = response.data.questions;
               this.dialogFormVisible = false;
-            }
-            else {
-              alert("问卷密码错误！")
+            } else {
+              alert("问卷密码错误！");
             }
           } else {
             console.log(response.data.message);
@@ -424,10 +466,13 @@ export default {
                 (response) => {
                   console.log(response);
                   if (response.data.success == true) {
-                    this.$message({
-                      message: "提交成功！",
-                      type: "success",
-                    });
+                    this.submitted = true;
+                    if (response.data.conclusion == undefined) {
+                      this.conclusion = "感谢您的提交!";
+                    } else {
+                      this.conclusion = response.data.conclusion;
+                    }
+                    this.results = response.data.results;
                   } else {
                     this.$message({
                       message: response.data.message,

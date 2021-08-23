@@ -98,10 +98,35 @@
                       placeholder="请填写问卷描述"
                     />
                   </el-form-item>
+                  <!-- 结束语 -->
+                  <el-form-item label="结束语">
+                    <el-input
+                      v-model="modelForm.conclusion"
+                      style="width: 258px"
+                      clearable
+                      placeholder="答卷后展示"
+                    />
+                  </el-form-item>
                   <!-- 问卷密码 -->
                   <el-form-item label="问卷密码">
                     <el-input
                       v-model="modelForm.password"
+                      style="width: 258px"
+                      clearable
+                      placeholder="可为空"
+                    />
+                  </el-form-item>
+                  <!-- 问卷限额 -->
+                  <el-form-item
+                    label="问卷限额"
+                    :rules="{
+                      type: 'number',
+                      message: '请输入数字',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <el-input
+                      v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
                       placeholder="可为空"
@@ -196,6 +221,31 @@
                           }}</el-checkbox>
                         </el-checkbox-group>
                       </div>
+                      <div class="multi" v-if="item.type == 'sign-up'">
+                        至少选择{{ item.min }}项
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-checkbox-group
+                            v-model="multi"
+                            v-for="(i, index) in item.choices"
+                            :min="0"
+                            :max="item.max"
+                            :key="index"
+                            @change="multiChangeValue(index_question)"
+                          >
+                            <el-checkbox class="option" :label="index" border>{{
+                              i
+                            }}</el-checkbox
+                            >共{{ item.quotas[index] }},剩余{{
+                              item.remains[index]
+                            }}
+                          </el-checkbox-group>
+                        </el-form-item>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -231,7 +281,9 @@ export default {
       modelForm: {
         title: "新的问卷",
         description: "",
+        conclusion: "",
         password: "",
+        quota: 0,
       },
       qrData: {
         text: window.location.host + "/questionnaire/" + this.templateId,
@@ -257,7 +309,9 @@ export default {
           this.modelForm.title = response.data.title;
           this.type = response.data.type;
           this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
+          this.modelForm.quota = response.data.quota;
           this.questions = response.data.questions;
         } else {
           console.log(response.data.message);
@@ -267,8 +321,14 @@ export default {
   },
   methods: {
     save() {
-      if(this.modelForm.password == undefined){
+      if (this.modelForm.password == undefined) {
         this.modelForm.password = "";
+      }
+      if (this.modelForm.conclusion == undefined) {
+        this.modelForm.conclusion = "";
+      }
+      if (this.modelForm.quota == undefined) {
+        this.modelForm.quota = 0;
       }
       console.log(this.modelForm.password);
       this.$axios({
@@ -278,7 +338,9 @@ export default {
           templateId: parseInt(this.templateId),
           title: this.modelForm.title,
           description: this.modelForm.description,
+          conclusion: this.modelForm.conclusion,
           password: this.modelForm.password,
+          quota: parseInt(this.modelForm.quota),
         }),
       }).then(
         (response) => {

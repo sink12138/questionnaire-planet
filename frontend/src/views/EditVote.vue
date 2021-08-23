@@ -106,6 +106,15 @@
                   placeholder="请填写问卷描述"
                 />
               </el-form-item>
+              <!-- 结束语 -->
+              <el-form-item label="结束语">
+                <el-input
+                  v-model="modelForm.conclusion"
+                  style="width: 258px"
+                  clearable
+                  placeholder="答卷后展示"
+                />
+              </el-form-item>
               <!-- 问卷密码 -->
               <el-form-item label="问卷密码">
                 <el-input
@@ -115,6 +124,22 @@
                   placeholder="可为空"
                 />
               </el-form-item>
+              <!-- 问卷限额 -->
+                  <el-form-item
+                    label="问卷限额"
+                    :rules="{
+                      type: 'number',
+                      message: '请输入数字',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <el-input
+                      v-model="modelForm.quota"
+                      style="width: 258px"
+                      clearable
+                      placeholder="若无限额请输入0"
+                    />
+                  </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -300,39 +325,57 @@
                     </el-row>
                     <!-- 答案 -->
                     <el-row v-if="item.type != 2">
-                      <el-form-item
-                        v-for="(opt, idx) in item.answers"
-                        :key="idx"
-                        :label="`选项${idx + 1}`"
-                        :prop="`questions.${index}.answers.${idx}.value`"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请输入选项',
-                            trigger: 'blur',
-                          },
-                        ]"
-                      >
-                        <el-input
-                          v-model.trim="opt.value"
-                          style="width: 258px"
-                          clearable
-                          placeholder="请输入选项"
-                        />
-                        <el-input
-                          v-model.trim="opt.scores"
-                          v-show="item.type == 3"
-                          style="width: 60px; margin-left: 10px"
-                          clearable
-                          placeholder="..."
-                        />
-                        <el-button
-                          style="margin-left: 20px"
-                          @click.prevent="removeDomain(index, idx)"
-                          >删除</el-button
-                        >
-                      </el-form-item></el-row
+                    <el-form-item
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`选项${idx + 1}`"
+                      :prop="`questions.${index}.answers.${idx}.value`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入选项',
+                          trigger: 'blur',
+                        },
+                      ]"
                     >
+                      <el-input
+                        v-model.trim="opt.value"
+                        style="width: 200px"
+                        clearable
+                        placeholder="请输入选项"
+                      />
+                      <el-button
+                        style="margin-left: 20px"
+                        @click.prevent="removeDomain(index, idx)"
+                        >删除</el-button
+                      >
+                    </el-form-item>
+                    <el-form-item
+                      v-show="item.type == 3"
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`第${idx + 1}项评分`"
+                      :prop="`questions.${index}.answers.${idx}.scores`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入评分',
+                          trigger: 'blur',
+                        },
+                        {
+                          validator: isNum,
+                          trigger: 'blur',
+                        }
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.scores"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入评分"
+                      />
+                    </el-form-item>
+                  </el-row>
                     <el-form-item label="编辑题目">
                       <el-button
                         icon="el-icon-circle-plus"
@@ -385,7 +428,9 @@ export default {
       modelForm: {
         title: "新的问卷",
         description: "",
+        conclusion: "",
         password: "",
+        quota: 0,
         questions: [],
       },
       qrData: {
@@ -411,7 +456,9 @@ export default {
         if (response.data.success == true) {
           this.modelForm.title = response.data.title;
           this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
+          this.modelForm.quota = response.data.quota;
           var question = {};
           var item = {};
           var i = 0;
@@ -453,8 +500,8 @@ export default {
                 break;
               case "grade":
                 question.type = "3";
-                for (j in item.answers) {
-                  x = item.answers[j];
+                for (j in item.choices) {
+                  x = item.choices[j];
                   y = item.scores[j];
                   question.answers.push({ value: x, scores: y });
                 }
@@ -630,6 +677,9 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          if(this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
@@ -637,8 +687,10 @@ export default {
               templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              type: "normal",
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
               questions: templateQuestions,
             }),
           }).then(

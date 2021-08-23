@@ -61,6 +61,7 @@
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
+            style="margin: 0"
             router>
             <el-menu-item index="/questionnaire">
               <i class="el-icon-circle-plus"></i>
@@ -68,7 +69,7 @@
             </el-menu-item>
             <el-menu-item index="/history">
               <i class="el-icon-s-order"></i>
-              <span slot="title">历史问卷</span>
+              <span slot="title">我的问卷</span>
             </el-menu-item>
             <el-menu-item index="/recycle">
               <i class="el-icon-delete-solid"></i>

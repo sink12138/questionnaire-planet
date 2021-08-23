@@ -1,5 +1,5 @@
 <template>
-  <div class="statistics">
+  <div class="statistics" style="height: 100%">
     <el-container>
       <el-aside width="200px">
       <div class="editor">
@@ -36,13 +36,28 @@
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
-          <div
-          v-for="(item, index) in sumData"
-          :key="index">
-            <span>{{item}}</span>
-            <el-button @click="loadData(item)">查看分析</el-button>
+          <div class="chart">
             <canvas id="myChart"></canvas>
           </div>
+          <el-table
+          :data="sumData"
+          style="width: 20%"
+          max-height="600">
+            <el-table-column
+            fixed
+            type="index"
+            width="80">
+            </el-table-column>
+            <el-table-column
+            prop="stem"
+            label="题目题干">
+            </el-table-column>
+            <el-table-column>
+              <template slot-scope="scope">
+                <el-button @click="loadData(scope.row)">查看分析</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </el-main>
     </el-container>
@@ -60,123 +75,17 @@ export default {
   data() {
     return {
       show: "data",
-      questionList: [
-        "题目1","题目2","题目3"
-      ],
-      answerData: [
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'Hello',
-          "题目2": 'How',
-          "题目3": 'Are'
-        }
-      ],
-      sumData: [
-        {
-          type: "choice",
-          stem: "hello",
-          answers: ["a","b","c","d"],
-          counts: [2, 4, 6, 8]
-        },
-        {
-          type: "choice",
-          stem: "hello",
-          answers: ["a","b","c","d"],
-          counts: [5, 5, 5, 5]
-        },
-      ],
+      questionList: [],
+      answerData: [],
+      sumData: [],
       answerTimes: [],
-      myChart: null,
-      canvas: null,
+      answerList: [],
+      countList: [],
       stem: '',
       type: '',
       avg: '',
-      answerList: [],
-      countList: [],
+      myChart: null,
+      canvas: null,
     }
   },
   created: function () {
@@ -190,8 +99,9 @@ export default {
     }).then((response) => {
       console.log(response);
       if (response.data.success == true) {
+        this.questionList = response.data.stems;
         this.answerData = response.data.answers;
-        this.answerTimes = response.data.answerTimes
+        this.answerTimes = response.data.answerTimes;
       } else {
         console.log(response.data.message);
       }
@@ -247,6 +157,7 @@ export default {
       if (this.type == 'grade') {
         this.avg = this.item['avg']
       }
+      this.updateChart()
     },
     loadChart: function() {
       console.log(this.sumData)
@@ -254,10 +165,10 @@ export default {
       this.myChart = new Chart(ctx1, {
         type: 'pie',
         data: {
-          labels: ['a','b','c','d'],
+          labels: [],
           datasets: [{
             label: '',
-            data: [1,2,3,4],
+            data: [],
             backgroundColor: [
               'rgba(44, 130, 201, 1)',
               'rgba(30, 139, 195, 1)',
@@ -278,21 +189,39 @@ export default {
     },
     updateChart: function() {
       if (this.type == 'grade') {
+        console.log('gggg')
+        this.myChart.data.type = 'bar'
+      } else {
         this.myChart.data.type = 'bar'
       }
       this.myChart.data.labels = this.answerList
       this.myChart.data.datasets[0].data = this.countList
+      this.myChart.update()
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+.el-container {
+  height: 100%;
+}
 .all-data {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+}
+.data-sum {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.chart {
+  height: 500px;
+  width: 500px;
+  position: relative;
+  top: 100px;
 }
 .editor {
   position: fixed;

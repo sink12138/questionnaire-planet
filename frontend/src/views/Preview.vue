@@ -170,6 +170,28 @@
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
+                <div class="multi" v-if="item.type == 'sign-up'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      v-model="multi"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border>{{
+                        i
+                      }}</el-checkbox>共{{item.quotas[index]}},剩余{{item.remains[index]}}
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
               </div>
             </div>
           </el-form>

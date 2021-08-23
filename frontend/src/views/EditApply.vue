@@ -125,21 +125,21 @@
                 />
               </el-form-item>
               <!-- 问卷限额 -->
-            <el-form-item
-              label="问卷限额"
-              :rules="{
-                type: 'number',
-                message: '请输入数字',
-                trigger: 'blur',
-              }"
-            >
-              <el-input
-                v-model="modelForm.quota"
-                style="width: 258px"
-                clearable
-                placeholder="若无限额请输入0"
-              />
-            </el-form-item>
+                  <el-form-item
+                    label="问卷限额"
+                    :rules="{
+                      type: 'number',
+                      message: '请输入数字',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <el-input
+                      v-model="modelForm.quota"
+                      style="width: 258px"
+                      clearable
+                      placeholder="若无限额请输入0"
+                    />
+                  </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -175,6 +175,7 @@
                         <el-radio label="2" border>填空题</el-radio>
                         <el-radio label="3" border>评分题</el-radio>
                         <el-radio label="4" border>下拉题</el-radio>
+                        <el-radio label="5" border>报名题</el-radio>
                       </el-radio-group>
                     </el-form-item>
                     <!-- 是否必填 -->
@@ -230,7 +231,7 @@
                       <!-- 最小选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-if="item.type == 1"
+                          v-if="item.type == 1 || item.type == 5"
                           :prop="`questions.${index}.min`"
                           label="最小选项"
                           :rules="[
@@ -253,7 +254,7 @@
                       <!-- 最大选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-if="item.type == 1"
+                          v-if="item.type == 1 || item.type == 5"
                           :prop="`questions.${index}.max`"
                           label="最大选项"
                           :rules="[
@@ -364,7 +365,7 @@
                         {
                           validator: isNum,
                           trigger: 'blur',
-                        }
+                        },
                       ]"
                     >
                       <el-input
@@ -372,6 +373,31 @@
                         style="width: 120px; margin-left: 10px"
                         clearable
                         placeholder="请输入评分"
+                      />
+                    </el-form-item>
+                    <el-form-item
+                      v-show="item.type == 5"
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`第${idx + 1}项名额`"
+                      :prop="`questions.${index}.answers.${idx}.number`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入名额',
+                          trigger: 'blur',
+                        },
+                        {
+                          validator: isNum,
+                          trigger: 'blur',
+                        },
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.number"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入名额"
                       />
                     </el-form-item>
                   </el-row>
@@ -512,6 +538,15 @@ export default {
                   question.answers.push({ value: x });
                 }
                 break;
+              case "sign-up":
+                question.type = "5";
+                question.max = item.max;
+                question.min = item.min;
+                for (j in item.choices) {
+                  x = item.choices[j];
+                  question.answers.push({ value: x, number: y });
+                }
+                break;
             }
             console.log(question);
             this.modelForm.questions.push(question);
@@ -528,6 +563,8 @@ export default {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
         callback(new Error("请输入数字"));
+      } else if (parseInt(value) < 1) {
+        callback(new Error("请输入大于等于一的数字"));
       } else {
         callback();
       }
@@ -566,7 +603,7 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({ value: "" });
+      this.modelForm.questions[index].answers.push({ value: "" ,scores: 0, number: 0});
     },
     addQuestion() {
       // 新增题目
@@ -580,8 +617,8 @@ export default {
         height: 1,
         width: 100,
         answers: [
-          { value: "", scores: 0 },
-          { value: "", scores: 0 },
+          { value: "", scores: 0 ,number: 0},
+          { value: "", scores: 0 ,number: 0},
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -651,6 +688,17 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "sign-up";
+                quest.quotas = [];
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.quotas.push(parseInt(x.number));
+                }
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -669,7 +717,7 @@ export default {
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
               quota: parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "sign-up",
               questions: templateQuestions,
             }),
           }).then(
