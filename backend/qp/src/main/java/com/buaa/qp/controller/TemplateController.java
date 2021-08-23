@@ -58,7 +58,7 @@ public class TemplateController {
                 conclusion = (String) requestMap.get("conclusion");
                 if (conclusion != null && conclusion.isEmpty()) conclusion = null;
                 quota = (Integer) requestMap.get("quota");
-                if (quota == null || quota <= 0) quota = null;
+                if (quota != null && quota <= 0) quota = null;
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException cce) {
@@ -271,6 +271,7 @@ public class TemplateController {
             String description;
             String password;
             String conclusion;
+            Integer quota;
 
             // Parameter checks of template
             try {
@@ -279,6 +280,7 @@ public class TemplateController {
                 description = (String) requestMap.get("description");
                 password = (String) requestMap.get("password");
                 conclusion = (String) requestMap.get("conclusion");
+                quota = (Integer) requestMap.get("quota");
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
@@ -286,6 +288,7 @@ public class TemplateController {
             if (description != null && description.isEmpty()) description = null;
             if (password != null && password.isEmpty()) password = null;
             if (conclusion != null && conclusion.isEmpty()) conclusion = null;
+            if (quota != null && quota <= 0) quota = null;
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
@@ -303,6 +306,7 @@ public class TemplateController {
             template.setDescription(description);
             template.setPassword(password);
             template.setConclusion(conclusion);
+            template.setQuota(quota);
             templateService.adjustTemplate(template);
             map.put("success", true);
 
