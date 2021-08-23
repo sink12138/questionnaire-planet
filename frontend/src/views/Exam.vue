@@ -3,9 +3,14 @@
     <el-header>
       <p>Exam</p>
     </el-header>
+
     <div class="timer">
-      <el-button v-if="show" @click="start" >{{ info }}</el-button>
-      <el-button v-if="!show">{{ times }}s</el-button>
+      <span>{{ times }}s</span>
+    </div>
+
+    <div>
+      <el-button type="primary" @click="submit">提交按钮(被点了{{ counter }}次)</el-button>
+      <el-button type="primary" @click="restart">点我重新计时！</el-button>
     </div>
   </el-container>
   
@@ -15,24 +20,30 @@
 export default {
   data() {
     return {
+      counter: 0,
       times: 5,
-      show: true,
-      info: "点我开始计时！"
     }
   },
   mounted: function(){
-
+    this.timer = setInterval(()=>{
+        this.times--
+        if(this.times===0){
+          this.submit();
+          clearInterval(this.timer);
+        }
+      },1000)
   },
   methods: {
-    start() {
-      this.show = false
+    submit() {
+      this.counter++;
+    },
+    restart() {
+      this.times = 5;
       this.timer = setInterval(()=>{
         this.times--
         if(this.times===0){
-          this.show = true
-          this.info = "时间到，再点我重新计时！"
-          this.times = 5
-          clearInterval(this.timer)
+          this.submit();
+          clearInterval(this.timer);
         }
       },1000)
     }
