@@ -1,5 +1,17 @@
 <template>
   <div id="quest" ref="quest">
+    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false">
+      <el-form :model="password">
+        <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
+          <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="goBack">返回首页</el-button>
+        <el-button type="primary" @click="unlock">确认</el-button>
+      </div>
+    </el-dialog>
+
     <div class="head">
       <h1>
         {{ title }}
@@ -143,6 +155,8 @@ export default {
       type: "normal",
       description: "问卷描述",
       password: "",
+      dialogFormVisible: false,
+      formLabelWidth: '100px',
       questions: [
         {
           type: "choice",
@@ -201,7 +215,7 @@ export default {
     console.log(this.templateId);
     this.$axios({
       method: "get",
-      url: "http://139.224.50.146:80/apis/locked",
+      url: "http://139.224.50.146:80/apis/attempt",
       params: { templateId: this.templateId },
     })
       .then((response) => {
@@ -213,26 +227,55 @@ export default {
         }
       })
       .catch((err) => console.log(err));
-    this.$axios({
-      method: "get",
-      url: "http://139.224.50.146:80/apis/details",
-      params: { templateId: this.templateId, password: "" },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.data.success == true) {
-          this.title = response.data.title;
-          this.type = response.data.type;
-          this.description = response.data.description;
-          this.password = response.data.password;
-          this.questions = response.data.questions;
-        } else {
-          console.log(response.data.message);
-        }
+
+    if (this.locked == true) {
+      this.dialogFormVisible = true;
+    }
+    else {
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/details",
+        params: { templateId: this.templateId },
       })
-      .catch((err) => console.log(err));
+        .then((response) => {
+          console.log(response);
+          if (response.data.success == true) {
+            this.title = response.data.title;
+            this.type = response.data.type;
+            this.description = response.data.description;
+            this.questions = response.data.questions;
+          } else {
+            console.log(response.data.message);
+          }
+        })
+        .catch((err) => console.log(err));
+    }
   },
   methods: {
+    goBack() {
+      this.$router.push("/");
+    },
+    unlock() {
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/details",
+        params: { templateId: this.templateId, password: this.password },
+      })
+        .then((response) => {
+          console.log(response);
+          if (response.data.success == true) {
+            this.title = response.data.title;
+            this.type = response.data.type;
+            this.description = response.data.description;
+            this.password = response.data.password;
+            this.questions = response.data.questions;
+          } else {
+            console.log(response.data.message);
+            alert("问卷密码错误！")
+          }
+        })
+        .catch((err) => console.log(err));
+    },
     exportQuest() {
       this.$PDFSave(this.$refs.quest, this.title);
     },

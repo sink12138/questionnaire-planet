@@ -165,7 +165,7 @@ export default {
     console.log(this.templateId);
     this.$axios({
       method: "get",
-      url: "http://139.224.50.146:80/apis/locked",
+      url: "http://139.224.50.146:80/apis/attempt",
       params: { templateId: this.templateId },
     })
       .then((response) => {
