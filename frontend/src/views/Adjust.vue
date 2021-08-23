@@ -182,6 +182,20 @@
                           </el-option>
                         </el-select>
                       </div>
+                      <div v-if="item.type == 'vote'">
+                        <el-checkbox-group
+                          v-model="multi"
+                          v-for="(i, index) in item.choices"
+                          :min="item.min"
+                          :max="item.max"
+                          :key="index"
+                          @change="multiChangeValue(index_question)"
+                        >
+                          <el-checkbox :label="index" border>{{
+                            i
+                          }}</el-checkbox>
+                        </el-checkbox-group>
+                      </div>
                     </div>
                   </div>
                 </div>
