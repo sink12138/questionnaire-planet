@@ -1,6 +1,6 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false">
+    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" @close="goBack">
       <el-form :model="password">
         <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
           <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
@@ -222,34 +222,41 @@ export default {
         console.log(response);
         if (response.data.success == true) {
           this.locked = response.data.locked;
+          if (this.locked == true) {
+            console.log(22);
+            this.dialogFormVisible = true;
+          }
+          else {
+            console.log(33);
+            this.$axios({
+              method: "get",
+              url: "http://139.224.50.146:80/apis/details",
+              params: { templateId: this.templateId },
+            })
+              .then((response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.title = response.data.title;
+                  this.type = response.data.type;
+                  this.description = response.data.description;
+                  this.questions = response.data.questions;
+                  this.dialogFormVisible = false;
+                } else {
+                  console.log(response.data.message);
+                }
+              })
+              .catch((err) => console.log(err));
+          }
         } else {
           console.log(response.data.message);
         }
       })
       .catch((err) => console.log(err));
 
-    if (this.locked == true) {
-      this.dialogFormVisible = true;
-    }
-    else {
-      this.$axios({
-        method: "get",
-        url: "http://139.224.50.146:80/apis/details",
-        params: { templateId: this.templateId },
-      })
-        .then((response) => {
-          console.log(response);
-          if (response.data.success == true) {
-            this.title = response.data.title;
-            this.type = response.data.type;
-            this.description = response.data.description;
-            this.questions = response.data.questions;
-          } else {
-            console.log(response.data.message);
-          }
-        })
-        .catch((err) => console.log(err));
-    }
+    
+  },
+  mounted: function() {
+    
   },
   methods: {
     goBack() {
@@ -264,14 +271,18 @@ export default {
         .then((response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.title = response.data.title;
-            this.type = response.data.type;
-            this.description = response.data.description;
-            this.password = response.data.password;
-            this.questions = response.data.questions;
+            if (response.data.password == this.password) {
+              this.title = response.data.title;
+              this.type = response.data.type;
+              this.description = response.data.description;
+              this.questions = response.data.questions;
+              this.dialogFormVisible = false;
+            }
+            else {
+              alert("问卷密码错误！")
+            }
           } else {
             console.log(response.data.message);
-            alert("问卷密码错误！")
           }
         })
         .catch((err) => console.log(err));
