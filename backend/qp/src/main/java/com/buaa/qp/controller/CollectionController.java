@@ -289,7 +289,7 @@ public class CollectionController {
                             answerContents.add(choice);
                             answerCounts.add(0);
                         }
-                        result.put("answer", answerContents);
+                        result.put("answers", answerContents);
                         result.put("counts", answerCounts);
                         results.add(result);
                     }
