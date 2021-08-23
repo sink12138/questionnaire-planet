@@ -9,9 +9,7 @@ import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -53,8 +51,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void modifyTemplate(Template template, ArrayList<Question> questions) {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        template.setDuration(sdf.format(new Date(0)));
+        template.setDuration("00:00:00");
         templateDao.update(template);
         Integer templateId = template.getTemplateId();
         answerDao.deleteByTid(templateId);

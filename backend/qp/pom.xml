@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.buaa</groupId>
 	<artifactId>qp</artifactId>
-	<version>0.2.1-SNAPSHOT</version>
+	<version>0.2.2-SNAPSHOT</version>
 	<name>qp</name>
 	<description>Questionnaire Planet project</description>
 	<properties>
