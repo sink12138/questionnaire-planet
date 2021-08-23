@@ -385,7 +385,7 @@ export default {
     isLogin() {
       if (this.locked == true) {
         console.log(22);
-        this.dialogFormVisible = true;
+        this.dialogFormVisible2 = true;
       }
       else {
         console.log(33);
@@ -401,7 +401,6 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
-              this.dialogFormVisible = false;
             } else {
               console.log(response.data.message);
             }
@@ -423,7 +422,7 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
-              this.dialogFormVisible = false;
+              this.dialogFormVisible2 = false;
             } else {
               alert("问卷密码错误！");
             }
