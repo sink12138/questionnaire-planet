@@ -39,8 +39,10 @@
           <div
           v-for="(item, index) in sumData"
           :key="index">
-            <span>{{item}}</span>
+            <span>{{item['stem']}}</span>
             <el-button @click="loadData(item)">查看分析</el-button>
+          </div>
+          <div class="chart">
             <canvas id="myChart"></canvas>
           </div>
         </div>
@@ -60,6 +62,7 @@ export default {
   data() {
     return {
       show: "data",
+      chart_show: false,
       questionList: [
         "题目1","题目2","题目3"
       ],
@@ -163,7 +166,7 @@ export default {
           counts: [2, 4, 6, 8]
         },
         {
-          type: "choice",
+          type: "grade",
           stem: "hello",
           answers: ["a","b","c","d"],
           counts: [5, 5, 5, 5]
@@ -183,7 +186,7 @@ export default {
     this.templateId = this.$route.query.templateId;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
-    this.$axios({
+    /*this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/data",
       params: { templateId: this.templateId },
@@ -211,7 +214,7 @@ export default {
       }
     }).catch((error) => {
       console.log(error)
-    });
+    });*/
   },
   watch: {
     canvas: function() {
@@ -247,6 +250,7 @@ export default {
       if (this.type == 'grade') {
         this.avg = this.item['avg']
       }
+      this.updateChart()
     },
     loadChart: function() {
       console.log(this.sumData)
@@ -254,10 +258,10 @@ export default {
       this.myChart = new Chart(ctx1, {
         type: 'pie',
         data: {
-          labels: ['a','b','c','d'],
+          labels: [],
           datasets: [{
             label: '',
-            data: [1,2,3,4],
+            data: [],
             backgroundColor: [
               'rgba(44, 130, 201, 1)',
               'rgba(30, 139, 195, 1)',
@@ -278,10 +282,14 @@ export default {
     },
     updateChart: function() {
       if (this.type == 'grade') {
+        console.log('gggg')
+        this.myChart.data.type = 'bar'
+      } else {
         this.myChart.data.type = 'bar'
       }
       this.myChart.data.labels = this.answerList
       this.myChart.data.datasets[0].data = this.countList
+      this.myChart.update()
     }
   }
 }
@@ -293,6 +301,15 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.data-sum {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.chart {
+  height: 600px;
+  width: 600px;
 }
 .editor {
   position: fixed;
