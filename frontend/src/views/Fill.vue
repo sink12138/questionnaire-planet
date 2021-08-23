@@ -232,9 +232,11 @@ export default {
   },
   mounted: function() {
     if (this.locked == true) {
+      console.log(22);
       this.dialogFormVisible = true;
     }
     else {
+      console.log(33);
       this.$axios({
         method: "get",
         url: "http://139.224.50.146:80/apis/details",
