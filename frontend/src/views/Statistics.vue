@@ -35,6 +35,15 @@
             </el-table-column>
           </el-table>
         </div>
+        <div class="data-sum" v-show="this.show === 'sum'">
+          <div
+          v-for="(item, index) in sumData"
+          :key="index">
+            <span>{{item}}</span>
+            <el-button @click="loadData(item)">查看分析</el-button>
+            <canvas id="myChart"></canvas>
+          </div>
+        </div>
       </el-main>
     </el-container>
   </div>
@@ -146,7 +155,28 @@ export default {
           "题目3": 'Are'
         }
       ],
-      answerTimes: []
+      sumData: [
+        {
+          type: "choice",
+          stem: "hello",
+          answers: ["a","b","c","d"],
+          counts: [2, 4, 6, 8]
+        },
+        {
+          type: "choice",
+          stem: "hello",
+          answers: ["a","b","c","d"],
+          counts: [5, 5, 5, 5]
+        },
+      ],
+      answerTimes: [],
+      myChart: null,
+      canvas: null,
+      stem: '',
+      type: '',
+      avg: '',
+      answerList: [],
+      countList: [],
     }
   },
   created: function () {
@@ -183,19 +213,75 @@ export default {
       console.log(error)
     });
   },
+  watch: {
+    canvas: function() {
+      console.log('load chart')
+      this.loadChart()
+    },
+    answerList: {
+      handler: function() {
+        this.updateChart()
+      },
+      deep: true
+    },
+    countList: {
+      handler: function() {
+        this.updateChart()
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    var el = document.getElementById('myChart');
+    this.canvas = el
+  },
   methods: {
     changeShow(key) {
       this.show = key
     },
-    loadSumChart: function() {
+    loadData(item) {
+      this.stem = item['stem']
+      this.type = item['type']
+      this.answerList = item['answers']
+      this.countList = item['counts']
+      if (this.type == 'grade') {
+        this.avg = this.item['avg']
+      }
+    },
+    loadChart: function() {
       console.log(this.sumData)
-      var ctx1 = document.getElementById('mySumChart');
+      var ctx1 = document.getElementById('myChart');
       this.myChart = new Chart(ctx1, {
         type: 'pie',
         data: {
-
+          labels: ['a','b','c','d'],
+          datasets: [{
+            label: '',
+            data: [1,2,3,4],
+            backgroundColor: [
+              'rgba(44, 130, 201, 1)',
+              'rgba(30, 139, 195, 1)',
+              'rgba(65, 131, 215, 1)',
+              'rgba(34, 167, 240, 1)',
+              'rgba(25, 181, 254, 1)',
+              'rgba(107, 185, 240, 1)',
+              'rgba(68, 108, 179, 1)',
+              'rgba(52, 152, 219, 1)',
+              'rgba(89, 171, 227, 1)',
+              'rgba(137, 196, 244, 1)'
+            ],
+            hoverOffset: 4,
+            borderWidth: 0
+          }]
         }
       })
+    },
+    updateChart: function() {
+      if (this.type == 'grade') {
+        this.myChart.data.type = 'bar'
+      }
+      this.myChart.data.labels = this.answerList
+      this.myChart.data.datasets[0].data = this.countList
     }
   }
 }
