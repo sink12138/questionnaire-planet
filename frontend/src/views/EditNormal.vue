@@ -20,6 +20,9 @@
             <div class="editor-reset">
               <el-button @click="resetForm('modelForm')">重置</el-button>
             </div>
+            <div class="preview">
+              <el-button @click="preview()">预览</el-button>
+            </div>
             <div class="publish">
               <el-button @click="publishQuestion" type="primary"
                 >发布问卷</el-button
@@ -638,6 +641,10 @@ export default {
           console.log("保存成功!");
         }
       });
+    },
+    preview() {
+      this.addSubmit();
+      this.$router.push("/preview?templateId=" + this.templateId);
     },
     publishQuestion() {
       this.addSubmit();
