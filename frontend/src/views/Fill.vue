@@ -228,9 +228,6 @@ export default {
       })
       .catch((err) => console.log(err));
 
-    
-  },
-  mounted: function() {
     if (this.locked == true) {
       console.log(22);
       this.dialogFormVisible = true;
@@ -255,6 +252,9 @@ export default {
         })
         .catch((err) => console.log(err));
     }
+  },
+  mounted: function() {
+    
   },
   methods: {
     goBack() {
