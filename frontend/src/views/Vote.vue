@@ -603,7 +603,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota,
+              quota: parseInt(this.modelForm.quota),
               type: "vote",
               questions: templateQuestions,
             }),
