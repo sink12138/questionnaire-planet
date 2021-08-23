@@ -630,6 +630,7 @@ export default {
                 break;
               case "5":
                 quest.type = "sign-up";
+                quest.quotas = [];
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 for (j in question.answers) {

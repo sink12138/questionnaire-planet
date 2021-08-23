@@ -525,8 +525,8 @@ export default {
                 break;
               case "grade":
                 question.type = "3";
-                for (j in item.answers) {
-                  x = item.answers[j];
+                for (j in item.choices) {
+                  x = item.choices[j];
                   y = item.scores[j];
                   question.answers.push({ value: x, scores: y });
                 }
@@ -690,6 +690,7 @@ export default {
                 break;
               case "5":
                 quest.type = "sign-up";
+                quest.quotas = [];
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 for (j in question.answers) {

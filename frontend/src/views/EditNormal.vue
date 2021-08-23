@@ -499,8 +499,8 @@ export default {
                 break;
               case "grade":
                 question.type = "3";
-                for (j in item.answers) {
-                  x = item.answers[j];
+                for (j in item.choices) {
+                  x = item.choices[j];
                   y = item.scores[j];
                   question.answers.push({ value: x, scores: y });
                 }
