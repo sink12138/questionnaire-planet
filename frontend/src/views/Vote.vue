@@ -553,6 +553,15 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "vote";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
