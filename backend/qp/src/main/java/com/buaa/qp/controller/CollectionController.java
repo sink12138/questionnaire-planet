@@ -53,9 +53,9 @@ public class CollectionController {
             }
             if (template.getType().equals("vote")) {
                 ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
-                InetAddress address = InetAddress.getLocalHost();
+                String ip = request.getHeader("x-forwarded-for") == null ? request.getHeader("x-forwarded-for") : request.getRemoteAddr();
                 for (Answer answer : answers) {
-                    if (answer.getIp().equals(address.getHostAddress())) {
+                    if (answer.getIp().equals(ip)) {
                         throw new ExtraMessageException("已填过问卷");
                     }
                 }
@@ -267,7 +267,7 @@ public class CollectionController {
                     throw new ParameterFormatException();
                 }
             }
-            String ip = InetAddress.getLocalHost().getHostAddress();
+            String ip = request.getHeader("x-forwarded-for") == null ? request.getHeader("x-forwarded-for") : request.getRemoteAddr();
             Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
             answerService.submitAnswer(answer);
             map.put("success", true);
