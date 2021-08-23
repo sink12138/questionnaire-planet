@@ -105,6 +105,15 @@
                 placeholder="请填写问卷描述"
               />
             </el-form-item>
+            <!-- 结束语 -->
+            <el-form-item label="结束语">
+              <el-input
+                v-model="modelForm.conclusion"
+                style="width: 258px"
+                clearable
+                placeholder="答卷后展示"
+              />
+            </el-form-item>
             <!-- 问卷密码 -->
             <el-form-item label="问卷密码">
               <el-input
@@ -112,6 +121,22 @@
                 style="width: 258px"
                 clearable
                 placeholder="可为空"
+              />
+            </el-form-item>
+            <!-- 问卷限额 -->
+            <el-form-item
+              label="问卷限额"
+              :rules="{
+                type: 'number',
+                message: '请输入数字',
+                trigger: 'blur',
+              }"
+            >
+              <el-input
+                v-model="modelForm.quota"
+                style="width: 258px"
+                clearable
+                placeholder="若无限额请输入0"
               />
             </el-form-item>
           </div>
@@ -382,7 +407,9 @@ export default {
       modelForm: {
         title: "新的问卷",
         description: "",
+        conclusion: "",
         password: "",
+        quota: 0,
         questions: [
           {
             type: "0",
@@ -574,7 +601,9 @@ export default {
               templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
               type: "vote",
               questions: templateQuestions,
             }),

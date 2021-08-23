@@ -106,6 +106,15 @@
                   placeholder="请填写问卷描述"
                 />
               </el-form-item>
+              <!-- 结束语 -->
+              <el-form-item label="结束语">
+                <el-input
+                  v-model="modelForm.conclusion"
+                  style="width: 258px"
+                  clearable
+                  placeholder="答卷后展示"
+                />
+              </el-form-item>
               <!-- 问卷密码 -->
               <el-form-item label="问卷密码">
                 <el-input
@@ -115,6 +124,22 @@
                   placeholder="可为空"
                 />
               </el-form-item>
+              <!-- 问卷限额 -->
+            <el-form-item
+              label="问卷限额"
+              :rules="{
+                type: 'number',
+                message: '请输入数字',
+                trigger: 'blur',
+              }"
+            >
+              <el-input
+                v-model="modelForm.quota"
+                style="width: 258px"
+                clearable
+                placeholder="若无限额请输入0"
+              />
+            </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -384,7 +409,9 @@ export default {
       modelForm: {
         title: "新的问卷",
         description: "",
+        conclusion: "",
         password: "",
+        quota: 0,
         questions: [],
       },
       qrData: {
@@ -410,7 +437,9 @@ export default {
         if (response.data.success == true) {
           this.modelForm.title = response.data.title;
           this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
+          this.modelForm.quota = response.data.quota;
           var question = {};
           var item = {};
           var i = 0;
@@ -609,6 +638,9 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          if(this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
@@ -616,7 +648,9 @@ export default {
               templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
