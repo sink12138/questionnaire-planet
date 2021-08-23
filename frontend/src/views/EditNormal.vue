@@ -20,6 +20,9 @@
             <div class="editor-reset">
               <el-button @click="resetForm('modelForm')">重置</el-button>
             </div>
+            <div class="preview">
+              <el-button @click="preview()">预览</el-button>
+            </div>
             <div class="publish">
               <el-button @click="publishQuestion" type="primary"
                 >发布问卷</el-button
@@ -608,12 +611,13 @@ export default {
           }
           this.$axios({
             method: "post",
-            url: "http://139.224.50.146:80/apis/normal/submit",
+            url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
               templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               password: this.modelForm.password,
+              type: "normal",
               questions: templateQuestions,
             }),
           }).then(
@@ -638,6 +642,10 @@ export default {
           console.log("保存成功!");
         }
       });
+    },
+    preview() {
+      this.addSubmit();
+      this.$router.push("/preview?templateId=" + this.templateId);
     },
     publishQuestion() {
       this.addSubmit();

@@ -143,6 +143,46 @@
                           >预览</el-button
                         ></el-dropdown-item
                       >
+                      <el-dropdown-item>
+                        <el-button @click="qr(item)">Qrcode</el-button>
+                        <el-dialog
+                          :append-to-body="true"
+                          title="分享问卷"
+                          :visible.sync="dialogVisible"
+                          width="30%"
+                          :before-close="handleClose"
+                          center
+                        >
+                          <div class="share">
+                            <div>
+                              <vue-qr
+                                ref="Qrcode"
+                                :text="qrData.text"
+                                :logoSrc="qrData.logo"
+                              >
+                              </vue-qr>
+                            </div>
+                            <div>
+                              <el-button
+                                style="margin: 10px"
+                                class="tag-copy"
+                                @click="copyShareLink"
+                                :data-clipboard-text="qrData.text"
+                              >
+                                复制链接
+                              </el-button>
+                              <a
+                                style="margin: 10px"
+                                :href="exportLink"
+                                @click="downloadImg"
+                                :download="downloadFilename"
+                              >
+                                <el-button>下载二维码</el-button>
+                              </a>
+                            </div>
+                          </div>
+                        </el-dialog>
+                      </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </el-button-group>
@@ -170,9 +210,12 @@
 
 <script>
 import svg from "../components/svg-history.vue";
+import VueQr from "vue-qr";
+import Clipboard from "clipboard";
 export default {
   components: {
     "question-pic": svg,
+    VueQr,
   },
   data() {
     return {
@@ -182,6 +225,7 @@ export default {
       total: 0,
       pagesize: 12,
       searchQue: [],
+      templateId: 0,
       allQuest: [
         {
           duration: "00:00:00",
@@ -310,6 +354,13 @@ export default {
           released: false,
         },
       ],
+      qrData: {
+        text: window.location.host + "/fill?templateId=" + this.templateId,
+        logo: require("../assets/logo.png"),
+      },
+      exportLink: "",
+      downloadFilename: "",
+      dialogVisible: false,
     };
   },
   created() {
@@ -436,13 +487,22 @@ export default {
               message: "问卷发布成功！",
               type: "success",
             });
-            location.reload();
+            this.templateId = item.templateId;
+            this.qrData.text =
+              window.location.host + "/fill?templateId=" + this.templateId;
+            this.dialogVisible = true;
           }
         },
         (err) => {
           alert(err);
         }
       );
+    },
+    qr(item) {
+      this.templateId = item.templateId;
+      this.qrData.text =
+        window.location.host + "/fill?templateId=" + this.templateId;
+      this.dialogVisible = true;
     },
     close(item) {
       this.$axios({
@@ -531,6 +591,28 @@ export default {
       console.log(this.quest);
       this.$router.push("/preview?templateId=" + this.quest);
     },
+    async copyShareLink() {
+      let clipboard = new Clipboard(".tag-copy");
+      console.log(clipboard);
+      await clipboard.on("success", () => {
+        alert("Copy Success");
+        clipboard.destroy();
+      });
+      clipboard.on("error", () => {
+        alert("Copy error");
+        clipboard.destroy();
+      });
+    },
+    downloadImg() {
+      let Qrcode = this.$refs.Qrcode;
+      this.exportLink = Qrcode.$el.currentSrc;
+      this.downloadFilename = "Questionnaire";
+    },
+    statistics(item) {
+      this.quest = item.templateId;
+      console.log(this.quest);
+      this.$router.push("/statistics?templateId=" + this.quest);
+    }
   },
 };
 </script>

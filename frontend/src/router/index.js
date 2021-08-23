@@ -14,6 +14,7 @@ const Exam = () => import("../views/Exam.vue")
 const Register = () => import("../views/Register.vue")
 const Preview = () => import("../views/Preview.vue")
 const Fill = () => import("../views/Fill.vue")
+const Statistics = () => import("../views/Statistics.vue")
 const Personal = () => import("../views/Personal.vue")
 
 Vue.use(VueRouter)
@@ -85,6 +86,11 @@ const routes = [
     path: '/fill',
     name: 'Fill',
     component: Fill
+  },
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: Statistics
   },
   {
     path: '/personal',
