@@ -50,7 +50,7 @@
             </el-table-column>
             <el-table-column
             prop="stem"
-            label="stem">
+            label="题目题干">
             </el-table-column>
             <el-table-column>
               <template slot-scope="scope">
@@ -75,139 +75,33 @@ export default {
   data() {
     return {
       show: "data",
-      chart_show: false,
-      questionList: [
-        "题目1","题目2","题目3"
-      ],
-      answerData: [
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'hello',
-          "题目2": 'how',
-          "题目3": 'are'
-        },
-        {
-          "题目1": 'Hello',
-          "题目2": 'How',
-          "题目3": 'Are'
-        }
-      ],
-      sumData: [
-        {
-          type: "choice",
-          stem: "hello",
-          answers: ["a","b","c","d"],
-          counts: [2, 4, 6, 8]
-        },
-        {
-          type: "grade",
-          stem: "what",
-          answers: ["a","b","c","d"],
-          counts: [5, 5, 5, 5]
-        },
-      ],
+      questionList: [],
+      answerData: [],
+      sumData: [],
       answerTimes: [],
-      myChart: null,
-      canvas: null,
+      answerList: [],
+      countList: [],
       stem: '',
       type: '',
       avg: '',
-      answerList: [],
-      countList: [],
+      myChart: null,
+      canvas: null,
     }
   },
   created: function () {
     this.templateId = this.$route.query.templateId;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
-    /*this.$axios({
+    this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/data",
       params: { templateId: this.templateId },
     }).then((response) => {
       console.log(response);
       if (response.data.success == true) {
+        this.questionList = response.data.stems;
         this.answerData = response.data.answers;
-        this.answerTimes = response.data.answerTimes
+        this.answerTimes = response.data.answerTimes;
       } else {
         console.log(response.data.message);
       }
@@ -227,7 +121,7 @@ export default {
       }
     }).catch((error) => {
       console.log(error)
-    });*/
+    });
   },
   watch: {
     canvas: function() {
