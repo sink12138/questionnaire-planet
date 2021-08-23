@@ -222,36 +222,37 @@ export default {
         console.log(response);
         if (response.data.success == true) {
           this.locked = response.data.locked;
+          if (this.locked == true) {
+            console.log(22);
+            this.dialogFormVisible = true;
+          }
+          else {
+            console.log(33);
+            this.$axios({
+              method: "get",
+              url: "http://139.224.50.146:80/apis/details",
+              params: { templateId: this.templateId },
+            })
+              .then((response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.title = response.data.title;
+                  this.type = response.data.type;
+                  this.description = response.data.description;
+                  this.questions = response.data.questions;
+                } else {
+                  console.log(response.data.message);
+                }
+              })
+              .catch((err) => console.log(err));
+          }
         } else {
           console.log(response.data.message);
         }
       })
       .catch((err) => console.log(err));
 
-    if (this.locked == true) {
-      console.log(22);
-      this.dialogFormVisible = true;
-    }
-    else {
-      console.log(33);
-      this.$axios({
-        method: "get",
-        url: "http://139.224.50.146:80/apis/details",
-        params: { templateId: this.templateId },
-      })
-        .then((response) => {
-          console.log(response);
-          if (response.data.success == true) {
-            this.title = response.data.title;
-            this.type = response.data.type;
-            this.description = response.data.description;
-            this.questions = response.data.questions;
-          } else {
-            console.log(response.data.message);
-          }
-        })
-        .catch((err) => console.log(err));
-    }
+    
   },
   mounted: function() {
     
