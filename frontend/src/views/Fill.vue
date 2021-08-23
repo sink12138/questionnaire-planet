@@ -228,6 +228,9 @@ export default {
       })
       .catch((err) => console.log(err));
 
+    
+  },
+  mounted: function() {
     if (this.locked == true) {
       this.dialogFormVisible = true;
     }
@@ -269,6 +272,7 @@ export default {
             this.description = response.data.description;
             this.password = response.data.password;
             this.questions = response.data.questions;
+            this.dialogFormVisible = false;
           } else {
             console.log(response.data.message);
             alert("问卷密码错误！")
