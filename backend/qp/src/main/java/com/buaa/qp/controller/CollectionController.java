@@ -217,6 +217,9 @@ public class CollectionController {
                                 if (choice < 0 || choice > maxIndex)
                                     throw new ParameterFormatException();
                             }
+                            choices = new ArrayList<>(choiceSet);
+                            Collections.sort(choices);
+                            answers.set(i, choices);
                             break;
                         }
                         case "filling": {
