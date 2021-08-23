@@ -10,7 +10,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+        <el-button @click="goBack">取 消</el-button>
         <el-button type="primary" @click="tologin">登 录</el-button>
         <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
       </div>
