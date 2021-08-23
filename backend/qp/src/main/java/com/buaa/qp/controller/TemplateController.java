@@ -42,6 +42,7 @@ public class TemplateController {
             String description;
             String password;
             String conclusion;
+            Integer quota;
             ArrayList<Map<String, Object>> questionMaps;
             ClassParser parser = new ClassParser();
 
@@ -56,6 +57,8 @@ public class TemplateController {
                 if (password != null && password.isEmpty()) password = null;
                 conclusion = (String) requestMap.get("conclusion");
                 if (conclusion != null && conclusion.isEmpty()) conclusion = null;
+                quota = (Integer) requestMap.get("quota");
+                if (quota == null || quota <= 0) quota = null;
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException cce) {
@@ -231,7 +234,7 @@ public class TemplateController {
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 
-            Template template = new Template(type, accountId, title, description, password, conclusion);
+            Template template = new Template(type, accountId, title, description, password, conclusion, quota);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(template, questions);
             }
