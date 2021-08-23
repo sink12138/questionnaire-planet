@@ -105,6 +105,15 @@
                 placeholder="请填写问卷描述"
               />
             </el-form-item>
+            <!-- 结束语 -->
+            <el-form-item label="结束语">
+              <el-input
+                v-model="modelForm.conclusion"
+                style="width: 258px"
+                clearable
+                placeholder="答卷后展示"
+              />
+            </el-form-item>
             <!-- 问卷密码 -->
             <el-form-item label="问卷密码">
               <el-input
@@ -112,6 +121,22 @@
                 style="width: 258px"
                 clearable
                 placeholder="可为空"
+              />
+            </el-form-item>
+            <!-- 问卷限额 -->
+            <el-form-item
+              label="问卷限额"
+              :rules="{
+                type: 'number',
+                message: '请输入数字',
+                trigger: 'blur',
+              }"
+            >
+              <el-input
+                v-model="modelForm.quota"
+                style="width: 258px"
+                clearable
+                placeholder="若无限额请输入0"
               />
             </el-form-item>
           </div>
@@ -205,7 +230,7 @@
                     <!-- 最小选项 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1"
+                        v-if="item.type == 1 || item.type == 5"
                         :prop="`questions.${index}.min`"
                         label="最小选项"
                         :rules="[
@@ -228,7 +253,7 @@
                     <!-- 最大选项 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1"
+                        v-if="item.type == 1 || item.type == 5"
                         :prop="`questions.${index}.max`"
                         label="最大选项"
                         :rules="[
@@ -314,16 +339,23 @@
                     >
                       <el-input
                         v-model.trim="opt.value"
-                        style="width: 258px"
+                        style="width: 200px"
                         clearable
                         placeholder="请输入选项"
                       />
                       <el-input
                         v-model.trim="opt.scores"
-                        v-show="item.type == 3"
-                        style="width: 60px; margin-left: 10px"
+                        v-show="item.type == 3 "
+                        style="width: 120px; margin-left: 10px"
                         clearable
-                        placeholder="..."
+                        placeholder="请输入评分"
+                      />
+                      <el-input
+                        v-model.trim="opt.number"
+                        v-show="item.type == 5"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入名额"
                       />
                       <el-button
                         style="margin-left: 20px"
@@ -382,7 +414,9 @@ export default {
       modelForm: {
         title: "新的问卷",
         description: "",
+        conclusion: "",
         password: "",
+        quota: 0,
         questions: [
           {
             type: "0",
@@ -394,8 +428,8 @@ export default {
             height: 1,
             width: 100,
             answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
+              { value: "", scores: 0 ,number: 0},
+              { value: "", scores: 0 ,number: 0},
             ],
           },
           {
@@ -408,8 +442,8 @@ export default {
             height: 1,
             width: 100,
             answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
+              { value: "", scores: 0 ,number: 0},
+              { value: "", scores: 0 ,number: 0},
             ],
           },
         ],
@@ -428,6 +462,8 @@ export default {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
         callback(new Error("请输入数字"));
+      } else if (parseInt(value) < 1) {
+        callback(new Error("请输入大于等于一的数字"));
       } else {
         callback();
       }
@@ -480,8 +516,8 @@ export default {
         height: 1,
         width: 100,
         answers: [
-          { value: "", scores: 0 },
-          { value: "", scores: 0 },
+          { value: "", scores: 0 ,number: 0},
+          { value: "", scores: 0 ,number: 0},
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -551,6 +587,16 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "sign-up";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.quotas.push(parseInt(x.number));
+                }
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -563,7 +609,9 @@ export default {
               templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),

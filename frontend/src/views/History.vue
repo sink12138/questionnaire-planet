@@ -480,6 +480,16 @@ export default {
             message: "问卷已发布！",
           });
         }
+      } else if (item.type == "sign-up") {
+        if (item.released == false) {
+          this.quest = item.templateId;
+          console.log(this.quest);
+          this.$router.push("/apply/edit?templateId=" + this.quest);
+        } else {
+          this.$message({
+            message: "问卷已发布！",
+          });
+        }
       }
     },
     release(item) {

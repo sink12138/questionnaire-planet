@@ -175,7 +175,7 @@
                         <el-radio label="2" border>填空题</el-radio>
                         <el-radio label="3" border>评分题</el-radio>
                         <el-radio label="4" border>下拉题</el-radio>
-                        <el-radio label="5" border>投票题</el-radio>
+                        <el-radio label="5" border>报名题</el-radio>
                       </el-radio-group>
                     </el-form-item>
                     <!-- 是否必填 -->
@@ -339,18 +339,25 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.value"
-                          style="width: 258px"
-                          clearable
-                          placeholder="请输入选项"
-                        />
-                        <el-input
-                          v-model.trim="opt.scores"
-                          v-show="item.type == 3"
-                          style="width: 60px; margin-left: 10px"
-                          clearable
-                          placeholder="..."
-                        />
+                        v-model.trim="opt.value"
+                        style="width: 200px"
+                        clearable
+                        placeholder="请输入选项"
+                      />
+                      <el-input
+                        v-model.trim="opt.scores"
+                        v-show="item.type == 3 "
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入评分"
+                      />
+                      <el-input
+                        v-model.trim="opt.number"
+                        v-show="item.type == 5"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入名额"
+                      />
                         <el-button
                           style="margin-left: 20px"
                           @click.prevent="removeDomain(index, idx)"
@@ -495,13 +502,13 @@ export default {
                   question.answers.push({ value: x });
                 }
                 break;
-              case "vote":
+              case "sign-up":
                 question.type = "5";
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
                   x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({ value: x, number: y });
                 }
                 break;
             }
@@ -574,8 +581,8 @@ export default {
         height: 1,
         width: 100,
         answers: [
-          { value: "", scores: 0 },
-          { value: "", scores: 0 },
+          { value: "", scores: 0 ,number: 0},
+          { value: "", scores: 0 ,number: 0},
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -646,12 +653,13 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "vote";
+                quest.type = "sign-up";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
+                  quest.quotas.push(parseInt(x.number));
                 }
                 break;
             }
@@ -672,7 +680,7 @@ export default {
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
               quota: parseInt(this.modelForm.quota),
-              type: "vote",
+              type: "sign-up",
               questions: templateQuestions,
             }),
           }).then(
