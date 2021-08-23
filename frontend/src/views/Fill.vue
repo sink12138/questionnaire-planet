@@ -10,7 +10,7 @@
     </div>
     <div class="question">
       <el-form
-        :model="ruleForm"
+        :model="answers"
         :rules="rules"
         ref="ruleForm"
         label-width="100px"
@@ -249,7 +249,7 @@ export default {
         type: "warning",
       })
         .then(() => {
-          this.$refs["ruleform"].validate((valid) => {
+          this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
               let submitData = JSON.stringify({
                 templateId: parseInt(this.templateId),
