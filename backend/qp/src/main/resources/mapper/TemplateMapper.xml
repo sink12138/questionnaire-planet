@@ -10,8 +10,8 @@
         where owner = #{owner}
     </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(type, owner, title, description, password, creation_time)
-        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now())
+        insert into template(type, owner, title, description, password, creation_time, conclusion)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclustion})
     </insert>
     <update id="update" parameterType="Template">
         update template
