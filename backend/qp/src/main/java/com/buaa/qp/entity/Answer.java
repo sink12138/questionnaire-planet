@@ -23,6 +23,8 @@ public class Answer {
 
     private Date submitTime;
 
+    private String Ip;
+
     public Answer() {
 
     }
@@ -30,5 +32,11 @@ public class Answer {
     public Answer(Integer templateId, String content) {
         this.templateId = templateId;
         this.content = content;
+    }
+
+    public Answer(Integer templateId, String content, String Ip) {
+        this.templateId = templateId;
+        this.content = content;
+        this.Ip = Ip;
     }
 }
