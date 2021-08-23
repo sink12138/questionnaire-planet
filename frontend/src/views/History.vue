@@ -608,6 +608,11 @@ export default {
       this.exportLink = Qrcode.$el.currentSrc;
       this.downloadFilename = "Questionnaire";
     },
+    statistics(item) {
+      this.quest = item.templateId;
+      console.log(this.quest);
+      this.$router.push("/statistics?templateId=" + this.quest);
+    }
   },
 };
 </script>
