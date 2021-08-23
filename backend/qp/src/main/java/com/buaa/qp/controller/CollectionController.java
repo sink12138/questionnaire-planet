@@ -247,7 +247,8 @@ public class CollectionController {
                     throw new ParameterFormatException();
                 }
             }
-            Answer answer = new Answer(templateId, JSON.toJSONString(answers));
+            String ip = InetAddress.getLocalHost().getHostAddress();
+            Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
             answerService.submitAnswer(answer);
             map.put("success", true);
             map.put("conclusion", template.getConclusion());

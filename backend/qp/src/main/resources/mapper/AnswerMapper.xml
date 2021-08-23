@@ -5,8 +5,8 @@
         delete from answer where template_id = #{templateId}
     </delete>
     <insert id="insert" parameterType="Answer" keyProperty="answerId" useGeneratedKeys="true">
-        insert into answer(template_id, content, submit_time)
-        values (#{templateId}, #{content}, now())
+        insert into answer(template_id, content, submit_time, ip)
+        values (#{templateId}, #{content}, now(), #{ip})
     </insert>
     <select id="selectByTid" parameterType="Integer" resultType="Answer">
         select * from answer where template_id = #{templateId}
