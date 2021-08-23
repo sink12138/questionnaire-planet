@@ -531,6 +531,11 @@ export default {
       console.log(this.quest);
       this.$router.push("/preview?templateId=" + this.quest);
     },
+    statistics(item) {
+      this.quest = item.templateId;
+      console.log(this.quest);
+      this.$router.push("/statistics?templateId=" + this.quest);
+    }
   },
 };
 </script>
