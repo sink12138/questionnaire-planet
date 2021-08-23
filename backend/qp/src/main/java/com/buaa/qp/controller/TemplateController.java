@@ -38,6 +38,7 @@ public class TemplateController {
 
             Integer templateId;
             String title;
+            String type;
             String description;
             String password;
             String conclusion;
@@ -48,6 +49,7 @@ public class TemplateController {
             try {
                 templateId = (Integer) requestMap.get("templateId");
                 title = (String) requestMap.get("title");
+                type = (String) requestMap.get("type");
                 description = (String) requestMap.get("description");
                 if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
@@ -64,6 +66,8 @@ public class TemplateController {
             if (title == null || title.isEmpty())
                 throw new ParameterFormatException();
             if (questionMaps.isEmpty())
+                throw new ParameterFormatException();
+            if (!type.equals("normal") && !type.equals("vote") && !type.equals("sign-up") && !type.equals("exam"))
                 throw new ParameterFormatException();
             ArrayList<Question> questions = new ArrayList<>();
 
@@ -191,6 +195,35 @@ public class TemplateController {
                         argsMap.put("scores", scores);
                         break;
                     }
+                    case "vote": {
+                        if (!type.equals("vote"))
+                            throw new ParameterFormatException();
+                        ArrayList<String> choices;
+                        Integer max;
+                        Integer min;
+                        try {
+                            choices = parser.toStringList(questionMap.get("choices"));
+                            max = (Integer) questionMap.get("max");
+                            min = (Integer) questionMap.get("min");
+                        }
+                        catch (ClassCastException cce) {
+                            throw new ParameterFormatException();
+                        }
+                        if (choices == null || choices.size() < 2)
+                            throw new ParameterFormatException();
+                        if (max == null || max > choices.size()) max = choices.size();
+                        if (min == null || min < 1) min = 1;
+                        if (min.equals(max) && min == choices.size()) {
+                            throw new ParameterFormatException();
+                        }
+                        else if (min > max) {
+                            throw new ParameterFormatException();
+                        }
+                        argsMap.put("choices", choices);
+                        argsMap.put("max", max);
+                        argsMap.put("min", min);
+                        break;
+                    }
                     default:
                         throw new ParameterFormatException();
                 }
@@ -198,7 +231,7 @@ public class TemplateController {
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 
-            Template template = new Template("normal", accountId, title, description, password, conclusion);
+            Template template = new Template(type, accountId, title, description, password, conclusion);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(template, questions);
             }
