@@ -254,6 +254,8 @@ public class ManagementController {
                 throw new RepetitiveOperationException();
             }
 
+            if (template.getReleased())
+                templateService.releaseTemplate(templateId, false);
             templateService.removeTemplate(templateId, true);
             map.put("success", true);
 
