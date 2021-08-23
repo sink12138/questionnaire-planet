@@ -38,7 +38,7 @@
       </div>
     </el-dialog>
 
-    <div class="head">
+    <div class="head" v-if="submitted == false">
       <h1>
         {{ title }}
       </h1>
@@ -189,9 +189,31 @@
         </div>
       </el-form>
     </div>
-    <div v-if="submitted == true">
-      <h3>{{ conclusion }}</h3>
-      
+    <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+    <div class="voted" v-if="(submitted == true)&&(isVote == true)">
+      <div class="result">
+        <div class="chart">
+          <canvas id="myChart"></canvas>
+        </div>
+        <el-table
+        :data="results"
+        max-height="300">
+          <el-table-column
+          fixed
+          type="index"
+          width="80">
+          </el-table-column>
+          <el-table-column
+          prop="stem"
+          label="题目题干">
+          </el-table-column>
+          <el-table-column>
+            <template slot-scope="scope">
+              <el-button @click="updateChart(scope.row)">投票结果</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
     <div class="submit">
       <el-button @click="submit()" v-if="submitted == false"
@@ -202,6 +224,8 @@
 </template>
 
 <script>
+import Chart from 'chart.js/auto'
+Chart.defaults.font.size = 15;
 export default {
   data() {
     var checkEmail = (rule, value, callback) => {
@@ -298,6 +322,8 @@ export default {
       ],
       multi: [],
       answers: [],
+      myChart: null,
+      canvas: null,
     };
   },
   created: function () {
@@ -352,7 +378,22 @@ export default {
       })
       .catch((err) => console.log(err));
   },
-  mounted: function () {},
+  watch: {
+    canvas: function() {
+      console.log('load chart')
+      this.loadChart()
+    },
+    results: {
+      handler: function() {
+        this.updateChart()
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    var el = document.getElementById('myChart');
+    this.canvas = el
+  },
   methods: {
     step: function (i) {
       return "step" + i;
@@ -471,7 +512,12 @@ export default {
                     } else {
                       this.conclusion = response.data.conclusion;
                     }
-                    this.results = response.data.results;
+                    if (response.data.results == undefined) {
+                      this.isVote = false;
+                    } else {
+                      this.isVote = true;
+                      this.results = response.data.results;
+                    }
                   } else {
                     this.$message({
                       message: response.data.message,
@@ -496,11 +542,55 @@ export default {
           });
         });
     },
+    loadChart: function() {
+      console.log(this.sumData)
+      var ctx1 = document.getElementById('myChart');
+      this.myChart = new Chart(ctx1, {
+        type: 'bar',
+        "options": {
+          legend: {display: false},
+        },
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: [
+              'rgba(44, 130, 201, 1)',
+              'rgba(30, 139, 195, 1)',
+              'rgba(65, 131, 215, 1)',
+              'rgba(34, 167, 240, 1)',
+              'rgba(25, 181, 254, 1)',
+              'rgba(107, 185, 240, 1)',
+              'rgba(68, 108, 179, 1)',
+              'rgba(52, 152, 219, 1)',
+              'rgba(89, 171, 227, 1)',
+              'rgba(137, 196, 244, 1)'
+            ],
+          }],
+        },
+      })
+    },
+    updateChart: function(item) {
+      this.myChart.data.labels = item.answers
+      this.myChart.data.datasets[0].data = item.counts
+      this.myChart.data.datasets[0].label = item.stem
+      this.myChart.update()
+    }
   },
 };
 </script>
 
 <style scoped>
+.voted {
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.results {
+  display: flex;
+  justify-content: space-between;
+}
 .editor {
   position: fixed;
   left: 0;
@@ -584,5 +674,12 @@ a:hover {
 .option {
   margin-left: 10px;
   margin-right: 30px;
+}
+.conclusion {
+  font-size: 20px;
+}
+.chart {
+  height: 240px;
+  width: 600px;
 }
 </style>
