@@ -557,12 +557,13 @@ export default {
           }
           this.$axios({
             method: "post",
-            url: "http://139.224.50.146:80/apis/normal/submit",
+            url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
               templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               password: this.modelForm.password,
+              type: "normal",
               questions: templateQuestions,
             }),
           }).then(
