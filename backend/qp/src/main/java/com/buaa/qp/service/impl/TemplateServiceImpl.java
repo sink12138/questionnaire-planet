@@ -25,6 +25,8 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public Template getTemplate(Integer templateId) {
         Template template = templateDao.selectById(templateId);
+        if (template == null)
+            return null;
         template.setDuration(templateDao.selectDuration(templateId));
         return template;
     }
