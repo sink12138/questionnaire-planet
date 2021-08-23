@@ -268,8 +268,8 @@ public class CollectionController {
                 }
             }
             Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
-            if (answerService.submitAnswer(answer)) {
-                throw new ExtraMessageException("剩余名额0");
+            if (!answerService.submitAnswer(answer)) {
+                throw new ExtraMessageException("名额已满");
             }
             else
                 map.put("conclusion", template.getConclusion());

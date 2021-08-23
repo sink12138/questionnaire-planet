@@ -12,6 +12,9 @@ import java.util.ArrayList;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
+
+    private static final Object quotaLock = new Object();
+
     @Autowired
     private AnswerDao answerDao;
 
@@ -29,16 +32,19 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean submitAnswer(Answer answer) {
         Integer templateId = answer.getTemplateId();
         Integer quota = templateDao.selectQuotaById(templateId);
         if (quota != null) {
-            Integer answerCount = answerDao.selectCountByTid(templateId);
-            if (answerCount >= quota)
-                return false;
+            synchronized (quotaLock) {
+                Integer answerCount = answerDao.selectCountByTid(templateId);
+                if (answerCount >= quota)
+                    return false;
+                answerDao.insert(answer);
+            }
         }
-        answerDao.insert(answer);
+        else
+            answerDao.insert(answer);
         return true;
     }
 
