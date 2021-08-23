@@ -23,7 +23,8 @@
             title = #{title},
             description = #{description},
             password = #{password},
-            conclusion = #{conclusion}
+            conclusion = #{conclusion},
+            quota = #{quota},
             <if test="duration != null">
                 duration = #{duration}
             </if>

@@ -14,8 +14,8 @@ import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
 import java.util.*;
 
 @RestController
@@ -52,8 +52,9 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷尚未发布, 无法访问");
             }
             if (template.getType().equals("vote")) {
+                String ip = request.getHeader("x-forwarded-for");
+                if (ip == null) ip = request.getRemoteAddr();
                 ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
-                String ip = request.getHeader("x-forwarded-for") == null ? request.getHeader("x-forwarded-for") : request.getRemoteAddr();
                 for (Answer answer : answers) {
                     if (answer.getIp().equals(ip)) {
                         throw new ExtraMessageException("已填过问卷");
@@ -113,10 +114,11 @@ public class CollectionController {
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
             if (template.getType().equals("vote")) {
+                String ip = request.getHeader("x-forwarded-for");
+                if (ip == null) ip = request.getRemoteAddr();
                 ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
-                InetAddress address = InetAddress.getLocalHost();
                 for (Answer answer : answers) {
-                    if (answer.getIp().equals(address.getHostAddress())) {
+                    if (answer.getIp().equals(ip)) {
                         throw new ExtraMessageException("已填过问卷");
                     }
                 }
@@ -194,11 +196,12 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
+            String ip = request.getHeader("x-forwarded-for");
+            if (ip == null) ip = request.getRemoteAddr();
             if (template.getType().equals("vote")) {
                 ArrayList<Answer> oldAnswers = answerService.getAnswersByTid(templateId);
-                InetAddress address = InetAddress.getLocalHost();
                 for (Answer answer : oldAnswers) {
-                    if (answer.getIp().equals(address.getHostAddress())) {
+                    if (answer.getIp().equals(ip)) {
                         throw new ExtraMessageException("已填过问卷");
                     }
                 }
@@ -267,10 +270,8 @@ public class CollectionController {
                     throw new ParameterFormatException();
                 }
             }
-            String ip = request.getHeader("x-forwarded-for") == null ? request.getHeader("x-forwarded-for") : request.getRemoteAddr();
             Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
             answerService.submitAnswer(answer);
-            map.put("success", true);
             map.put("conclusion", template.getConclusion());
 
             // vote results
@@ -312,10 +313,12 @@ public class CollectionController {
                         }
                     }
                 }
-            map.put("results", results);
+                map.put("results", results);
+                map.put("success", true);
             }
         }
         catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
+            map.clear();
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {

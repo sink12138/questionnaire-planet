@@ -35,6 +35,10 @@ mybatis:
     call-setters-on-nulls: true
 server:
   port: 8090
+  tomcat:
+    remoteip:
+      remote-ip-header: X-Real-IP
+      protocol-header: X-Forwarded-Proto
 
 admin:
   username: lbh
