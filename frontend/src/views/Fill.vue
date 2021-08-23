@@ -1,6 +1,22 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
+    <el-dialog title="请先登录后再填写问卷哦~~~" :visible.sync="dialogFormVisible1" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
+      <el-form :model="formData" :rules="rules" ref="formData">
+        <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
+          <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
+          <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+        <el-button type="primary" @click="tologin">登 录</el-button>
+        <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible2" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
       <el-form :model="password">
         <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
           <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
@@ -148,14 +164,45 @@
 <script>
 export default {
   data() {
+    var checkEmail = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error("邮箱不能为空"));
+      } else {
+        callback();
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else {
+          if (value.length < 6 || value.length > 20) {
+            callback(new Error("请输入六至二十位"));
+          }
+          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+          if (!this.formData.password.match(regx)) {
+            callback(new Error("请同时包含字母数字"));
+          }
+          callback();
+      }
+    };
     return {
       templateId: 0,
       locked: false,
+      login: false,
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
       password: "",
-      dialogFormVisible: false,
+      formData: {
+        email: "",
+        password: ""
+      },
+      rules: {
+        email: [{ validator: checkEmail, trigger: "blur" }],
+        password: [{ validator: validatePass, trigger: "blur" }],
+      },
+      dialogFormVisible1: false,
+      dialogFormVisible2: false,
       formLabelWidth: '100px',
       questions: [
         {
@@ -221,32 +268,40 @@ export default {
       .then((response) => {
         console.log(response);
         if (response.data.success == true) {
+          this.login = response.data.login;
           this.locked = response.data.locked;
-          if (this.locked == true) {
-            console.log(22);
-            this.dialogFormVisible = true;
+          if (this.login == true) {
+            this.dialogFormVisible1 = true;
           }
           else {
-            console.log(33);
-            this.$axios({
-              method: "get",
-              url: "http://139.224.50.146:80/apis/details",
-              params: { templateId: this.templateId },
-            })
-              .then((response) => {
-                console.log(response);
-                if (response.data.success == true) {
-                  this.title = response.data.title;
-                  this.type = response.data.type;
-                  this.description = response.data.description;
-                  this.questions = response.data.questions;
-                  this.dialogFormVisible = false;
-                } else {
-                  console.log(response.data.message);
-                }
+            if (this.locked == true) {
+              console.log(22);
+              this.dialogFormVisible2 = true;
+            }
+            else {
+              console.log(33);
+              this.$axios({
+                method: "get",
+                url: "http://139.224.50.146:80/apis/details",
+                params: { templateId: this.templateId },
               })
-              .catch((err) => console.log(err));
+                .then((response) => {
+                  console.log(response);
+                  if (response.data.success == true) {
+                    this.title = response.data.title;
+                    this.type = response.data.type;
+                    this.description = response.data.description;
+                    this.questions = response.data.questions;
+                    this.dialogFormVisible = false;
+                  } else {
+                    console.log(response.data.message);
+                  }
+                })
+                .catch((err) => console.log(err));
+            }
           }
+
+          
         } else {
           console.log(response.data.message);
         }
@@ -261,6 +316,55 @@ export default {
   methods: {
     goBack() {
       this.$router.push("/");
+    },
+    tologin() {
+      this.$axios({
+        method: "post",
+        url: "http://139.224.50.146/apis/login",
+        data: JSON.stringify(this.formData),
+      }).then((res) => {
+        console.log(this.formData);
+        if (res.data.success == true) {
+          sessionStorage.setItem("isLogin", true);
+          this.$store.commit("login");
+          this.$message({
+            message: "登录成功！",
+            type: "success",
+          });
+          this.dialogFormVisible1 = false;
+          this.isLogin();
+        } else {
+          alert("用户名或密码错误！");
+        }
+        console.log(res);
+      });
+    },
+    isLogin() {
+      if (this.locked == true) {
+        console.log(22);
+        this.dialogFormVisible = true;
+      }
+      else {
+        console.log(33);
+        this.$axios({
+          method: "get",
+          url: "http://139.224.50.146:80/apis/details",
+          params: { templateId: this.templateId },
+        })
+          .then((response) => {
+            console.log(response);
+            if (response.data.success == true) {
+              this.title = response.data.title;
+              this.type = response.data.type;
+              this.description = response.data.description;
+              this.questions = response.data.questions;
+              this.dialogFormVisible = false;
+            } else {
+              console.log(response.data.message);
+            }
+          })
+          .catch((err) => console.log(err));
+      }
     },
     unlock() {
       this.$axios({
