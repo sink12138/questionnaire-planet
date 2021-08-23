@@ -342,27 +342,65 @@
                         clearable
                         placeholder="请输入选项"
                       />
-                      <el-input
-                        v-model.trim="opt.scores"
-                        v-show="item.type == 3 "
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入评分"
-                      />
-                      <el-input
-                        v-model.trim="opt.number"
-                        v-show="item.type == 5"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入名额"
-                      />
                       <el-button
                         style="margin-left: 20px"
                         @click.prevent="removeDomain(index, idx)"
                         >删除</el-button
                       >
-                    </el-form-item></el-row
-                  >
+                    </el-form-item>
+                  </el-row>
+                  <el-row v-if="item.type == 3">
+                    <el-form-item
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`第${idx + 1}项评分`"
+                      :prop="`questions.${index}.answers.${idx}.scores`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入评分',
+                          trigger: 'blur',
+                        },
+                        {
+                          validator: isNum,
+                          trigger: 'blur',
+                        },
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.scores"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入评分"
+                      />
+                    </el-form-item>
+                  </el-row>
+                  <el-row v-if="item.type == 5">
+                    <el-form-item
+                      v-for="(opt, idx) in item.answers"
+                      :key="idx"
+                      :label="`第${idx + 1}项名额`"
+                      :prop="`questions.${index}.answers.${idx}.number`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入名额',
+                          trigger: 'blur',
+                        },
+                        {
+                          validator: isNum,
+                          trigger: 'blur',
+                        },
+                      ]"
+                    >
+                      <el-input
+                        v-model.trim="opt.number"
+                        style="width: 120px; margin-left: 10px"
+                        clearable
+                        placeholder="请输入名额"
+                      />
+                    </el-form-item>
+                  </el-row>
                   <el-form-item label="编辑题目">
                     <el-button
                       icon="el-icon-circle-plus"
@@ -427,8 +465,8 @@ export default {
             height: 1,
             width: 100,
             answers: [
-              { value: "", scores: 0 ,number: 0},
-              { value: "", scores: 0 ,number: 0},
+              { value: "", scores: 0, number: 0 },
+              { value: "", scores: 0, number: 0 },
             ],
           },
           {
@@ -441,8 +479,8 @@ export default {
             height: 1,
             width: 100,
             answers: [
-              { value: "", scores: 0 ,number: 0},
-              { value: "", scores: 0 ,number: 0},
+              { value: "", scores: 0, number: 0 },
+              { value: "", scores: 0, number: 0 },
             ],
           },
         ],
@@ -501,7 +539,11 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({ value: "" });
+      this.modelForm.questions[index].answers.push({
+        value: "",
+        scores: 0,
+        number: 0,
+      });
     },
     addQuestion() {
       // 新增题目
@@ -515,8 +557,8 @@ export default {
         height: 1,
         width: 100,
         answers: [
-          { value: "", scores: 0 ,number: 0},
-          { value: "", scores: 0 ,number: 0},
+          { value: "", scores: 0, number: 0 },
+          { value: "", scores: 0, number: 0 },
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -588,6 +630,7 @@ export default {
                 break;
               case "5":
                 quest.type = "sign-up";
+                quest.quotas = [];
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 for (j in question.answers) {

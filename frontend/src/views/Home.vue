@@ -106,12 +106,12 @@ export default {
           if (value.length < 6 || value.length > 20) {
             callback(new Error("请输入六至二十位"));
           }
-    var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
-      if (!this.formData.password.match(regx)) {
-        callback(new Error("请同时包含字母数字"));
+          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+          if (!this.formData.password.match(regx)) {
+            callback(new Error("请同时包含字母数字"));
+          }
+          callback();
       }
-      callback();
-    }
     };
     return {
       formData: {
