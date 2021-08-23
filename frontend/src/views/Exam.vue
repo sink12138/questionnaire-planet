@@ -1,26 +1,42 @@
 <template>
-  <span>Exam</span>
+  <el-container>
+    <el-header>
+      <p>Exam</p>
+    </el-header>
+    <div class="timer">
+      <el-button v-if="show" @click="start" >{{ info }}</el-button>
+      <el-button v-if="!show">{{ times }}s</el-button>
+    </div>
+  </el-container>
+  
 </template>
 
 <script>
 export default {
   data() {
     return {
-      
+      times: 5,
+      show: true,
+      info: "点我开始计时！"
     }
   },
-  /*页面打开3秒后则执行test方法，输出2333。可用于定时触发提交问卷事件。*/
   mounted: function(){
-    this.timer = setTimeout(this.test, 3000)
+
   },
   methods: {
-    test: function(){
-      console.log("2333")
+    start() {
+      this.show = false
+      this.timer = setInterval(()=>{
+        this.times--
+        if(this.times===0){
+          this.show = true
+          this.info = "时间到，再点我重新计时！"
+          this.times = 5
+          clearInterval(this.timer)
+        }
+      },1000)
     }
   },
-  beforeDestroy() {
-    clearTimeout(this.timer);
-  }
 }
 </script>
 
