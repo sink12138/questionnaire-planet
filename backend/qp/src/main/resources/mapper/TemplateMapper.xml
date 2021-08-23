@@ -9,7 +9,7 @@
         select * from template
         where owner = #{owner}
     </select>
-    <select id="selectQuotaById" resultType="Template">
+    <select id="selectQuotaById" resultType="Integer">
         select quota from template
         where template_id = #{templateId}
     </select>

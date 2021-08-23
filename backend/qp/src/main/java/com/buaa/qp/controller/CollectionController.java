@@ -123,6 +123,12 @@ public class CollectionController {
                     }
                 }
             }
+            if (template.getType().equals("sign-up")) {
+                if (template.getOwner().equals(accountId)) {
+                    map.put("quota", template.getQuota());
+                }
+                map.put("remain", template.getQuota() - answerService.countAnswers(templateId));
+            }
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
@@ -271,8 +277,11 @@ public class CollectionController {
                 }
             }
             Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
-            answerService.submitAnswer(answer);
-            map.put("conclusion", template.getConclusion());
+            if (answerService.submitAnswer(answer)) {
+                throw new ExtraMessageException("剩余名额0");
+            }
+            else
+                map.put("conclusion", template.getConclusion());
 
             // vote results
             if (template.getType().equals("vote")) {
