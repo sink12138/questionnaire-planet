@@ -252,6 +252,7 @@ export default {
     return {
       templateId: 0,
       submitted: false,
+      isVote: false,
       locked: false,
       login: false,
       title: "问卷标题",
@@ -271,7 +272,7 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       formLabelWidth: '100px',
-      results: [{stem:"题干",answers:['A','B'],counts:[12,25]}],
+      results: [],
       questions: [
         {
           type: "choice",
@@ -426,7 +427,7 @@ export default {
     isLogin() {
       if (this.locked == true) {
         console.log(22);
-        this.dialogFormVisible = true;
+        this.dialogFormVisible2 = true;
       }
       else {
         console.log(33);
@@ -442,7 +443,6 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
-              this.dialogFormVisible = false;
             } else {
               console.log(response.data.message);
             }
@@ -464,7 +464,7 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
-              this.dialogFormVisible = false;
+              this.dialogFormVisible2 = false;
             } else {
               alert("问卷密码错误！");
             }
@@ -518,6 +518,7 @@ export default {
                     } else {
                       this.isVote = true;
                       this.results = response.data.results;
+                      console.log(this.results)
                     }
                   } else {
                     this.$message({

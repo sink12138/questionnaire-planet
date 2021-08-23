@@ -606,7 +606,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
