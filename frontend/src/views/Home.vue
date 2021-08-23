@@ -12,7 +12,7 @@
         <div>
           <div v-if="this.$store.state.isLogin == false" class="butt1">
             <el-dropdown>
-              <el-button class="user" icon="el-icon-user" style="font-size:30px">
+              <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
               <el-dropdown-menu slot="dropdown">
                 <router-link to="/">
@@ -24,7 +24,7 @@
           </div>
           <div v-else class="butt2">
             <el-dropdown>
-              <el-button class="user" icon="el-icon-user" style="font-size:30px">
+              <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
               <el-dropdown-menu slot="dropdown">
                 <router-link to="/">
@@ -199,13 +199,13 @@ export default {
   display: inline-flex;
   float: right;
   position: relative;
-  left: 880px;
+  left: 1100px;
 }
 .butt2 {
   display: inline-flex;
   float: right;
   position: relative;
-  left: 890px;
+  left: 1100px;
 }
 .web-title {
   margin-left: 15px;
