@@ -53,4 +53,9 @@
         delete from template
         where template_id = #{templateId}
     </delete>
+    <select id="selectDuration" parameterType="Integer" resultType="String">
+        select if(released, addtime(duration, timediff(now(), release_time)), duration) as duration
+        from template
+        where template_id = #{templateId}
+    </select>
 </mapper>

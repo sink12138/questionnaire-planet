@@ -21,4 +21,6 @@ public interface TemplateDao {
     void updateDeleted(Template template);
 
     int deleteByTid(Integer templateId);
+
+    String selectDuration(Integer templateId);
 }

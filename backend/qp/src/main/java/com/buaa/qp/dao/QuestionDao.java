@@ -12,4 +12,6 @@ public interface QuestionDao {
     Integer insert(Question question);
 
     void deleteByTid(Integer templateId);
+
+    void updateRemains(Question question);
 }

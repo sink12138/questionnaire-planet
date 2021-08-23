@@ -227,6 +227,48 @@ public class TemplateController {
                         argsMap.put("min", min);
                         break;
                     }
+                    case "sign-up": {
+                        if (!type.equals("sign-up"))
+                            throw new ParameterFormatException();
+                        ArrayList<String> choices;
+                        ArrayList<Integer> quotas;
+                        Integer max;
+                        Integer min;
+                        try {
+                            choices = parser.toStringList(questionMap.get("choices"));
+                            quotas = parser.toIntegerList(questionMap.get("quotas"));
+                            max = (Integer) questionMap.get("max");
+                            min = (Integer) questionMap.get("min");
+                        }
+                        catch (ClassCastException cce) {
+                            throw new ParameterFormatException();
+                        }
+                        if (choices == null || choices.size() < 2)
+                            throw new ParameterFormatException();
+                        if (quotas == null || quotas.size() != choices.size()) {
+                            throw new ParameterFormatException();
+                        }
+                        for (Integer q : quotas) {
+                            if (q < 1) {
+                                throw new ParameterFormatException();
+                            }
+                        }
+                        if (max == null || max > choices.size()) max = choices.size();
+                        if (min == null || min < 1) min = 1;
+                        if (min.equals(max) && min == choices.size()) {
+                            throw new ParameterFormatException();
+                        }
+                        else if (min > max) {
+                            throw new ParameterFormatException();
+                        }
+                        argsMap.put("choices", choices);
+                        argsMap.put("quotas", quotas);
+                        ArrayList<Integer> remains = new ArrayList<>(quotas);
+                        argsMap.put("remains", remains);
+                        argsMap.put("max", max);
+                        argsMap.put("min", min);
+                        break;
+                    }
                     default:
                         throw new ParameterFormatException();
                 }

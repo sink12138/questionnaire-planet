@@ -55,13 +55,7 @@ public class ManagementController {
                     templateMap.put("creationTime", sdf.format(result.getCreationTime()));
                     boolean released = result.getReleased();
                     templateMap.put("released", released);
-                    Time duration = result.getDuration();
-                    if (released) {
-                        Date releaseTime = result.getReleaseTime();
-                        templateMap.put("releaseTime", sdf.format(releaseTime));
-                        duration = new Time(duration.getTime() + System.currentTimeMillis() - releaseTime.getTime());
-                    }
-                    templateMap.put("duration", duration.toString());
+                    templateMap.put("duration", result.getDuration());
                     templateMap.put("answerCount", answerService.countAnswers(templateId));
                     templates.add(templateMap);
                 }

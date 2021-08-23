@@ -213,7 +213,7 @@ public class DataController {
                     for (int j = 0; j < choices.size(); j++) {
                         if (question.getType().equals("choice") || question.getType().equals("multi-choice")) {
                             choicesInFormat.add((char) ((int) 'A' + j) + "." + choices.get(j));
-                        } else if (question.getType().equals("dropdown") || question.getType().equals("vote")) {
+                        } else if (question.getType().equals("dropdown") || question.getType().equals("vote") || question.getType().equals("sign-up")) {
                             choicesInFormat.add(choices.get(j));
                         } else {
                             ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
@@ -236,6 +236,8 @@ public class DataController {
                 for (int i = 0; i < answerInFormat.size() - 1; i++) {
                     switch (questions.get(i).getType()) {
                         case "vote": {
+                        }
+                        case "sign-up": {
                         }
                         case "multi-choice": {
                             if (!answerInFormat.get(i + 1).equals("")) {
@@ -361,6 +363,8 @@ public class DataController {
                             break;
                         }
                         case "vote":{
+                        }
+                        case "sign-up": {
                         }
                         case "multi-choice": {
                             ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);

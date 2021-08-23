@@ -8,8 +8,10 @@ import com.buaa.qp.entity.Template;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.sql.Time;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -24,12 +26,18 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public Template getTemplate(Integer templateId) {
-        return templateDao.selectById(templateId);
+        Template template = templateDao.selectById(templateId);
+        template.setDuration(templateDao.selectDuration(templateId));
+        return template;
     }
 
     @Override
     public ArrayList<Template> getMyTemplates(Integer owner) {
-        return templateDao.selectByOwner(owner);
+        ArrayList<Template> templates = templateDao.selectByOwner(owner);
+        for (Template template : templates) {
+            template.setDuration(templateDao.selectDuration(template.getTemplateId()));
+        }
+        return templates;
     }
 
     @Override
@@ -45,7 +53,8 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void modifyTemplate(Template template, ArrayList<Question> questions) {
-        template.setDuration(new Time(-28800000));
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        template.setDuration(sdf.format(new Date(0)));
         templateDao.update(template);
         Integer templateId = template.getTemplateId();
         answerDao.deleteByTid(templateId);

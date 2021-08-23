@@ -13,4 +13,7 @@
         delete from question
         where template_id = #{templateId}
     </delete>
+    <update id="updateRemains" parameterType="Question">
+        update question set args = #{args} where question_id = #{questionId}
+    </update>
 </mapper>

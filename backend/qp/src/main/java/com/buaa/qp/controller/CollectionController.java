@@ -11,6 +11,7 @@ import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.AnswerService;
+import com.buaa.qp.service.QuestionService;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class CollectionController {
 
     @Autowired
     private AnswerService answerService;
+
+    @Autowired
+    private QuestionService questionService;
 
     @GetMapping("/attempt")
     public Map<String, Object> locked(@RequestParam(value = "templateId", required = false) String idStr) {
@@ -122,7 +126,7 @@ public class CollectionController {
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
-            if (template.getType().equals("sign-up")) {
+            if (template.getType().equals("sign-up") && template.getQuota() != null) {
                 if (template.getOwner().equals(accountId)) {
                     map.put("quota", template.getQuota());
                 }
@@ -238,10 +242,30 @@ public class CollectionController {
                                 throw new ParameterFormatException();
                             break;
                         }
+                        case "sign-up":
                         case "multi-choice":
                         case "vote": {
                             int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
                             ArrayList<Integer> choices = parser.toIntegerList(answerObject);
+                            if (question.getType().equals("sign-up")) {
+                                ArrayList<Integer> remains = parser.toIntegerList(argsMap.get("remains"));
+                                for (Integer ch : choices) {
+                                    if (remains.get(ch) <= 0) {
+                                        throw new ExtraMessageException("名额已满");
+                                    }
+                                }
+                                for (Integer ch : choices) {
+                                    int number = remains.get(ch);
+                                    number --;
+                                    remains.set(ch, number);
+                                }
+                                argsMap.put("remains", remains);
+                                String argsStr = JSON.toJSONString(argsMap);
+                                Question newQuestion = new Question();
+                                newQuestion.setArgs(argsStr);
+                                newQuestion.setQuestionId(question.getQuestionId());
+                                questionService.updateRemains(newQuestion);
+                            }
                             Set<Integer> choiceSet = new HashSet<>(choices);
                             int size = choiceSet.size();
                             if (size == 0) {

@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.sql.Time;
 import java.util.Date;
 
 @Entity
@@ -36,7 +35,7 @@ public class Template {
 
     private Date releaseTime;
 
-    private Time duration;
+    private String duration;
 
     private String conclusion;
 
@@ -65,7 +64,7 @@ public class Template {
         this.quota = quota;
     }
 
-    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, Time duration) {
+    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration) {
         this.templateId = templateId;
         this.type = type;
         this.owner = owner;
