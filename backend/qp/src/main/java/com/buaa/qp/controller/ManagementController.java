@@ -120,7 +120,7 @@ public class ManagementController {
             templateService.releaseTemplate(templateId, true);
             map.put("success", true);
         }
-        catch (LoginVerificationException | ParameterFormatException |
+        catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException |
                 RepetitiveOperationException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
@@ -170,7 +170,8 @@ public class ManagementController {
             templateService.releaseTemplate(templateId, false);
             map.put("success", true);
         }
-        catch (LoginVerificationException | ParameterFormatException | ExtraMessageException exc) {
+        catch (LoginVerificationException | ParameterFormatException |
+                ExtraMessageException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         }
