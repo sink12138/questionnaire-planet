@@ -44,12 +44,13 @@ public class Template {
 
     }
 
-    public Template(String type, Integer owner, String title, String description, String password) {
+    public Template(String type, Integer owner, String title, String description, String password, String conclusion) {
         this.type = type;
         this.owner = owner;
         this.title = title;
         this.description = description;
         this.password = password;
+        this.conclusion = conclusion;
     }
 
     public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, Time duration) {

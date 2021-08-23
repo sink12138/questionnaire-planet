@@ -27,7 +27,7 @@ public class TemplateController {
     @Autowired
     private TemplateService templateService;
 
-    @PostMapping("/normal/submit")
+    @PostMapping("/submit")
     public Map<String, Object> normalSubmit(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
         try {
@@ -40,6 +40,7 @@ public class TemplateController {
             String title;
             String description;
             String password;
+            String conclusion;
             ArrayList<Map<String, Object>> questionMaps;
             ClassParser parser = new ClassParser();
 
@@ -51,6 +52,8 @@ public class TemplateController {
                 if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
                 if (password != null && password.isEmpty()) password = null;
+                conclusion = (String) requestMap.get("conclusion");
+                if (conclusion != null && conclusion.isEmpty()) conclusion = null;
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException cce) {
@@ -195,7 +198,7 @@ public class TemplateController {
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
 
-            Template template = new Template("normal", accountId, title, description, password);
+            Template template = new Template("normal", accountId, title, description, password, conclusion);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(template, questions);
             }
@@ -231,6 +234,7 @@ public class TemplateController {
             String title;
             String description;
             String password;
+            String conclusion;
 
             // Parameter checks of template
             try {
@@ -238,19 +242,14 @@ public class TemplateController {
                 title = (String) requestMap.get("title");
                 description = (String) requestMap.get("description");
                 password = (String) requestMap.get("password");
+                conclusion = (String) requestMap.get("conclusion");
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
             }
-            if (password == null || description == null) {
-                throw new ParameterFormatException();
-            }
-            if (password.equals("")) {
-                password = null;
-            }
-            if (description.equals("")) {
-                description = null;
-            }
+            if (description != null && description.isEmpty()) description = null;
+            if (password != null && password.isEmpty()) password = null;
+            if (conclusion != null && conclusion.isEmpty()) conclusion = null;
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
@@ -267,6 +266,7 @@ public class TemplateController {
             template.setTitle(title);
             template.setDescription(description);
             template.setPassword(password);
+            template.setConclusion(conclusion);
             templateService.adjustTemplate(template);
             map.put("success", true);
 

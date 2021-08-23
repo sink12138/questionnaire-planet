@@ -54,7 +54,7 @@ public class CollectionController {
                 ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
                 InetAddress address = InetAddress.getLocalHost();
                 for (Answer answer : answers) {
-                    if (answer.getIp().equals(address)) {
+                    if (answer.getIp().equals(address.getHostAddress())) {
                         throw new ExtraMessageException("已填过问卷");
                     }
                 }
@@ -250,6 +250,7 @@ public class CollectionController {
             Answer answer = new Answer(templateId, JSON.toJSONString(answers));
             answerService.submitAnswer(answer);
             map.put("success", true);
+            map.put("conclusion", template.getConclusion());
         }
         catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
