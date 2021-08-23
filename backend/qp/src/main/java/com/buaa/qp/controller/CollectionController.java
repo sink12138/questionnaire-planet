@@ -111,6 +111,15 @@ public class CollectionController {
             }
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
+            if (template.getType().equals("vote")) {
+                ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
+                InetAddress address = InetAddress.getLocalHost();
+                for (Answer answer : answers) {
+                    if (answer.getIp().equals(address.getHostAddress())) {
+                        throw new ExtraMessageException("已填过问卷");
+                    }
+                }
+            }
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
@@ -184,6 +193,15 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
+            if (template.getType().equals("vote")) {
+                ArrayList<Answer> oldAnswers = answerService.getAnswersByTid(templateId);
+                InetAddress address = InetAddress.getLocalHost();
+                for (Answer answer : oldAnswers) {
+                    if (answer.getIp().equals(address.getHostAddress())) {
+                        throw new ExtraMessageException("已填过问卷");
+                    }
+                }
+            }
 
             // Detailed parameter checks
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
@@ -210,7 +228,8 @@ public class CollectionController {
                                 throw new ParameterFormatException();
                             break;
                         }
-                        case "multi-choice": {
+                        case "multi-choice":
+                        case "vote": {
                             int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
                             ArrayList<Integer> choices = parser.toIntegerList(answerObject);
                             Set<Integer> choiceSet = new HashSet<>(choices);
