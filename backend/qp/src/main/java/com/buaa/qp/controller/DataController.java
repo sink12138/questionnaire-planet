@@ -80,8 +80,10 @@ public class DataController {
             map.put("answers", answerMaps);
 
             ArrayList<String> stems = new ArrayList<>();
+            int i = 1;
             for (Question q: questions) {
-                stems.add(q.getStem());
+                stems.add(i + "." + q.getStem());
+                i ++;
             }
             map.put("stems", stems);
             map.put("success", true);
