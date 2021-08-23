@@ -39,6 +39,7 @@ server:
     remoteip:
       remote-ip-header: X-Real-IP
       protocol-header: X-Forwarded-Proto
+  forward-headers-strategy: framework
 
 admin:
   username: lbh

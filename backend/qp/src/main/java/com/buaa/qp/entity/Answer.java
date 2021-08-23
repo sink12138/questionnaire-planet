@@ -23,7 +23,7 @@ public class Answer {
 
     private Date submitTime;
 
-    private String Ip;
+    private Integer submitter;
 
     public Answer() {
 
@@ -34,9 +34,9 @@ public class Answer {
         this.content = content;
     }
 
-    public Answer(Integer templateId, String content, String Ip) {
+    public Answer(Integer templateId, String content, Integer submitter) {
         this.templateId = templateId;
         this.content = content;
-        this.Ip = Ip;
+        this.submitter = submitter;
     }
 }

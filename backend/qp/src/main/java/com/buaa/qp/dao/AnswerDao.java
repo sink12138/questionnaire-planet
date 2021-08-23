@@ -15,5 +15,5 @@ public interface AnswerDao {
 
     Integer selectCountByTid(Integer templateId);
 
-    Answer selectByTidAndIp(Answer answer);
+    Answer selectByTidAndSubmitter(Answer answer);
 }

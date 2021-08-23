@@ -5,8 +5,8 @@
         delete from answer where template_id = #{templateId}
     </delete>
     <insert id="insert" parameterType="Answer" keyProperty="answerId" useGeneratedKeys="true">
-        insert into answer(template_id, content, submit_time, ip)
-        values (#{templateId}, #{content}, now(), #{ip})
+        insert into answer(template_id, content, submit_time, submitter)
+        values (#{templateId}, #{content}, now(), #{submitter})
     </insert>
     <select id="selectByTid" parameterType="Integer" resultType="Answer">
         select * from answer where template_id = #{templateId}
@@ -14,8 +14,9 @@
     <select id="selectCountByTid" parameterType="Integer" resultType="Integer">
         select count(*) from answer where template_id = #{templateId}
     </select>
-    <select id="selectByTidAndIp" parameterType="Answer" resultType="Answer">
+    <select id="selectByTidAndSubmitter" parameterType="Answer" resultType="Answer">
         select * from answer
-        where template_id = #{templateId} and ip = #{ip}
+        where template_id = #{templateId} and submitter = #{submitter} and submitter is not null
+        limit 1
     </select>
 </mapper>

@@ -7,6 +7,7 @@ import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
+import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.AnswerService;
@@ -51,15 +52,17 @@ public class CollectionController {
             } else if (!template.getReleased()) {
                 throw new ExtraMessageException("问卷尚未发布, 无法访问");
             }
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (template.getType().equals("vote")) {
-                String ip = request.getHeader("X-Real-IP");
-                if (ip == null) ip = request.getRemoteAddr();
-                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
+            Boolean locked = template.getPassword() != null;
+            Boolean login = !template.getType().equals("normal") && accountId == null;
             map.put("success", true);
-            map.put("locked", template.getPassword() != null && !template.getPassword().equals(""));
+            map.put("locked", locked);
+            map.put("login", login);
         } catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
@@ -96,9 +99,13 @@ public class CollectionController {
             if (template == null)
                 throw new ObjectNotFoundException();
 
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (!template.getType().equals("normal") && accountId == null)
+                throw new LoginVerificationException();
+
             // Authority checks
             boolean allowed = false;
-            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (template.getOwner().equals(accountId))
                 allowed = true;
             else if (template.getReleased()) {
@@ -111,9 +118,7 @@ public class CollectionController {
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
             if (template.getType().equals("vote") && !template.getOwner().equals(accountId)) {
-                String ip = request.getHeader("X-Real-IP");
-                if (ip == null) ip = request.getRemoteAddr();
-                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
@@ -149,7 +154,8 @@ public class CollectionController {
                 map.put("password", pwd);
             map.put("questions", questionMaps);
         }
-        catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
+        catch (ParameterFormatException | ObjectNotFoundException |
+                ExtraMessageException | LoginVerificationException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         }
@@ -190,16 +196,19 @@ public class CollectionController {
             if (template == null)
                 throw new ObjectNotFoundException();
 
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (!template.getType().equals("normal") && accountId == null)
+                throw new LoginVerificationException();
+
             // Authority checks
             String pwd = template.getPassword();
             if (!template.getReleased())
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
-            String ip = request.getHeader("X-Real-IP");
-            if (ip == null) ip = request.getRemoteAddr();
             if (template.getType().equals("vote")) {
-                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
@@ -267,7 +276,7 @@ public class CollectionController {
                     throw new ParameterFormatException();
                 }
             }
-            Answer answer = new Answer(templateId, JSON.toJSONString(answers), ip);
+            Answer answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
             if (!answerService.submitAnswer(answer)) {
                 throw new ExtraMessageException("名额已满");
             }
@@ -317,7 +326,8 @@ public class CollectionController {
             }
             map.put("success", true);
         }
-        catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
+        catch (ParameterFormatException | ObjectNotFoundException |
+                ExtraMessageException | LoginVerificationException exc) {
             map.clear();
             map.put("success", false);
             map.put("message", exc.toString());

@@ -54,10 +54,10 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public Answer getOldAnswerByIp(Integer templateId, String ip) {
+    public Answer getOldAnswer(Integer templateId, Integer submitter) {
         Answer answer = new Answer();
         answer.setTemplateId(templateId);
-        answer.setIp(ip);
-        return answerDao.selectByTidAndIp(answer);
+        answer.setSubmitter(submitter);
+        return answerDao.selectByTidAndSubmitter(answer);
     }
 }
