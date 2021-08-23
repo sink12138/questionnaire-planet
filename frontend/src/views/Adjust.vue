@@ -86,9 +86,6 @@
                   <!-- 问卷描述 -->
                   <el-form-item
                     label="问卷描述"
-                    :rules="{
-                      required: true,
-                    }"
                   >
                     <el-input
                       v-model="modelForm.description"
@@ -237,12 +234,11 @@
                             :key="index"
                             @change="multiChangeValue(index_question)"
                           >
-                            <el-checkbox class="option" :label="index" border>{{
-                              i
-                            }}</el-checkbox
-                            >共{{ item.quotas[index] }},剩余{{
-                              item.remains[index]
-                            }}
+                            <el-checkbox class="option" :label="index" border
+                              >{{ i }}共{{ item.quotas[index] }},剩余{{
+                                item.remains[index]
+                              }}
+                            </el-checkbox>
                           </el-checkbox-group>
                         </el-form-item>
                       </div>
