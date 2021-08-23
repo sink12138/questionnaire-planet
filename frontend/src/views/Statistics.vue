@@ -1,5 +1,5 @@
 <template>
-  <div class="statistics">
+  <div class="statistics" style="height: 100%">
     <el-container>
       <el-aside width="200px">
       <div class="editor">
@@ -36,15 +36,28 @@
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
-          <div
-          v-for="(item, index) in sumData"
-          :key="index">
-            <span>{{item['stem']}}</span>
-            <el-button @click="loadData(item)">查看分析</el-button>
-          </div>
           <div class="chart">
             <canvas id="myChart"></canvas>
           </div>
+          <el-table
+          :data="sumData"
+          style="width: 20%"
+          max-height="600">
+            <el-table-column
+            fixed
+            type="index"
+            width="80">
+            </el-table-column>
+            <el-table-column
+            prop="stem"
+            label="stem">
+            </el-table-column>
+            <el-table-column>
+              <template slot-scope="scope">
+                <el-button @click="loadData(scope.row)">查看分析</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </el-main>
     </el-container>
@@ -167,7 +180,7 @@ export default {
         },
         {
           type: "grade",
-          stem: "hello",
+          stem: "what",
           answers: ["a","b","c","d"],
           counts: [5, 5, 5, 5]
         },
@@ -295,12 +308,15 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.el-container {
+  height: 100%;
+}
 .all-data {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 .data-sum {
   display: flex;
@@ -308,8 +324,10 @@ export default {
   align-items: center;
 }
 .chart {
-  height: 600px;
-  width: 600px;
+  height: 500px;
+  width: 500px;
+  position: relative;
+  top: 100px;
 }
 .editor {
   position: fixed;
