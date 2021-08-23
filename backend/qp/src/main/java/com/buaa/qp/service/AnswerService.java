@@ -12,4 +12,6 @@ public interface AnswerService {
     boolean submitAnswer(Answer answer);
 
     int countAnswers(Integer templateId);
+
+    Answer getOldAnswerByIp(Integer templateId, String ip);
 }

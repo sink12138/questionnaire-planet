@@ -54,12 +54,9 @@ public class CollectionController {
             if (template.getType().equals("vote")) {
                 String ip = request.getHeader("x-forwarded-for");
                 if (ip == null) ip = request.getRemoteAddr();
-                ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
-                for (Answer answer : answers) {
-                    if (answer.getIp().equals(ip)) {
-                        throw new ExtraMessageException("已填过问卷");
-                    }
-                }
+                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                if (oldAnswer != null)
+                    throw new ExtraMessageException("已填过问卷");
             }
             map.put("success", true);
             map.put("locked", template.getPassword() != null && !template.getPassword().equals(""));
@@ -116,12 +113,9 @@ public class CollectionController {
             if (template.getType().equals("vote")) {
                 String ip = request.getHeader("x-forwarded-for");
                 if (ip == null) ip = request.getRemoteAddr();
-                ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
-                for (Answer answer : answers) {
-                    if (answer.getIp().equals(ip)) {
-                        throw new ExtraMessageException("已填过问卷");
-                    }
-                }
+                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                if (oldAnswer != null)
+                    throw new ExtraMessageException("已填过问卷");
             }
             if (template.getType().equals("sign-up")) {
                 if (template.getOwner().equals(accountId)) {
@@ -205,12 +199,9 @@ public class CollectionController {
             String ip = request.getHeader("x-forwarded-for");
             if (ip == null) ip = request.getRemoteAddr();
             if (template.getType().equals("vote")) {
-                ArrayList<Answer> oldAnswers = answerService.getAnswersByTid(templateId);
-                for (Answer answer : oldAnswers) {
-                    if (answer.getIp().equals(ip)) {
-                        throw new ExtraMessageException("已填过问卷");
-                    }
-                }
+                Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
+                if (oldAnswer != null)
+                    throw new ExtraMessageException("已填过问卷");
             }
 
             // Detailed parameter checks

@@ -28,7 +28,7 @@ public class TemplateController {
     private TemplateService templateService;
 
     @PostMapping("/submit")
-    public Map<String, Object> normalSubmit(@RequestBody Map<String, Object> requestMap) {
+    public Map<String, Object> submit(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks

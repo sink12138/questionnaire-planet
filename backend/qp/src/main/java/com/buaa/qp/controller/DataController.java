@@ -254,8 +254,7 @@ public class DataController {
                             }
                             break;
                         }
-                        case "choice": {
-                        }
+                        case "choice":
                         case "dropdown": {
                             if (!answerInFormat.get(i + 1).equals("")) {
                                 String chStr = answerInFormat.get(i + 1);

@@ -47,4 +47,11 @@ public class AnswerServiceImpl implements AnswerService {
         return answerDao.selectCountByTid(templateId);
     }
 
+    @Override
+    public Answer getOldAnswerByIp(Integer templateId, String ip) {
+        Answer answer = new Answer();
+        answer.setTemplateId(templateId);
+        answer.setIp(ip);
+        return answerDao.selectByTidAndIp(answer);
+    }
 }

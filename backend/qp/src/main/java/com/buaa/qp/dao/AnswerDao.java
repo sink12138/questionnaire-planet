@@ -14,4 +14,6 @@ public interface AnswerDao {
     ArrayList<Answer> selectByTid(Integer templateId);
 
     Integer selectCountByTid(Integer templateId);
+
+    Answer selectByTidAndIp(Answer answer);
 }

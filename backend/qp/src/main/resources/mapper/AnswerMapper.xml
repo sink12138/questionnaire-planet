@@ -14,4 +14,8 @@
     <select id="selectCountByTid" parameterType="Integer" resultType="Integer">
         select count(*) from answer where template_id = #{templateId}
     </select>
+    <select id="selectByTidAndIp" parameterType="Answer" resultType="Answer">
+        select * from answer
+        where template_id = #{templateId} and ip = #{ip}
+    </select>
 </mapper>
