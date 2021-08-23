@@ -52,7 +52,7 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷尚未发布, 无法访问");
             }
             if (template.getType().equals("vote")) {
-                String ip = request.getHeader("x-forwarded-for");
+                String ip = request.getHeader("X-Real-IP");
                 if (ip == null) ip = request.getRemoteAddr();
                 Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
                 if (oldAnswer != null)
@@ -110,8 +110,8 @@ public class CollectionController {
             }
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
-            if (template.getType().equals("vote")) {
-                String ip = request.getHeader("x-forwarded-for");
+            if (template.getType().equals("vote") && !template.getOwner().equals(accountId)) {
+                String ip = request.getHeader("X-Real-IP");
                 if (ip == null) ip = request.getRemoteAddr();
                 Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
                 if (oldAnswer != null)
@@ -196,7 +196,7 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
-            String ip = request.getHeader("x-forwarded-for");
+            String ip = request.getHeader("X-Real-IP");
             if (ip == null) ip = request.getRemoteAddr();
             if (template.getType().equals("vote")) {
                 Answer oldAnswer = answerService.getOldAnswerByIp(templateId, ip);
@@ -314,8 +314,8 @@ public class CollectionController {
                     }
                 }
                 map.put("results", results);
-                map.put("success", true);
             }
+            map.put("success", true);
         }
         catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.clear();
