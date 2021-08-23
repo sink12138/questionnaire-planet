@@ -1,69 +1,135 @@
 <template>
-    <div id="quest" ref="quest">
+  <div id="quest" ref="quest">
     <div class="head">
-        <h1>
+      <h1>
         {{ title }}
-        </h1>
-        <h3>
+      </h1>
+      <h3>
         {{ description }}
-        </h3>
+      </h3>
     </div>
     <div class="question">
+      <el-form
+        :model="answers"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="ruleForm"
+      >
         <div v-for="(item, index_question) in questions" :key="index_question">
-        <el-divider content-position="left" style="margin-top: 15px">第{{ index_question + 1 }}题</el-divider>
-        <div class="question-title">
+          <el-divider content-position="left" style="margin-top: 15px"
+            >第{{ index_question + 1 }}题</el-divider
+          >
+          <div class="question-title">
             <div class="stem">{{ item.stem }}</div>
             <div class="description">{{ item.description }}</div>
-        </div>
-        <div class="question-content">
+          </div>
+
+          <div class="question-content">
             <div v-if="item.type == 'choice'">
-            <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio class="option" :label="index">{{ i }}</el-radio>
-            </el-radio-group>
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-radio-group
+                  v-model="answers[index_question]"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index">{{ i }}</el-radio>
+                </el-radio-group></el-form-item
+              >
             </div>
             <div class="multi" v-if="item.type == 'multi-choice'">
-            <el-checkbox-group
-            v-model="multi" 
-            v-for="(i, index) in item.choices"
-            :min = "item.min"
-            :max = "item.max"
-            :key="index" 
-            @change="multiChangeValue(index_question)">
-                <el-checkbox class="option" :label="index" border>{{ i }}</el-checkbox>
-            </el-checkbox-group>
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-checkbox-group
+                  v-model="multi"
+                  v-for="(i, index) in item.choices"
+                  :min=0
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group></el-form-item
+              >
             </div>
             <div v-if="item.type == 'filling'">
-            <el-input
-            type="textarea"
-            class="input"
-            :rows="item.height"
-            :style="{'--width': item.width}"
-            placeholder="请输入内容"
-            v-model="answers[index_question]">
-            </el-input>
+              <el-form-item
+                label="请输入"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-input
+                  type="textarea"
+                  class="input"
+                  :rows="item.height"
+                  :style="{ '--width': item.width }"
+                  placeholder="请输入内容"
+                  v-model="answers[index_question]"
+                >
+                </el-input
+              ></el-form-item>
             </div>
             <div v-if="item.type == 'grade'">
-            <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio class="option" :label="index">{{ i }}({{item.scores[ index ]}})</el-radio>
-            </el-radio-group>
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-radio-group
+                  v-model="answers[index_question]"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index"
+                    >{{ i }}({{ item.scores[index] }})</el-radio
+                  >
+                </el-radio-group></el-form-item
+              >
             </div>
             <div v-if="item.type == 'dropdown'">
-            <el-select v-model="answers[index_question]" clearable placeholder="请选择">
-                <el-option
-                v-for="(i, index) in item.choices"
-                :key="index"
-                :label="i"
-                :value="index">
-                </el-option>
-            </el-select>
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-select
+                  v-model="answers[index_question]"
+                  clearable
+                  placeholder="请选择"
+                >
+                  <el-option
+                    v-for="(i, index) in item.choices"
+                    :key="index"
+                    :label="i"
+                    :value="index"
+                  >
+                  </el-option> </el-select
+              ></el-form-item>
             </div>
+          </div>
         </div>
-        </div>
+      </el-form>
     </div>
     <div class="submit">
-        <el-button @click="submit">提交问卷</el-button>
+      <el-button @click="submit">提交问卷</el-button>
     </div>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -82,27 +148,21 @@ export default {
           stem: "这题什么意思？",
           description: "题目描述，题目描述，描述一下题目",
           required: true,
-          choices: [
-            "生异形","生瓜蛋子","What's up?","萨日朗"
-          ],
+          choices: ["生异形", "生瓜蛋子", "What's up?", "萨日朗"],
         },
         {
           type: "choice",
           stem: "你的姓名？",
           description: "",
           required: true,
-          choices: [
-            "华强","大鹏","有一个人"
-          ],
+          choices: ["华强", "大鹏", "有一个人"],
         },
         {
           type: "multi-choice",
           stem: "哪些词形容你合适？",
           description: "请用恰当的词来形容你",
           required: true,
-          choices: [
-            "沉鱼落雁","玉树临风","惊天动地"
-          ],
+          choices: ["沉鱼落雁", "玉树临风", "惊天动地"],
           max: 2,
           min: 0,
         },
@@ -112,32 +172,26 @@ export default {
           description: "华强买瓜多少钱一斤？",
           required: true,
           height: 3,
-          width: '600px',
+          width: "600px",
         },
         {
           type: "grade",
           stem: "瓜店老板态度怎样？",
           description: "给态度打分",
           required: true,
-          choices: [
-            "good","very good","very very good"
-          ],
-          scores: [
-            10, 50, 100
-          ]
+          choices: ["good", "very good", "very very good"],
+          scores: [10, 50, 100],
         },
         {
           type: "dropdown",
           stem: "瓜是什么做的?",
           description: "",
-          required: true,
-          choices: [
-            "(C2H5O)n","Au","Fe"
-          ]
-        }
+          required: false,
+          choices: ["(C2H5O)n", "Au", "Fe"],
+        },
       ],
       multi: [],
-      answers: []
+      answers: [],
     };
   },
   created: function () {
@@ -182,54 +236,63 @@ export default {
       this.$PDFSave(this.$refs.quest, this.title);
     },
     changeValue() {
-      console.log(this.answers)
+      console.log(this.answers);
     },
     multiChangeValue(index) {
-      this.answers[index] = this.multi
-      console.log(this.multi)
+      this.answers[index] = this.multi;
+      console.log(this.multi);
     },
     submit() {
-        this.$confirm('是否提交问卷?', '提示', {
-          confirmButtonText: '提交',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let submitData = JSON.stringify({
-            templateId: parseInt(this.templateId),
-            password: this.password,
-            answers: this.answers
-          })
-          console.log(submitData)
-          this.$axios({
-              method: "post",
-              url: "http://139.224.50.146:80/apis/answer",
-              data: submitData
-          }).then( 
-            (response) => {
-              console.log(response);
-              if (response.data.success == true) {
-                this.$message({
-                  message: "提交成功！",
-                  type: "success",
-                });
-              } else {
-                this.$message({
-                  message: response.data.message,
-                  type: "info"
-                });
-              }
-            },
-            (err) => {
-              alert(err);
+      this.$confirm("是否提交问卷?", "提示", {
+        confirmButtonText: "提交",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.$refs["ruleForm"].validate((valid) => {
+            if (valid) {
+              let submitData = JSON.stringify({
+                templateId: parseInt(this.templateId),
+                password: this.password,
+                answers: this.answers,
+              });
+              console.log(submitData);
+              this.$axios({
+                method: "post",
+                url: "http://139.224.50.146:80/apis/answer",
+                data: submitData,
+              }).then(
+                (response) => {
+                  console.log(response);
+                  if (response.data.success == true) {
+                    this.$message({
+                      message: "提交成功！",
+                      type: "success",
+                    });
+                  } else {
+                    this.$message({
+                      message: response.data.message,
+                      type: "info",
+                    });
+                  }
+                },
+                (err) => {
+                  alert(err);
+                }
+              );
+            } else {
+              console.log("error submit!!");
+              return false;
             }
-          )
-        }).catch(() => {
+          });
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消提交'
-          });          
+            type: "info",
+            message: "已取消提交",
+          });
         });
-    }
+    },
   },
 };
 </script>
@@ -309,7 +372,7 @@ a:hover {
   margin: 25px;
 }
 .question-content .input {
-  width: var(--width)
+  width: var(--width);
 }
 .multi {
   display: flex;
