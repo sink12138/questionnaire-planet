@@ -252,6 +252,7 @@ export default {
     return {
       templateId: 0,
       submitted: false,
+      isVote: false,
       locked: false,
       login: false,
       title: "问卷标题",
@@ -271,7 +272,7 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       formLabelWidth: '100px',
-      results: [{stem:"题干",answers:['A','B'],counts:[12,25]}],
+      results: [],
       questions: [
         {
           type: "choice",
@@ -518,6 +519,7 @@ export default {
                     } else {
                       this.isVote = true;
                       this.results = response.data.results;
+                      console.log(this.results)
                     }
                   } else {
                     this.$message({
