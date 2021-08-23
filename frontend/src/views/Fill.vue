@@ -1,6 +1,6 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" @close="goBack">
+    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
       <el-form :model="password">
         <el-form-item label="问卷密码" :label-width="formLabelWidth" prop="password">
           <el-input v-model="password" autocomplete="off" show-password style="width: 300px" placeholder="请输入问卷密码"></el-input>
