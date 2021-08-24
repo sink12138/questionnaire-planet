@@ -386,6 +386,9 @@
                   </el-collapse-item>
                 </vuedraggable>
               </el-collapse>
+              <div class="foot">
+                <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
+              </div>
             </div>
           </el-form>
         </el-main>
@@ -1061,5 +1064,16 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.foot .el-button {
+  margin-top: 15px;
+  font-size: 20px;
+  height: 60px;
+  width: 160px;
 }
 </style>
