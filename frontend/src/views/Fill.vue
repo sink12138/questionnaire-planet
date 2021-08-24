@@ -412,6 +412,11 @@ export default {
                     this.questions = response.data.questions;
                   } else {
                     console.log(response.data.message);
+                    this.$message({
+                      message: response.data.message,
+                      type: "warning",
+                      showClose: true
+                    });
                   }
                 })
                 .catch((err) => console.log(err));
@@ -524,6 +529,12 @@ export default {
             }
           } else {
             console.log(response.data.message);
+            this.$message({
+              message: response.data.message,
+              type: "warning",
+              showClose: true
+            });
+            this.dialogFormVisible2 = false;
           }
         })
         .catch((err) => console.log(err));
