@@ -126,7 +126,7 @@ export default {
       formLabelWidth: '100px'
     }
   },
-  mounted: function(){
+  created(){
     if (sessionStorage.getItem("isLogin") == undefined)
       sessionStorage.setItem("isLogin", false);
     if (sessionStorage.getItem("isLogin") == true) {
