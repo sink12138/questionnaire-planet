@@ -34,6 +34,11 @@
                 <span>{{ scope.row[item] }}</span>
               </template>
             </el-table-column>
+            <el-table-column label="回答时间">
+              <template slot-scope="scope">
+                <span>{{this.answerTimes[scope.$index]}}</span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
