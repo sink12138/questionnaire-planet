@@ -573,6 +573,7 @@ export default {
       })
     },
     updateChart: function(item) {
+      console.log('update',item)
       this.myChart.data.labels = item.answers
       this.myChart.data.datasets[0].data = item.counts
       this.myChart.data.datasets[0].label = item.stem
