@@ -401,7 +401,7 @@ export default {
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
-                params: { templateId: this.templateId },
+                params: { templateId: this.templateId, visitor: true },
               })
                 .then((response) => {
                   console.log(response);
@@ -488,7 +488,7 @@ export default {
         this.$axios({
           method: "get",
           url: "http://139.224.50.146:80/apis/details",
-          params: { templateId: this.templateId },
+          params: { templateId: this.templateId, visitor: true },
         })
           .then((response) => {
             console.log(response);
@@ -513,7 +513,7 @@ export default {
       this.$axios({
         method: "get",
         url: "http://139.224.50.146:80/apis/details",
-        params: { templateId: this.templateId, password: this.password },
+        params: { templateId: this.templateId, password: this.password, visitor: true },
       })
         .then((response) => {
           console.log(response);
