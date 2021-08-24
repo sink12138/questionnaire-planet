@@ -198,7 +198,7 @@
                       }"
                     >
                       <el-input
-                        v-model.trim="item.questionName"
+                        v-model="item.questionName"
                         style="width: 258px"
                         clearable
                         placeholder="请填写问题"
@@ -210,7 +210,7 @@
                       label="问题描述"
                     >
                       <el-input
-                        v-model.trim="item.questionSummary"
+                        v-model="item.questionSummary"
                         style="width: 258px"
                         clearable
                         placeholder="请填写问题描述"
@@ -233,7 +233,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.min"
+                            v-model="item.min"
                             style="width: 125px"
                             clearable
                             placeholder="请填写最小选项个数"
@@ -256,7 +256,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.max"
+                            v-model="item.max"
                             style="width: 125px"
                             clearable
                             placeholder="请填写最大选项个数"
@@ -281,7 +281,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.height"
+                            v-model="item.height"
                             style="width: 125px"
                             clearable
                             placeholder="请填写填空框高度"
@@ -304,7 +304,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.width"
+                            v-model="item.width"
                             style="width: 125px"
                             clearable
                             placeholder="请填写填空框宽度"
@@ -328,7 +328,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.value"
+                          v-model="opt.value"
                           style="width: 200px"
                           clearable
                           placeholder="请输入选项"
@@ -359,7 +359,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.scores"
+                          v-model="opt.scores"
                           style="width: 120px; margin-left: 10px"
                           clearable
                           placeholder="请输入评分"
