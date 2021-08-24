@@ -434,20 +434,6 @@ export default {
               { value: "", scores: 0 },
             ],
           },
-          {
-            type: "0",
-            required: "",
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
-            ],
-          },
         ],
       },
       qrData: {
