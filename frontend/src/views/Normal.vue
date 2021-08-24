@@ -472,17 +472,17 @@ export default {
     },
     copyQuestion(index) {
       //复制题目
-      this.template.type = this.modelForm.questions[index].type;
-      this.template.required = this.modelForm.questions[index].required;
-      this.template.questionName = this.modelForm.questions[index].questionName;
-      this.template.questionSummary =
-        this.modelForm.questions[index].questionSummary;
-      this.template.max = this.modelForm.questions[index].max;
-      this.template.min = this.modelForm.questions[index].min;
-      this.template.height = this.modelForm.questions[index].height;
-      this.template.width = this.modelForm.questions[index].width;
-      this.template.answers = this.modelForm.questions[index].answers;
-      this.modelForm.questions.splice(index, 0, this.template);
+      this.modelForm.questions.push({
+        type: this.modelForm.questions[index].type,
+        required: this.modelForm.questions[index].required,
+        questionName: this.modelForm.questions[index].questionName,
+        questionSummary: this.modelForm.questions[index].quxestionSummary,
+        max: this.modelForm.questions[index].max,
+        min: this.modelForm.questions[index].min,
+        height: this.modelForm.questions[index].height,
+        width: this.modelForm.questions[index].width,
+        answers: this.modelForm.questions[index].answers
+      });
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
