@@ -342,7 +342,6 @@ export default {
       .then((response) => {
         console.log(response);
         if (response.data.success == true) {
-          this.fillRight = true;
           this.login = response.data.login;
           this.locked = response.data.locked;
           if (this.login == true) {
@@ -353,6 +352,7 @@ export default {
               this.dialogFormVisible2 = true;
             } else {
               console.log(33);
+              this.fillRight = true;
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
