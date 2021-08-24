@@ -642,12 +642,6 @@ export default {
         },
       });
     },
-    updateChart: function (item) {
-      this.myChart.data.labels = item.answers;
-      this.myChart.data.datasets[0].data = item.counts;
-      this.myChart.data.datasets[0].label = item.stem;
-      this.myChart.update();
-    },
     updateChart: function(item) {
       this.loadChart()
       console.log('update',item)
