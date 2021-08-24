@@ -91,9 +91,7 @@
                 />
               </el-form-item>
               <!-- 问卷描述 -->
-              <el-form-item
-                label="问卷描述"
-              >
+              <el-form-item label="问卷描述">
                 <el-input
                   v-model="modelForm.description"
                   style="width: 258px"
@@ -121,21 +119,21 @@
                 />
               </el-form-item>
               <!-- 问卷限额 -->
-                  <el-form-item
-                    label="问卷限额"
-                    :rules="{
-                      type: 'number',
-                      message: '请输入数字',
-                      trigger: 'blur',
-                    }"
-                  >
-                    <el-input
-                      v-model="modelForm.quota"
-                      style="width: 258px"
-                      clearable
-                      placeholder="若无限额请输入0"
-                    />
-                  </el-form-item>
+              <el-form-item
+                label="问卷限额"
+                :rules="{
+                  type: 'number',
+                  message: '请输入数字',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input
+                  v-model="modelForm.quota"
+                  style="width: 258px"
+                  clearable
+                  placeholder="若无限额请输入0"
+                />
+              </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -316,57 +314,57 @@
                     </el-row>
                     <!-- 答案 -->
                     <el-row v-if="item.type != 2">
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`选项${idx + 1}`"
-                      :prop="`questions.${index}.answers.${idx}.value`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入选项',
-                          trigger: 'blur',
-                        },
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="opt.value"
-                        style="width: 200px"
-                        clearable
-                        placeholder="请输入选项"
-                      />
-                      <el-button
-                        style="margin-left: 20px"
-                        @click.prevent="removeDomain(index, idx)"
-                        >删除</el-button
+                      <el-form-item
+                        v-for="(opt, idx) in item.answers"
+                        :key="idx"
+                        :label="`选项${idx + 1}`"
+                        :prop="`questions.${index}.answers.${idx}.value`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入选项',
+                            trigger: 'blur',
+                          },
+                        ]"
                       >
-                    </el-form-item>
-                    <el-form-item
-                      v-show="item.type == 3"
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`第${idx + 1}项评分`"
-                      :prop="`questions.${index}.answers.${idx}.scores`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入评分',
-                          trigger: 'blur',
-                        },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        }
-                      ]"
-                    >
-                      <el-input
-                        v-model.trim="opt.scores"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入评分"
-                      />
-                    </el-form-item>
-                  </el-row>
+                        <el-input
+                          v-model.trim="opt.value"
+                          style="width: 200px"
+                          clearable
+                          placeholder="请输入选项"
+                        />
+                        <el-button
+                          style="margin-left: 20px"
+                          @click.prevent="removeDomain(index, idx)"
+                          >删除</el-button
+                        >
+                      </el-form-item>
+                      <el-form-item
+                        v-show="item.type == 3"
+                        v-for="(opt, idx) in item.answers"
+                        :key="idx"
+                        :label="`第${idx + 1}项评分`"
+                        :prop="`questions.${index}.answers.${idx}.scores`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入评分',
+                            trigger: 'blur',
+                          },
+                          {
+                            validator: isNum,
+                            trigger: 'blur',
+                          },
+                        ]"
+                      >
+                        <el-input
+                          v-model.trim="opt.scores"
+                          style="width: 120px; margin-left: 10px"
+                          clearable
+                          placeholder="请输入评分"
+                        />
+                      </el-form-item>
+                    </el-row>
                     <el-form-item label="编辑题目">
                       <el-button
                         icon="el-icon-circle-plus"
@@ -628,6 +626,15 @@ export default {
                 quest.type = "multi-choice";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  var mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
@@ -658,6 +665,15 @@ export default {
                 quest.type = "vote";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
@@ -668,7 +684,7 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if(this.modelForm.quota == undefined) {
+          if (this.modelForm.quota == undefined) {
             this.modelForm.quota = 0;
           }
           this.$axios({
@@ -708,37 +724,295 @@ export default {
       });
     },
     preview() {
-      this.addSubmit();
-      this.$router.push("/preview?templateId=" + this.templateId);
+      this.$refs.modelForm.validate((valid) => {
+        if (valid) {
+          console.log("保存中");
+          console.log(this.modelForm.questions);
+          var templateQuestions = [];
+          var quest = new Map();
+          var question = new Map();
+          var x = {};
+          var i = 0;
+          var j = 0;
+          for (i in this.modelForm.questions) {
+            quest = new Map();
+            question = this.modelForm.questions[i];
+            console.log(question);
+            quest.stem = question.questionName;
+            quest.description = question.questionSummary;
+            if (question.required == "false") {
+              quest.required = false;
+            } else {
+              quest.required = true;
+            }
+            quest.choices = [];
+            switch (question.type) {
+              case "0":
+                quest.type = "choice";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "1":
+                quest.type = "multi-choice";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  var mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "2":
+                quest.type = "filling";
+                quest.height = question.height;
+                quest.width = question.width;
+                break;
+              case "3":
+                quest.type = "grade";
+                quest.scores = [];
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.scores.push(x.scores);
+                }
+                break;
+              case "4":
+                quest.type = "dropdown";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "5":
+                quest.type = "vote";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+            }
+            console.log(quest);
+            templateQuestions.push(quest);
+            console.log(templateQuestions);
+          }
+          if (this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/submit",
+            data: JSON.stringify({
+              templateId: parseInt(this.templateId),
+              title: this.modelForm.title,
+              description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
+              password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
+              questions: templateQuestions,
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.templateId = response.data.templateId;
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
+                });
+                this.$router.push("/preview?templateId=" + this.templateId);
+              } else {
+                this.$message({
+                  message: response.data.message,
+                });
+              }
+            },
+            (err) => {
+              alert(err);
+            }
+          );
+          console.log("保存成功!");
+        }
+      });
     },
     publishQuestion() {
-      this.addSubmit();
-      this.$axios({
-        method: "post",
-        url: "http://139.224.50.146:80/apis/release",
-        data: JSON.stringify({
-          templateId: parseInt(this.templateId),
-        }),
-      }).then(
-        (response) => {
-          console.log(response);
-          if (response.data.success == true) {
-            this.$message({
-              message: "问卷发布成功！",
-              type: "success",
-            });
-            this.dialogVisible = true;
-          } else {
-            this.$message({
-              message: response.data.message,
-            });
+      this.$refs.modelForm.validate((valid) => {
+        if (valid) {
+          console.log("保存中");
+          console.log(this.modelForm.questions);
+          var templateQuestions = [];
+          var quest = new Map();
+          var question = new Map();
+          var x = {};
+          var i = 0;
+          var j = 0;
+          for (i in this.modelForm.questions) {
+            quest = new Map();
+            question = this.modelForm.questions[i];
+            console.log(question);
+            quest.stem = question.questionName;
+            quest.description = question.questionSummary;
+            if (question.required == "false") {
+              quest.required = false;
+            } else {
+              quest.required = true;
+            }
+            quest.choices = [];
+            switch (question.type) {
+              case "0":
+                quest.type = "choice";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "1":
+                quest.type = "multi-choice";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  var mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "2":
+                quest.type = "filling";
+                quest.height = question.height;
+                quest.width = question.width;
+                break;
+              case "3":
+                quest.type = "grade";
+                quest.scores = [];
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                  quest.scores.push(x.scores);
+                }
+                break;
+              case "4":
+                quest.type = "dropdown";
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+              case "5":
+                quest.type = "vote";
+                quest.max = parseInt(question.max);
+                quest.min = parseInt(question.min);
+                if (quest.max < quest.min) {
+                  mes =
+                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                  this.$message({
+                    message: mes,
+                    type: "warning",
+                  });
+                  return;
+                }
+                for (j in question.answers) {
+                  x = question.answers[j];
+                  quest.choices.push(x.value);
+                }
+                break;
+            }
+            console.log(quest);
+            templateQuestions.push(quest);
+            console.log(templateQuestions);
           }
-        },
-        (err) => {
-          alert(err);
+          if (this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/submit",
+            data: JSON.stringify({
+              templateId: parseInt(this.templateId),
+              title: this.modelForm.title,
+              description: this.modelForm.description,
+              conclusion: this.modelForm.conclusion,
+              password: this.modelForm.password,
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
+              questions: templateQuestions,
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.templateId = response.data.templateId;
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
+                });
+                this.$axios({
+                  method: "post",
+                  url: "http://139.224.50.146:80/apis/release",
+                  data: JSON.stringify({
+                    templateId: parseInt(this.templateId),
+                  }),
+                }).then(
+                  (response) => {
+                    console.log(response);
+                    if (response.data.success == true) {
+                      this.$message({
+                        message: "问卷发布成功！",
+                        type: "success",
+                      });
+                      this.dialogVisible = true;
+                    } else {
+                      this.$message({
+                        message: response.data.message,
+                      });
+                    }
+                  },
+                  (err) => {
+                    alert(err);
+                  }
+                );
+                console.log("发布成功!");
+              } else {
+                this.$message({
+                  message: response.data.message,
+                });
+              }
+            },
+            (err) => {
+              alert(err);
+            }
+          );
+          console.log("保存成功!");
         }
-      );
-      console.log("发布成功!");
+      });
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");

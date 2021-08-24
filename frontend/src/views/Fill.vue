@@ -1,22 +1,56 @@
 <template>
   <div id="quest" ref="quest">
-    <el-dialog title="请先登录后再填写问卷哦~~~" :visible.sync="dialogFormVisible1" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
+    <el-dialog
+      title="请先登录后再填写问卷哦~~~"
+      :visible.sync="dialogFormVisible1"
+      style="text-align: left; width: 1050px; margin: auto"
+      :close-on-click-modal="false"
+      :before-close="goBack"
+    >
       <el-form :model="formData" :rules="rules" ref="formData">
-        <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-          <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
+        <el-form-item
+          label="电子邮箱"
+          :label-width="formLabelWidth"
+          prop="email"
+        >
+          <el-input
+            v-model="formData.email"
+            autocomplete="off"
+            style="width: 300px"
+            placeholder="请输入您的电子邮箱"
+            v-focus
+          ></el-input>
         </el-form-item>
-        <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-          <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
+        <el-form-item
+          label="密码"
+          :label-width="formLabelWidth"
+          prop="password"
+        >
+          <el-input
+            v-model="formData.password"
+            autocomplete="off"
+            show-password
+            style="width: 300px"
+            placeholder="请输入密码"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="goBack">取 消</el-button>
         <el-button type="primary" @click="tologin">登 录</el-button>
-        <el-link href="register" type="info" style="margin:5px 5px 5px 320px"><sup>还没有账号？点此处注册账号</sup></el-link>
+        <el-link href="register" type="info" style="margin: 5px 5px 5px 320px"
+          ><sup>还没有账号？点此处注册账号</sup></el-link
+        >
       </div>
     </el-dialog>
 
-    <el-dialog title="哎呀，问卷被加密了，请输入问卷密码！" :visible.sync="dialogFormVisible2" style="text-align:left; width:1050px; margin:auto" :close-on-click-modal="false" :before-close="goBack">
+    <el-dialog
+      title="哎呀，问卷被加密了，请输入问卷密码！"
+      :visible.sync="dialogFormVisible2"
+      style="text-align: left; width: 1050px; margin: auto"
+      :close-on-click-modal="false"
+      :before-close="goBack"
+    >
       <el-form :model="password">
         <el-form-item
           label="问卷密码"
@@ -185,28 +219,43 @@
                 </el-checkbox-group>
               </el-form-item>
             </div>
+            <div class="multi" v-if="item.type == 'sign-up'">
+              至少选择{{ item.min }}项
+              <el-form-item
+                label="选项"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-checkbox-group
+                  v-model="multi"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border :disabled="item.remains[index]==0?true:false"
+                    >{{ i }}共{{ item.quotas[index] }},剩余{{
+                      item.remains[index]
+                    }}
+                  </el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+            </div>
           </div>
         </div>
       </el-form>
     </div>
     <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
-    <div class="voted" v-if="(submitted == true)&&(isVote == true)">
+    <div class="voted" v-if="submitted == true && isVote == true">
       <div class="result">
         <div class="chart">
           <canvas id="myChart"></canvas>
         </div>
-        <el-table
-        :data="results"
-        max-height="300">
-          <el-table-column
-          fixed
-          type="index"
-          width="80">
-          </el-table-column>
-          <el-table-column
-          prop="stem"
-          label="题目题干">
-          </el-table-column>
+        <el-table :data="results" max-height="300">
+          <el-table-column fixed type="index" width="80"> </el-table-column>
+          <el-table-column prop="stem" label="题目题干"> </el-table-column>
           <el-table-column>
             <template slot-scope="scope">
               <el-button @click="updateChart(scope.row)">投票结果</el-button>
@@ -224,7 +273,7 @@
 </template>
 
 <script>
-import Chart from 'chart.js/auto'
+import Chart from "chart.js/auto";
 Chart.defaults.font.size = 15;
 export default {
   data() {
@@ -239,14 +288,14 @@ export default {
       if (value === "") {
         callback(new Error("请输入密码"));
       } else {
-          if (value.length < 6 || value.length > 20) {
-            callback(new Error("请输入六至二十位"));
-          }
-          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
-          if (!this.formData.password.match(regx)) {
-            callback(new Error("请同时包含字母数字"));
-          }
-          callback();
+        if (value.length < 6 || value.length > 20) {
+          callback(new Error("请输入六至二十位"));
+        }
+        var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+        if (!this.formData.password.match(regx)) {
+          callback(new Error("请同时包含字母数字"));
+        }
+        callback();
       }
     };
     return {
@@ -263,7 +312,7 @@ export default {
       password: "",
       formData: {
         email: "",
-        password: ""
+        password: "",
       },
       rules: {
         email: [{ validator: checkEmail, trigger: "blur" }],
@@ -271,7 +320,7 @@ export default {
       },
       dialogFormVisible1: false,
       dialogFormVisible2: false,
-      formLabelWidth: '100px',
+      formLabelWidth: "100px",
       results: [],
       questions: [
         {
@@ -343,13 +392,11 @@ export default {
           this.locked = response.data.locked;
           if (this.login == true) {
             this.dialogFormVisible1 = true;
-          }
-          else {
+          } else {
             if (this.locked == true) {
               console.log(22);
               this.dialogFormVisible2 = true;
-            }
-            else {
+            } else {
               console.log(33);
               this.$axios({
                 method: "get",
@@ -363,7 +410,6 @@ export default {
                     this.type = response.data.type;
                     this.description = response.data.description;
                     this.questions = response.data.questions;
-                    this.dialogFormVisible = false;
                   } else {
                     console.log(response.data.message);
                   }
@@ -371,29 +417,32 @@ export default {
                 .catch((err) => console.log(err));
             }
           }
-
-          
         } else {
           console.log(response.data.message);
+          this.$message({
+            message: response.data.message,
+            type: "warning",
+            showClose: true
+          });
         }
       })
       .catch((err) => console.log(err));
   },
   watch: {
-    canvas: function() {
-      console.log('load chart')
-      this.loadChart()
+    canvas: function () {
+      console.log("load chart");
+      this.loadChart();
     },
     results: {
-      handler: function() {
-        this.updateChart()
+      handler: function () {
+        this.updateChart();
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   mounted() {
-    var el = document.getElementById('myChart');
-    this.canvas = el
+    var el = document.getElementById("myChart");
+    this.canvas = el;
   },
   methods: {
     step: function (i) {
@@ -428,6 +477,24 @@ export default {
       if (this.locked == true) {
         console.log(22);
         this.dialogFormVisible2 = true;
+
+        this.$axios({
+          method: "get",
+          url: "http://139.224.50.146:80/apis/details",
+          params: { templateId: this.templateId },
+        })
+          .then((response) => {
+            console.log(response);
+            if (response.data.success == false) {
+              console.log(response.data.message);
+              this.$message({
+                message: response.data.message,
+                type: "warning",
+                showClose: true
+              });
+            }
+          })
+          .catch((err) => console.log(err));
       }
       else {
         console.log(33);
@@ -445,6 +512,11 @@ export default {
               this.questions = response.data.questions;
             } else {
               console.log(response.data.message);
+              this.$message({
+                message: response.data.message,
+                type: "warning",
+                showClose: true
+              });
             }
           })
           .catch((err) => console.log(err));
@@ -518,7 +590,7 @@ export default {
                     } else {
                       this.isVote = true;
                       this.results = response.data.results;
-                      console.log(this.results)
+                      console.log(this.results);
                     }
                   } else {
                     this.$message({
@@ -550,23 +622,31 @@ export default {
         type: 'bar',
         data: {
           labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: [
-              'rgba(44, 130, 201, 1)',
-              'rgba(30, 139, 195, 1)',
-              'rgba(65, 131, 215, 1)',
-              'rgba(34, 167, 240, 1)',
-              'rgba(25, 181, 254, 1)',
-              'rgba(107, 185, 240, 1)',
-              'rgba(68, 108, 179, 1)',
-              'rgba(52, 152, 219, 1)',
-              'rgba(89, 171, 227, 1)',
-              'rgba(137, 196, 244, 1)'
-            ],
-          }],
+          datasets: [
+            {
+              data: [],
+              backgroundColor: [
+                "rgba(44, 130, 201, 1)",
+                "rgba(30, 139, 195, 1)",
+                "rgba(65, 131, 215, 1)",
+                "rgba(34, 167, 240, 1)",
+                "rgba(25, 181, 254, 1)",
+                "rgba(107, 185, 240, 1)",
+                "rgba(68, 108, 179, 1)",
+                "rgba(52, 152, 219, 1)",
+                "rgba(89, 171, 227, 1)",
+                "rgba(137, 196, 244, 1)",
+              ],
+            },
+          ],
         },
-      })
+      });
+    },
+    updateChart: function (item) {
+      this.myChart.data.labels = item.answers;
+      this.myChart.data.datasets[0].data = item.counts;
+      this.myChart.data.datasets[0].label = item.stem;
+      this.myChart.update();
     },
     updateChart: function(item) {
       this.loadChart()
