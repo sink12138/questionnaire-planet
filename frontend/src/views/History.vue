@@ -37,10 +37,7 @@
       <div class="list" style="margin-left: 1%; margin-right: 1%">
         <div
         class="cards"
-        v-for="item in searchQue.slice(
-          (current_page - 1) * pagesize,
-          current_page * pagesize
-        )"
+        v-for="item in searchQue"
         :key="item.templateId">
           <el-card shadow="hover">
             <div class="card">
@@ -193,19 +190,6 @@
             </div>
           </el-card>
         </div>
-        <!-- 该div是做分页的 -->
-        <div class="block">
-          <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="current_page"
-            :page-sizes="[4, 8, 12, 16]"
-            :page-size="pagesize"
-            layout="total, sizes, prev, pager, next"
-            :total="total"
-          >
-          </el-pagination>
-        </div>
       </div>
     </div>
   </div>
@@ -224,9 +208,7 @@ export default {
     return {
       search: "",
       quest: 0,
-      current_page: 1,
       total: 0,
-      pagesize: 12,
       searchQue: [],
       templateId: 0,
       allQuest: [],
@@ -263,12 +245,6 @@ export default {
         console.log(this.searchQue);
         this.total = this.searchQue.length;
       });
-    },
-    handleSizeChange: function (size) {
-      this.pagesize = size;
-    },
-    handleCurrentChange: function (currentPage) {
-      this.current_page = currentPage;
     },
     creationTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
@@ -574,10 +550,5 @@ export default {
 }
 .clearfix .el-button {
   width: 45px;
-}
-.block {
-  position: absolute;
-  bottom: 5px;
-  left: 40%;
 }
 </style>
