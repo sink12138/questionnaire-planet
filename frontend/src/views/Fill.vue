@@ -264,7 +264,7 @@
         </el-table>
       </div>
     </div>
-    <div class="submit">
+    <div class="submit" v-if="fillRight == true">
       <el-button @click="submit()" v-if="submitted == false"
         >提交问卷</el-button
       >
@@ -304,11 +304,12 @@ export default {
       isVote: false,
       locked: false,
       login: false,
-      title: "问卷标题",
+      fillRight: false,
+      title: "未找到问卷",
       type: "normal",
-      description: "问卷描述",
+      description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
       conclusion: "谢谢",
-      remain: "无限制",
+      remain: "∞",
       password: "",
       formData: {
         email: "",
@@ -322,54 +323,7 @@ export default {
       dialogFormVisible2: false,
       formLabelWidth: "100px",
       results: [],
-      questions: [
-        {
-          type: "choice",
-          stem: "这题什么意思？",
-          description: "题目描述，题目描述，描述一下题目",
-          required: true,
-          choices: ["生异形", "生瓜蛋子", "What's up?", "萨日朗"],
-        },
-        {
-          type: "choice",
-          stem: "你的姓名？",
-          description: "",
-          required: true,
-          choices: ["华强", "大鹏", "有一个人"],
-        },
-        {
-          type: "multi-choice",
-          stem: "哪些词形容你合适？",
-          description: "请用恰当的词来形容你",
-          required: true,
-          choices: ["沉鱼落雁", "玉树临风", "惊天动地"],
-          max: 2,
-          min: 0,
-        },
-        {
-          type: "filling",
-          stem: "华强买的瓜多少钱一斤？",
-          description: "华强买瓜多少钱一斤？",
-          required: true,
-          height: 3,
-          width: "600px",
-        },
-        {
-          type: "grade",
-          stem: "瓜店老板态度怎样？",
-          description: "给态度打分",
-          required: true,
-          choices: ["good", "very good", "very very good"],
-          scores: [10, 50, 100],
-        },
-        {
-          type: "dropdown",
-          stem: "瓜是什么做的?",
-          description: "",
-          required: false,
-          choices: ["(C2H5O)n", "Au", "Fe"],
-        },
-      ],
+      questions: [],
       multi: [],
       answers: [],
       myChart: null,
@@ -406,6 +360,7 @@ export default {
                 .then((response) => {
                   console.log(response);
                   if (response.data.success == true) {
+                    this.fillRight = true;
                     this.title = response.data.title;
                     this.type = response.data.type;
                     this.description = response.data.description;
@@ -619,16 +574,16 @@ export default {
             {
               data: [],
               backgroundColor: [
-                "rgba(44, 130, 201, 1)",
-                "rgba(30, 139, 195, 1)",
-                "rgba(65, 131, 215, 1)",
-                "rgba(34, 167, 240, 1)",
-                "rgba(25, 181, 254, 1)",
-                "rgba(107, 185, 240, 1)",
-                "rgba(68, 108, 179, 1)",
-                "rgba(52, 152, 219, 1)",
-                "rgba(89, 171, 227, 1)",
-                "rgba(137, 196, 244, 1)",
+                'rgba(2, 62, 138, 1)',
+                'rgba(0, 150, 199, 1)',
+                'rgba(72, 202, 228, 1)',
+                'rgba(144, 224, 239, 1)',
+                'rgba(173, 232, 244, 1)',
+                'rgba(202, 240, 248, 1)',
+                'rgba(68, 108, 179, 1)',
+                'rgba(52, 152, 219, 1)',
+                'rgba(89, 171, 227, 1)',
+                'rgba(137, 196, 244, 1)'
               ],
             },
           ],

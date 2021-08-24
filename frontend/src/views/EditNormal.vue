@@ -4,7 +4,7 @@
       <el-container>
         <el-aside width="200px">
           <div class="editor">
-            <router-link to="/">
+            <router-link to="/history">
               <div class="logo">
                 <Logo></Logo>
                 <div class="web-title">问卷星球</div>
@@ -27,7 +27,6 @@
               <el-button @click="publishQuestion" type="primary"
                 >发布问卷</el-button
               >
-              <el-button @click="dialogVisible = true">Qrcode</el-button>
               <el-dialog
                 :append-to-body="true"
                 title="分享问卷"
@@ -417,14 +416,13 @@ export default {
       templateId: 0,
       modelForm: {
         title: "新的问卷",
-        description: "",
         conclusion: "",
         password: "",
         quota: 0,
         questions: [],
       },
       qrData: {
-        text: window.location.host + "/questionnaire/" + this.templateId,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",

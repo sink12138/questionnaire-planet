@@ -3,7 +3,7 @@
     <el-container>
       <el-aside width="200px">
         <div class="editor">
-          <router-link to="/">
+          <router-link to="/questionnaire">
             <div class="logo">
               <Logo></Logo>
               <div class="web-title">问卷星球</div>
@@ -420,20 +420,6 @@ export default {
         password: "",
         quota: undefined,
         questions: [
-          {
-            type: "0",
-            required: "",
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
-            ],
-          },
           {
             type: "0",
             required: "",

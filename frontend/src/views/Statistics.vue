@@ -3,7 +3,7 @@
     <el-container>
       <el-aside width="200px">
       <div class="editor">
-        <router-link to="/">
+        <router-link to="/history">
           <div class="logo">
             <Logo></Logo>
             <div class="web-title">问卷星球</div>
@@ -12,6 +12,7 @@
         <div class="info">问卷数据统计</div>
         <el-button @click="changeShow('data')">查看数据</el-button>
         <el-button @click="changeShow('sum')">选项分析</el-button>
+        <el-button @click="handleDownload()">下载数据</el-button>
       </div>
     </el-aside>
       <el-main>
@@ -31,6 +32,11 @@
             :label="item">
               <template slot-scope="scope">
                 <span>{{ scope.row[item] }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="回答时间">
+              <template slot-scope="scope">
+                <span>{{ scope.row['answerTime'] }}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -170,12 +176,12 @@ export default {
             label: '',
             data: [],
             backgroundColor: [
-              'rgba(44, 130, 201, 1)',
-              'rgba(30, 139, 195, 1)',
-              'rgba(65, 131, 215, 1)',
-              'rgba(34, 167, 240, 1)',
-              'rgba(25, 181, 254, 1)',
-              'rgba(107, 185, 240, 1)',
+              'rgba(2, 62, 138, 1)',
+              'rgba(0, 150, 199, 1)',
+              'rgba(72, 202, 228, 1)',
+              'rgba(144, 224, 239, 1)',
+              'rgba(173, 232, 244, 1)',
+              'rgba(202, 240, 248, 1)',
               'rgba(68, 108, 179, 1)',
               'rgba(52, 152, 219, 1)',
               'rgba(89, 171, 227, 1)',
@@ -197,6 +203,33 @@ export default {
       this.myChart.data.labels = this.answerList
       this.myChart.data.datasets[0].data = this.countList
       this.myChart.update()
+    },
+    handleDownload:function() {
+      this.$axios({
+        method: 'get',
+        url: 'http://139.224.50.146:80/apis/excel',
+        params: { templateId: this.templateId },
+        responseType: 'blob',
+      }).then(res => {
+        console.log(res)
+        const filename = decodeURI(res.headers['content-disposition'].split(';')[1].split('=')[1]);
+        console.log(filename);
+        this.download(res.data, filename)
+      }).catch(err => console.log(err))
+    },
+    download (data, filename) {
+      if (! data) {
+        return
+      }
+      let url = window.URL.createObjectURL(new Blob([data],{ type:'application/force-download;charset=utf-8'}))
+      let link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
     }
   }
 }

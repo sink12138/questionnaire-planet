@@ -127,17 +127,14 @@ export default {
     }
   },
   created(){
-    if (sessionStorage.getItem("isLogin") == undefined)
+    var login = sessionStorage.getItem("isLogin")
+    if (login == undefined)
       sessionStorage.setItem("isLogin", false);
-    if (sessionStorage.getItem("isLogin") == true) {
-      console.log('before commit',this.$store.state.isLogin)
+    if (login == "true") {
       this.$store.commit("login");
-      console.log('after commit',this.$store.state.isLogin)
-    } else if (sessionStorage.getItem("isLogin") == false) {
+    } else if (login == "false") {
       this.$store.commit("logout");
     }
-    console.log(sessionStorage.getItem("isLogin"))
-    console.log(this.$store.state.isLogin)
   },
   methods: {
     login: function() {
