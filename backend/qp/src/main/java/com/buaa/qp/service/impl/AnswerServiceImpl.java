@@ -1,25 +1,18 @@
 package com.buaa.qp.service.impl;
 
 import com.buaa.qp.dao.AnswerDao;
-import com.buaa.qp.dao.TemplateDao;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.service.AnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
 
-    private static final Object quotaLock = new Object();
-
     @Autowired
     private AnswerDao answerDao;
-
-    @Autowired
-    private TemplateDao templateDao;
 
     @Override
     public ArrayList<Answer> getAnswersByTid(Integer templateId) {
@@ -32,20 +25,8 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public boolean submitAnswer(Answer answer) {
-        Integer templateId = answer.getTemplateId();
-        Integer quota = templateDao.selectQuotaById(templateId);
-        if (quota != null) {
-            synchronized (quotaLock) {
-                Integer answerCount = answerDao.selectCountByTid(templateId);
-                if (answerCount >= quota)
-                    return false;
-                answerDao.insert(answer);
-            }
-        }
-        else
-            answerDao.insert(answer);
-        return true;
+    public void submitAnswer(Answer answer) {
+        answerDao.insert(answer);
     }
 
     @Override

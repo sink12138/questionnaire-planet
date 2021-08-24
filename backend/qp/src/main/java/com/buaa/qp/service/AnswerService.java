@@ -9,7 +9,7 @@ public interface AnswerService {
 
     void deleteAnswersByTid(Integer templateId);
 
-    boolean submitAnswer(Answer answer);
+    void submitAnswer(Answer answer);
 
     int countAnswers(Integer templateId);
 

@@ -1,7 +1,6 @@
 package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
@@ -16,6 +15,7 @@ import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -129,8 +129,10 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷不存在或无权访问");
             Integer quota = template.getQuota();
             if (isOwner) {
-                map.put("conclusion", template.getConclusion());
-                map.put("quota", quota);
+                if (template.getConclusion() != null)
+                    map.put("conclusion", template.getConclusion());
+                if (template.getQuota() != null)
+                    map.put("quota", quota);
             }
             if (!template.getType().equals("normal") && (visitor || !isOwner)) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
@@ -224,7 +226,7 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
-            if (template.getType().equals("vote")) {
+            if (!template.getType().equals("normal")) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
@@ -294,11 +296,64 @@ public class CollectionController {
                     throw new ParameterFormatException();
                 }
             }
+
+            // Submit the answer
             Answer answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
-            if (!answerService.submitAnswer(answer)) {
-                throw new ExtraMessageException("名额已满");
+            Integer quota = template.getQuota();
+            if (quota == null && !template.getType().equals("sign-up"))
+                answerService.submitAnswer(answer);
+            else synchronized (quotaLock) {
+                int answerCount = answerService.countAnswers(templateId);
+                if (quota != null && answerCount >= quota)
+                    throw new ExtraMessageException("问卷名额已满");
+
+                // Synchronization for sign-up questionnaires
+                if (template.getType().equals("sign-up")) {
+                    questions = templateService.getQuestionsByTid(templateId);
+                    ArrayList<Question> signUpQuestions = new ArrayList<>();
+                    ArrayList<Map<String, Object>> argsMaps = new ArrayList<>();
+                    ArrayList<ArrayList<Integer>> remainsList = new ArrayList<>();
+                    ArrayList<ArrayList<Integer>> signUpAnswers = new ArrayList<>();
+                    // Parsing JSON and args
+                    for (int i = 0; i < questions.size(); ++i) {
+                        Question question = questions.get(i);
+                        if (question.getType().equals("sign-up")) {
+                            signUpQuestions.add(question);
+                            Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                            argsMaps.add(argsMap);
+                            remainsList.add(parser.toIntegerList(argsMap.get("remains")));
+                            signUpAnswers.add(parser.toIntegerList(answers.get(i)));
+                        }
+                    }
+                    // Quota checks for every choice
+                    for (int i = 0; i < signUpQuestions.size(); i++) {
+                        ArrayList<Integer> remains = remainsList.get(i);
+                        ArrayList<Integer> choices = signUpAnswers.get(i);
+                        for (Integer ch : choices) {
+                            if (remains.get(ch) <= 0)
+                                throw new ExtraMessageException("部分选项名额已满");
+                        }
+                    }
+                    // Update the remains
+                    for (int i = 0; i < signUpQuestions.size(); i++) {
+                        Question question = signUpQuestions.get(i);
+                        Map<String, Object> argsMap = argsMaps.get(i);
+                        ArrayList<Integer> remains = remainsList.get(i);
+                        ArrayList<Integer> choices = signUpAnswers.get(i);
+                        for (Integer ch : choices) {
+                            remains.set(ch, remains.get(ch) - 1);
+                        }
+                        argsMap.put("remains", remains);
+                        question.setArgs(JSON.toJSONString(argsMap));
+                        questionService.updateRemains(question);
+                    }
+                }
+
+                answerService.submitAnswer(answer);
             }
-            else
+
+            // Collect the conclusion and results after the submission
+            if (template.getConclusion() != null)
                 map.put("conclusion", template.getConclusion());
 
             // vote results
@@ -341,34 +396,6 @@ public class CollectionController {
                     }
                 }
                 map.put("results", results);
-            }
-            // Sign-up synchronization
-            else if (template.getType().equals("sign-up")) {
-                synchronized (quotaLock) {
-                    questions = templateService.getQuestionsByTid(templateId);
-                    for (int i = 0; i < questions.size(); ++i) {
-                        Question question = questions.get(i);
-                        if (question.getType().equals("sign-up")) {
-                            ArrayList<Integer> choices = parser.toIntegerList(answers.get(i));
-                            Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
-                            ArrayList<Integer> remains = parser.toIntegerList(argsMap.get("remains"));
-                            for (Integer ch : choices) {
-                                if (remains.get(ch) <= 0) {
-                                    throw new ExtraMessageException("名额已满");
-                                }
-                            }
-                            for (Integer ch : choices) {
-                                remains.set(ch, remains.get(ch) - 1);
-                            }
-                            argsMap.put("remains", remains);
-                            String argsStr = JSON.toJSONString(argsMap);
-                            Question newQuestion = new Question();
-                            newQuestion.setArgs(argsStr);
-                            newQuestion.setQuestionId(question.getQuestionId());
-                            questionService.updateRemains(newQuestion);
-                        }
-                    }
-                }
             }
             map.put("success", true);
         }

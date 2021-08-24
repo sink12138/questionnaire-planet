@@ -137,7 +137,7 @@ public class DataController {
             if(!file.createNewFile())
                 throw new ExtraMessageException("File already exists");
             WritableWorkbook workbook = Workbook.createWorkbook(file);
-            WritableSheet sheet = workbook.createSheet("sheet1", 0);
+            WritableSheet sheet = workbook.createSheet("数据汇总", 0);
             for (int i = 0; i < formContent.get(0).size(); ++i) {
                 sheet.addCell(new Label(i, 0, formContent.get(0).get(i)));
             }
