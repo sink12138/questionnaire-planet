@@ -203,6 +203,7 @@ export default {
       this.$axios({
         method: 'get',
         url: 'http://139.224.50.146:80/apis/excel',
+        params: { templateId: this.templateId },
         responseType: 'blob',
       }).then(res => {
         console.log(res)
