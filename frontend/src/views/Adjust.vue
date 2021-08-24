@@ -322,7 +322,7 @@ export default {
         description: "",
         conclusion: "",
         password: "",
-        quota: 0,
+        quota: undefined,
         questions: [],
       },
       qrData: {
@@ -380,7 +380,7 @@ export default {
           description: this.modelForm.description,
           conclusion: this.modelForm.conclusion,
           password: this.modelForm.password,
-          quota: parseInt(this.modelForm.quota),
+          quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
         }),
       }).then(
         (response) => {

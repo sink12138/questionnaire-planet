@@ -12,6 +12,7 @@
         <div class="info">问卷数据统计</div>
         <el-button @click="changeShow('data')">查看数据</el-button>
         <el-button @click="changeShow('sum')">选项分析</el-button>
+        <el-button @click="handleDownload()">下载数据</el-button>
       </div>
     </el-aside>
       <el-main>
@@ -197,6 +198,32 @@ export default {
       this.myChart.data.labels = this.answerList
       this.myChart.data.datasets[0].data = this.countList
       this.myChart.update()
+    },
+    handleDownload:function() {
+      this.$axios({
+        method: 'get',
+        url: 'http://139.224.50.146:80/apis/excel',
+        responseType: 'blob',
+      }).then(res => {
+        console.log(res)
+        const filename = decodeURI(res.headers['content-disposition'].split(';')[1].split('=')[1]);
+        console.log(filename);
+        this.download(res.data, filename)
+      }).catch(err => console.log(err))
+    },
+    download (data, filename) {
+      if (! data) {
+        return
+      }
+      let url = window.URL.createObjectURL(new Blob([data],{ type:'application/force-download;charset=utf-8'}))
+      let link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
     }
   }
 }

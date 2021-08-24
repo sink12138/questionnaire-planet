@@ -126,12 +126,13 @@ export default {
       formLabelWidth: '100px'
     }
   },
-  mounted: function(){
-    if (sessionStorage.getItem("isLogin") == undefined)
+  created(){
+    var login = sessionStorage.getItem("isLogin")
+    if (login == undefined)
       sessionStorage.setItem("isLogin", false);
-    if (sessionStorage.getItem("isLogin") == true) {
+    if (login == "true") {
       this.$store.commit("login");
-    } else if (sessionStorage.getItem("isLogin") == false) {
+    } else if (login == "false") {
       this.$store.commit("logout");
     }
   },

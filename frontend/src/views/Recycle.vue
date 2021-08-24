@@ -54,11 +54,11 @@
               <div class="time">
                 <time> 创建时间:{{ item.creationTime }} </time>
               </div>
-              <div class="time" v-if="item.releaseTime != ''">
-                <time> 发布时间:{{ item.releaseTime }} </time>
+              <div class="time" v-if="item.releaseTime != undefined">
+                <time> 最后发布:{{ item.releaseTime }} </time>
               </div>
               <div class="time" v-else>
-                <time> 发布时间:未曾发布 </time>
+                <time> 最后发布:未曾发布 </time>
               </div>
               <div class="time">
                 <time> 收集时长:{{ item.duration }} </time>
