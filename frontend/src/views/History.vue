@@ -146,8 +146,7 @@
                         type="text"
                         class="button"
                         @click="qr(item)"
-                        icon="el-icon-share">
-                        分享
+                        icon="el-icon-share">分享
                         </el-button>
                         <el-dialog
                           :append-to-body="true"
