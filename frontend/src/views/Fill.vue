@@ -19,6 +19,7 @@
             style="width: 300px"
             placeholder="请输入您的电子邮箱"
             v-focus
+            @keyup.enter.native="tologin"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -32,6 +33,7 @@
             show-password
             style="width: 300px"
             placeholder="请输入密码"
+            @keyup.enter.native="tologin"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -342,6 +344,7 @@ export default {
       .then((response) => {
         console.log(response);
         if (response.data.success == true) {
+          this.fillRight = true;
           this.login = response.data.login;
           this.locked = response.data.locked;
           if (this.login == true) {
@@ -349,9 +352,11 @@ export default {
           } else {
             if (this.locked == true) {
               console.log(22);
+              this.fillRight = true;
               this.dialogFormVisible2 = true;
             } else {
               console.log(33);
+              
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
@@ -360,7 +365,6 @@ export default {
                 .then((response) => {
                   console.log(response);
                   if (response.data.success == true) {
-                    this.fillRight = true;
                     this.title = response.data.title;
                     this.type = response.data.type;
                     this.description = response.data.description;
