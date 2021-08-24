@@ -342,6 +342,7 @@ export default {
       .then((response) => {
         console.log(response);
         if (response.data.success == true) {
+          this.fillRight = true;
           this.login = response.data.login;
           this.locked = response.data.locked;
           if (this.login == true) {
@@ -360,7 +361,6 @@ export default {
                 .then((response) => {
                   console.log(response);
                   if (response.data.success == true) {
-                    this.fillRight = true;
                     this.title = response.data.title;
                     this.type = response.data.type;
                     this.description = response.data.description;
