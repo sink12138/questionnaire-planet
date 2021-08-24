@@ -160,8 +160,8 @@ public class TemplateController {
                         if (width == null || width <= 0)
                             throw new ParameterFormatException();
                         if (height > 10) height = 10;
-                        if (width < 30) width = 30;
-                        else if (width > 500) width = 500;
+                        if (width < 300) width = 300;
+                        else if (width > 800) width = 800;
                         argsMap.put("height", height);
                         argsMap.put("width", width + "px");
                         break;

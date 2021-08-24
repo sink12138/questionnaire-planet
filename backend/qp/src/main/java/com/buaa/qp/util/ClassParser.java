@@ -46,8 +46,13 @@ public class ClassParser {
         if (!(object instanceof List))
             throw new ClassCastException();
         @SuppressWarnings("unchecked")
-        ArrayList<Object> objectList = new ArrayList<>((List<Object>) object);
-        return objectList;
+        List<Object> objectList = (List<Object>) object;
+        ArrayList<Object> noNullList = new ArrayList<>();
+        for (Object obj : objectList) {
+            if (obj != null)
+                noNullList.add(obj);
+        }
+        return noNullList;
     }
 
     public Map<String, Object> toMap(Object object) throws ClassCastException {
