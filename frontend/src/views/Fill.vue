@@ -432,24 +432,6 @@ export default {
       if (this.locked == true) {
         console.log(22);
         this.dialogFormVisible2 = true;
-
-        this.$axios({
-          method: "get",
-          url: "http://139.224.50.146:80/apis/details",
-          params: { templateId: this.templateId },
-        })
-          .then((response) => {
-            console.log(response);
-            if (response.data.success == false) {
-              console.log(response.data.message);
-              this.$message({
-                message: response.data.message,
-                type: "warning",
-                showClose: true
-              });
-            }
-          })
-          .catch((err) => console.log(err));
       }
       else {
         console.log(33);
