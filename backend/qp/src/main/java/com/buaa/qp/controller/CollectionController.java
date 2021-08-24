@@ -34,6 +34,8 @@ public class CollectionController {
     @Autowired
     private QuestionService questionService;
 
+    private static final Object quotaLock = new Object();
+
     @GetMapping("/attempt")
     public Map<String, Object> locked(@RequestParam(value = "templateId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
@@ -80,11 +82,13 @@ public class CollectionController {
 
     @GetMapping("/details")
     public Map<String, Object> details(@RequestParam(value = "templateId", required = false) String idStr,
-                                       @RequestParam(value = "password", required = false) String password) {
+                                       @RequestParam(value = "password", required = false) String password,
+                                       @RequestParam(value = "visitor", required = false) String vStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Parameter checks
             int templateId;
+            boolean visitor = Boolean.parseBoolean(vStr);
             if (idStr == null)
                 throw new ParameterFormatException();
             try {
@@ -129,13 +133,16 @@ public class CollectionController {
                 map.put("conclusion", template.getConclusion());
                 map.put("quota", quota);
             }
-            if (template.getType().equals("vote") && !isOwner) {
+            if (!template.getType().equals("normal") && (visitor || !isOwner)) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
-            if (template.getType().equals("sign-up") && quota != null) {
-                map.put("remain", quota - answerService.countAnswers(templateId));
+            if (quota != null) {
+                int remain = quota - answerService.countAnswers(templateId);
+                if (remain == 0 && (visitor || !isOwner))
+                    throw new ExtraMessageException("名额已满");
+                map.put("remain", remain);
             }
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
@@ -165,11 +172,13 @@ public class CollectionController {
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {
+            map.clear();
             map.put("success", false);
             map.put("message", exc.toString());
         }
         catch (Exception exception) {
             exception.printStackTrace();
+            map.clear();
             map.put("success", false);
             map.put("message", "操作失败");
         }
@@ -252,25 +261,6 @@ public class CollectionController {
                         case "vote": {
                             int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
                             ArrayList<Integer> choices = parser.toIntegerList(answerObject);
-                            if (question.getType().equals("sign-up")) {
-                                ArrayList<Integer> remains = parser.toIntegerList(argsMap.get("remains"));
-                                for (Integer ch : choices) {
-                                    if (remains.get(ch) <= 0) {
-                                        throw new ExtraMessageException("名额已满");
-                                    }
-                                }
-                                for (Integer ch : choices) {
-                                    int number = remains.get(ch);
-                                    number --;
-                                    remains.set(ch, number);
-                                }
-                                argsMap.put("remains", remains);
-                                String argsStr = JSON.toJSONString(argsMap);
-                                Question newQuestion = new Question();
-                                newQuestion.setArgs(argsStr);
-                                newQuestion.setQuestionId(question.getQuestionId());
-                                questionService.updateRemains(newQuestion);
-                            }
                             Set<Integer> choiceSet = new HashSet<>(choices);
                             int size = choiceSet.size();
                             if (size == 0) {
@@ -353,6 +343,34 @@ public class CollectionController {
                 }
                 map.put("results", results);
             }
+            // Sign-up synchronization
+            else if (template.getType().equals("sign-up")) {
+                synchronized (quotaLock) {
+                    questions = templateService.getQuestionsByTid(templateId);
+                    for (int i = 0; i < questions.size(); ++i) {
+                        Question question = questions.get(i);
+                        if (question.getType().equals("sign-up")) {
+                            ArrayList<Integer> choices = parser.toIntegerList(answers.get(i));
+                            Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                            ArrayList<Integer> remains = parser.toIntegerList(argsMap.get("remains"));
+                            for (Integer ch : choices) {
+                                if (remains.get(ch) <= 0) {
+                                    throw new ExtraMessageException("名额已满");
+                                }
+                            }
+                            for (Integer ch : choices) {
+                                remains.set(ch, remains.get(ch) - 1);
+                            }
+                            argsMap.put("remains", remains);
+                            String argsStr = JSON.toJSONString(argsMap);
+                            Question newQuestion = new Question();
+                            newQuestion.setArgs(argsStr);
+                            newQuestion.setQuestionId(question.getQuestionId());
+                            questionService.updateRemains(newQuestion);
+                        }
+                    }
+                }
+            }
             map.put("success", true);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
@@ -362,6 +380,7 @@ public class CollectionController {
             map.put("message", exc.toString());
         } catch (Exception exception) {
             exception.printStackTrace();
+            map.clear();
             map.put("success", false);
             map.put("message", "操作失败");
         }

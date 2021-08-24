@@ -85,8 +85,9 @@ public class TemplateController {
                 if (template.getDeleted())
                     throw new ExtraMessageException("已删除的问卷不能编辑");
             }
-            boolean hasSpecialQuestion = !type.equals("vote") && !(type.equals("sign-up") && quota == null);
+
             // Parameter checks of questions
+            boolean hasSpecialQuestion = !type.equals("vote") && !(type.equals("sign-up") && quota == null);
             for (Map<String, Object> questionMap : questionMaps) {
                 String questionType;
                 String questionStem;
