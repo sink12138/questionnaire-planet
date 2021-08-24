@@ -474,6 +474,7 @@ export default {
     },
     copyQuestion(index) {
       //复制题目
+        height: this.modelForm.questions[index].height,
       this.template = {
         type: "0",
         required: "",
