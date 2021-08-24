@@ -36,7 +36,7 @@
             </el-table-column>
             <el-table-column label="回答时间">
               <template slot-scope="scope">
-                <span>{{this.answerTimes[scope.$index]}}</span>
+                <span>{{ scope.row['answerTime'] }}</span>
               </template>
             </el-table-column>
           </el-table>
