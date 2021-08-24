@@ -264,7 +264,7 @@
         </el-table>
       </div>
     </div>
-    <div class="submit">
+    <div class="submit" v-if="fillRight == true">
       <el-button @click="submit()" v-if="submitted == false"
         >提交问卷</el-button
       >
@@ -304,6 +304,7 @@ export default {
       isVote: false,
       locked: false,
       login: false,
+      fillRight: false,
       title: "未找到问卷",
       type: "normal",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
@@ -359,6 +360,7 @@ export default {
                 .then((response) => {
                   console.log(response);
                   if (response.data.success == true) {
+                    this.fillRight = true;
                     this.title = response.data.title;
                     this.type = response.data.type;
                     this.description = response.data.description;

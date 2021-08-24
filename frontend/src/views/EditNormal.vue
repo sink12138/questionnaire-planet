@@ -27,7 +27,6 @@
               <el-button @click="publishQuestion" type="primary"
                 >发布问卷</el-button
               >
-              <el-button @click="dialogVisible = true">Qrcode</el-button>
               <el-dialog
                 :append-to-body="true"
                 title="分享问卷"
@@ -419,57 +418,10 @@ export default {
         conclusion: "",
         password: "",
         quota: undefined,
-        questions: [
-        {
-          type: "choice",
-          stem: "这题什么意思？",
-          description: "题目描述，题目描述，描述一下题目",
-          required: true,
-          choices: ["生异形", "生瓜蛋子", "What's up?", "萨日朗"],
-        },
-        {
-          type: "choice",
-          stem: "你的姓名？",
-          description: "",
-          required: true,
-          choices: ["华强", "大鹏", "有一个人"],
-        },
-        {
-          type: "multi-choice",
-          stem: "哪些词形容你合适？",
-          description: "请用恰当的词来形容你",
-          required: true,
-          choices: ["沉鱼落雁", "玉树临风", "惊天动地"],
-          max: 2,
-          min: 0,
-        },
-        {
-          type: "filling",
-          stem: "华强买的瓜多少钱一斤？",
-          description: "华强买瓜多少钱一斤？",
-          required: true,
-          height: 3,
-          width: "600px",
-        },
-        {
-          type: "grade",
-          stem: "瓜店老板态度怎样？",
-          description: "给态度打分",
-          required: true,
-          choices: ["good", "very good", "very very good"],
-          scores: [10, 50, 100],
-        },
-        {
-          type: "dropdown",
-          stem: "瓜是什么做的?",
-          description: "",
-          required: false,
-          choices: ["(C2H5O)n", "Au", "Fe"],
-        },
-      ],
+        questions: [],
       },
       qrData: {
-        text: window.location.host + "/questionnaire/" + this.templateId,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
