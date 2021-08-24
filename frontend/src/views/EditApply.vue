@@ -340,8 +340,9 @@
                           >删除</el-button
                         >
                       </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 3">
                       <el-form-item
-                        v-show="item.type == 3"
                         v-for="(opt, idx) in item.answers"
                         :key="idx"
                         :label="`第${idx + 1}项评分`"
@@ -365,8 +366,9 @@
                           placeholder="请输入评分"
                         />
                       </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 5">
                       <el-form-item
-                        v-show="item.type == 5"
                         v-for="(opt, idx) in item.answers"
                         :key="idx"
                         :label="`第${idx + 1}项名额`"
@@ -445,7 +447,7 @@ export default {
         description: "",
         conclusion: "",
         password: "",
-        quota: undefined,
+        quota: 0,
         questions: [],
       },
       qrData: {
@@ -473,7 +475,7 @@ export default {
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
-          this.modelForm.quota = response.data.quota;
+          response.data.quota == undefined?this.modelForm.quota = 0:this.modelForm.quota = response.data.quota
           var question = {};
           var item = {};
           var i = 0;
@@ -511,7 +513,7 @@ export default {
               case "filling":
                 question.type = "2";
                 question.height = item.height;
-                question.width = item.width;
+                question.width = parseInt(item.width);
                 break;
               case "grade":
                 question.type = "3";
@@ -729,7 +731,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -863,7 +865,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -998,7 +1000,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),

@@ -339,8 +339,9 @@
                           >删除</el-button
                         >
                       </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 3">
                       <el-form-item
-                        v-show="item.type == 3"
                         v-for="(opt, idx) in item.answers"
                         :key="idx"
                         :label="`第${idx + 1}项评分`"
@@ -419,7 +420,7 @@ export default {
         description: "",
         conclusion: "",
         password: "",
-        quota: undefined,
+        quota: 0,
         questions: [],
       },
       qrData: {
@@ -447,7 +448,9 @@ export default {
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
-          this.modelForm.quota = response.data.quota;
+          response.data.quota == undefined
+            ? (this.modelForm.quota = 0)
+            : (this.modelForm.quota = response.data.quota);
           var question = {};
           var item = {};
           var i = 0;
@@ -465,12 +468,16 @@ export default {
               question.required = "true";
             }
             question.answers = [];
+            question.height = 0;
+            question.width = 0;
+            question.max = 0;
+            question.min = 0;
             switch (item.type) {
               case "choice":
                 question.type = "0";
                 for (j in item.choices) {
                   x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({ value: x ,scores: 0});
                 }
                 break;
               case "multi-choice":
@@ -479,13 +486,15 @@ export default {
                 question.min = item.min;
                 for (j in item.choices) {
                   x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({ value: x ,scores: 0});
                 }
                 break;
               case "filling":
                 question.type = "2";
-                question.height = item.height;
-                question.width = item.width;
+                question.height = parseInt(item.height);
+                question.width = parseInt(item.width);
+                question.answers.push({ value: x ,scores: 0});
+                question.answers.push({ value: x ,scores: 0});
                 break;
               case "grade":
                 question.type = "3";
@@ -499,7 +508,7 @@ export default {
                 question.type = "4";
                 for (j in item.choices) {
                   x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({ value: x ,scores: 0 });
                 }
                 break;
             }
@@ -507,6 +516,7 @@ export default {
             this.modelForm.questions.push(question);
             this.activeNames.push(this.modelForm.questions.length - 1);
           }
+          console.log(this.modelForm.questions);
         } else {
           console.log(response.data.message);
         }
@@ -556,7 +566,7 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({ value: "" });
+      this.modelForm.questions[index].answers.push({ value: "" ,scores: 0});
     },
     addQuestion() {
       // 新增题目
@@ -667,7 +677,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -781,7 +791,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -896,7 +906,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
