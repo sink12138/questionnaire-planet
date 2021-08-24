@@ -4,7 +4,7 @@
       <el-container>
         <el-aside width="200px">
           <div class="editor">
-            <router-link to="/">
+            <router-link to="/history">
               <div class="logo">
                 <Logo></Logo>
                 <div class="web-title">问卷星球</div>
