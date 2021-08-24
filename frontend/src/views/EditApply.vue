@@ -94,9 +94,6 @@
               <!-- 问卷描述 -->
               <el-form-item
                 label="问卷描述"
-                :rules="{
-                  required: true,
-                }"
               >
                 <el-input
                   v-model="modelForm.description"
@@ -214,11 +211,6 @@
                     <el-form-item
                       :prop="`questions.${index}.questionSummary`"
                       label="问题描述"
-                      :rules="{
-                        required: true,
-                        message: '请填写问题描述',
-                        trigger: 'change',
-                      }"
                     >
                       <el-input
                         v-model.trim="item.questionSummary"
@@ -544,6 +536,7 @@ export default {
                 question.min = item.min;
                 for (j in item.choices) {
                   x = item.choices[j];
+                  y = item.quotas[j];
                   question.answers.push({ value: x, number: y });
                 }
                 break;
