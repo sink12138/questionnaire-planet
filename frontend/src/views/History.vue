@@ -55,7 +55,7 @@
               <div class="time">
                 <time> 创建时间:{{ item.creationTime }} </time>
               </div>
-              <div class="time" v-if="item.releaseTime != ''">
+              <div class="time" v-if="item.releaseTime != undefined">
                 <time> 最后发布:{{ item.releaseTime }} </time>
               </div>
               <div class="time" v-else>
