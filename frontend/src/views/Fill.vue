@@ -349,6 +349,7 @@ export default {
           } else {
             if (this.locked == true) {
               console.log(22);
+              this.fillRight = true;
               this.dialogFormVisible2 = true;
             } else {
               console.log(33);
