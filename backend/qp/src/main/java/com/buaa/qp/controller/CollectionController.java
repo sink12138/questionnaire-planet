@@ -326,11 +326,12 @@ public class CollectionController {
                     int qIndex = 0;
                     for (int i = 0; i < questions.size(); i++) {
                         if (questions.get(i).getType().equals("vote")) {
-                            List<Object> answerContents = JSONArray.parseArray(answerData.getContent(), Object.class);
+                            List<Object> answerContents = JSON.parseArray(answerData.getContent(), Object.class);
                             String choiceStr = answerContents.get(i).toString();
                             ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
                             for (Integer j : chIndexes) {
-                                ArrayList<Integer> choiceCounts = parser.toIntegerList(results.get(qIndex).get("counts"));
+                                @SuppressWarnings("unchecked")
+                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(qIndex).get("counts");
                                 Integer number = choiceCounts.get(j);
                                 number += 1;
                                 choiceCounts.set(j, number);
