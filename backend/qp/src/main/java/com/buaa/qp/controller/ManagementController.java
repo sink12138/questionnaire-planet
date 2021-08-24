@@ -52,10 +52,10 @@ public class ManagementController {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
                     sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
                     templateMap.put("creationTime", sdf.format(result.getCreationTime()));
-                    boolean released = result.getReleased();
-                    templateMap.put("released", released);
-                    if (released)
-                        templateMap.put("releaseTime", sdf.format(result.getReleaseTime()));
+                    templateMap.put("released", result.getReleased());
+                    Date releaseTime = result.getReleaseTime();
+                    if (releaseTime != null)
+                        templateMap.put("releaseTime", sdf.format(releaseTime));
                     templateMap.put("duration", result.getDuration());
                     templateMap.put("answerCount", answerService.countAnswers(templateId));
                     templates.add(templateMap);
