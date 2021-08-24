@@ -9,8 +9,8 @@
           </div>
         </router-link>
 
-        <div>
-          <div v-if="this.$store.state.isLogin == false" class="butt1">
+        <div class="butt">
+          <div v-if="this.$store.state.isLogin == false">
             <el-dropdown>
               <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
@@ -22,7 +22,7 @@
               </el-dropdown-menu>
             </el-dropdown>
           </div>
-          <div v-else class="butt2">
+          <div v-else>
             <el-dropdown>
               <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
@@ -41,10 +41,10 @@
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
             <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
+              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus @keyup.enter.native="login"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
+              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码" @keyup.enter.native="login"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -197,17 +197,10 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.butt1 {
-  display: inline-flex;
+.butt {
+  position: absolute;
   float: right;
-  position: relative;
-  left: 1100px;
-}
-.butt2 {
-  display: inline-flex;
-  float: right;
-  position: relative;
-  left: 1100px;
+  right: 10px;
 }
 .web-title {
   margin-left: 15px;
