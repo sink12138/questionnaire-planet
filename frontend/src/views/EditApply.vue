@@ -199,7 +199,7 @@
                       }"
                     >
                       <el-input
-                        v-model.trim="item.questionName"
+                        v-model="item.questionName"
                         style="width: 258px"
                         clearable
                         placeholder="请填写问题"
@@ -211,7 +211,7 @@
                       label="问题描述"
                     >
                       <el-input
-                        v-model.trim="item.questionSummary"
+                        v-model="item.questionSummary"
                         style="width: 258px"
                         clearable
                         placeholder="请填写问题描述"
@@ -234,7 +234,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.min"
+                            v-model="item.min"
                             style="width: 125px"
                             clearable
                             placeholder="请填写最小选项个数"
@@ -257,7 +257,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.max"
+                            v-model="item.max"
                             style="width: 125px"
                             clearable
                             placeholder="请填写最大选项个数"
@@ -282,7 +282,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.height"
+                            v-model="item.height"
                             style="width: 125px"
                             clearable
                             placeholder="请填写填空框高度"
@@ -305,7 +305,7 @@
                           ]"
                         >
                           <el-input
-                            v-model.trim="item.width"
+                            v-model="item.width"
                             style="width: 125px"
                             clearable
                             placeholder="请填写填空框宽度"
@@ -329,7 +329,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.value"
+                          v-model="opt.value"
                           style="width: 200px"
                           clearable
                           placeholder="请输入选项"
@@ -340,8 +340,9 @@
                           >删除</el-button
                         >
                       </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 3">
                       <el-form-item
-                        v-show="item.type == 3"
                         v-for="(opt, idx) in item.answers"
                         :key="idx"
                         :label="`第${idx + 1}项评分`"
@@ -359,14 +360,15 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.scores"
+                          v-model="opt.scores"
                           style="width: 120px; margin-left: 10px"
                           clearable
                           placeholder="请输入评分"
                         />
                       </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 5">
                       <el-form-item
-                        v-show="item.type == 5"
                         v-for="(opt, idx) in item.answers"
                         :key="idx"
                         :label="`第${idx + 1}项名额`"
@@ -384,7 +386,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="opt.number"
+                          v-model="opt.number"
                           style="width: 120px; margin-left: 10px"
                           clearable
                           placeholder="请输入名额"
@@ -412,6 +414,13 @@
                   </el-collapse-item>
                 </vuedraggable>
               </el-collapse>
+              <div class="foot">
+                <el-button
+                  icon="el-icon-circle-plus-outline"
+                  @click="addQuestion"
+                  >新增题目</el-button
+                >
+              </div>
             </div>
           </el-form>
         </el-main>
@@ -445,7 +454,7 @@ export default {
         description: "",
         conclusion: "",
         password: "",
-        quota: undefined,
+        quota: 0,
         questions: [],
       },
       qrData: {
@@ -473,15 +482,35 @@ export default {
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.password = response.data.password;
-          this.modelForm.quota = response.data.quota;
-          var question = {};
+          response.data.quota == undefined
+            ? (this.modelForm.quota = 0)
+            : (this.modelForm.quota = response.data.quota);
+          var question = {
+            type: "0",
+            required: "",
+            questionName: "",
+            questionSummary: "",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            answers: [],
+          };
           var item = {};
           var i = 0;
           var j = 0;
-          var x = "";
-          var y = 0;
           for (i in response.data.questions) {
-            question = new Map();
+            question = {
+              type: "0",
+              required: "",
+              questionName: "",
+              questionSummary: "",
+              max: 2,
+              min: 1,
+              height: 1,
+              width: 800,
+              answers: [],
+            };
             item = response.data.questions[i];
             question.questionName = item.stem;
             question.questionSummary = item.description;
@@ -495,8 +524,11 @@ export default {
               case "choice":
                 question.type = "0";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: 0,
+                    number: 0,
+                  });
                 }
                 break;
               case "multi-choice":
@@ -504,28 +536,41 @@ export default {
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: 0,
+                    number: 0,
+                  });
                 }
                 break;
               case "filling":
                 question.type = "2";
                 question.height = item.height;
-                question.width = item.width;
+                question.width = parseInt(item.width);
+                question.answers.push({
+                  value: "",
+                  scores: 0,
+                  number: 0,
+                });
                 break;
               case "grade":
                 question.type = "3";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  y = item.scores[j];
-                  question.answers.push({ value: x, scores: y });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: item.scores[j],
+                    number: 0,
+                  });
                 }
                 break;
               case "dropdown":
                 question.type = "4";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: 0,
+                    number: 0,
+                  });
                 }
                 break;
               case "sign-up":
@@ -533,9 +578,11 @@ export default {
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  y = item.quotas[j];
-                  question.answers.push({ value: x, number: y });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: 0,
+                    number: item.quotas[j],
+                  });
                 }
                 break;
             }
@@ -578,6 +625,17 @@ export default {
     },
     copyQuestion(index) {
       //复制题目
+      this.template = {
+        type: "0",
+        required: "",
+        questionName: "",
+        questionSummary: "",
+        max: 2,
+        min: 1,
+        height: 1,
+        width: 800,
+        answers: [],
+      };
       this.template.type = this.modelForm.questions[index].type;
       this.template.required = this.modelForm.questions[index].required;
       this.template.questionName = this.modelForm.questions[index].questionName;
@@ -587,8 +645,14 @@ export default {
       this.template.min = this.modelForm.questions[index].min;
       this.template.height = this.modelForm.questions[index].height;
       this.template.width = this.modelForm.questions[index].width;
-      this.template.answers = this.modelForm.questions[index].answers;
-      this.modelForm.questions.splice(index, 0, this.template);
+      var i = 0;
+      for (i in this.modelForm.questions[index].answers) {
+        this.template.answers.push({
+          value: this.modelForm.questions[index].answers[i].value,
+          scores: this.modelForm.questions[index].answers[i].scores,
+        });
+      }
+      this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
@@ -729,7 +793,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -863,7 +927,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -998,7 +1062,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -1154,5 +1218,16 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.foot .el-button {
+  margin-top: 15px;
+  font-size: 20px;
+  height: 60px;
+  width: 160px;
 }
 </style>

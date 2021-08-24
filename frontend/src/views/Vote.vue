@@ -197,7 +197,7 @@
                     }"
                   >
                     <el-input
-                      v-model.trim="item.questionName"
+                      v-model="item.questionName"
                       style="width: 258px"
                       clearable
                       placeholder="请填写问题"
@@ -209,7 +209,7 @@
                     label="问题描述"
                   >
                     <el-input
-                      v-model.trim="item.questionSummary"
+                      v-model="item.questionSummary"
                       style="width: 258px"
                       clearable
                       placeholder="请填写问题描述"
@@ -232,7 +232,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="item.min"
+                          v-model="item.min"
                           style="width: 125px"
                           clearable
                           placeholder="请填写最小选项个数"
@@ -255,7 +255,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="item.max"
+                          v-model="item.max"
                           style="width: 125px"
                           clearable
                           placeholder="请填写最大选项个数"
@@ -280,7 +280,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="item.height"
+                          v-model="item.height"
                           style="width: 125px"
                           clearable
                           placeholder="请填写填空框高度"
@@ -303,7 +303,7 @@
                         ]"
                       >
                         <el-input
-                          v-model.trim="item.width"
+                          v-model="item.width"
                           style="width: 125px"
                           clearable
                           placeholder="请填写填空框宽度"
@@ -327,7 +327,7 @@
                       ]"
                     >
                       <el-input
-                        v-model.trim="opt.value"
+                        v-model="opt.value"
                         style="width: 200px"
                         clearable
                         placeholder="请输入选项"
@@ -358,7 +358,7 @@
                       ]"
                     >
                       <el-input
-                        v-model.trim="opt.scores"
+                        v-model="opt.scores"
                         style="width: 120px; margin-left: 10px"
                         clearable
                         placeholder="请输入评分"
@@ -386,6 +386,9 @@
                 </el-collapse-item>
               </vuedraggable>
             </el-collapse>
+          </div>
+          <div class="foot">
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
           </div>
         </el-form>
       </el-main>
@@ -419,20 +422,6 @@ export default {
         password: "",
         quota: undefined,
         questions: [
-          {
-            type: "0",
-            required: "",
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
-            ],
-          },
           {
             type: "0",
             required: "",
@@ -487,6 +476,17 @@ export default {
     },
     copyQuestion(index) {
       //复制题目
+      this.template = {
+        type: "0",
+        required: "",
+        questionName: "",
+        questionSummary: "",
+        max: 2,
+        min: 1,
+        height: 1,
+        width: 800,
+        answers: [],
+      };
       this.template.type = this.modelForm.questions[index].type;
       this.template.required = this.modelForm.questions[index].required;
       this.template.questionName = this.modelForm.questions[index].questionName;
@@ -496,8 +496,11 @@ export default {
       this.template.min = this.modelForm.questions[index].min;
       this.template.height = this.modelForm.questions[index].height;
       this.template.width = this.modelForm.questions[index].width;
-      this.template.answers = this.modelForm.questions[index].answers;
-      this.modelForm.questions.splice(index, 0, this.template);
+      var i = 0;
+      for (i in this.modelForm.questions[index].answers){
+        this.template.answers.push({value:this.modelForm.questions[index].answers[i].value,scores:this.modelForm.questions[index].answers[i].scores,number:this.modelForm.questions[index].answers[i].number});
+      }
+      this.modelForm.questions.splice(index+1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
@@ -1044,5 +1047,16 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.foot .el-button {
+  margin-top: 15px;
+  font-size: 20px;
+  height: 60px;
+  width: 160px;
 }
 </style>
