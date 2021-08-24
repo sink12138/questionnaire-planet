@@ -16,7 +16,6 @@ import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -331,8 +330,7 @@ public class CollectionController {
                             String choiceStr = answerContents.get(i).toString();
                             ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
                             for (Integer j : chIndexes) {
-                                @SuppressWarnings("unchecked")
-                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(qIndex).get("counts");
+                                ArrayList<Integer> choiceCounts = parser.toIntegerList(results.get(qIndex).get("counts"));
                                 Integer number = choiceCounts.get(j);
                                 number += 1;
                                 choiceCounts.set(j, number);

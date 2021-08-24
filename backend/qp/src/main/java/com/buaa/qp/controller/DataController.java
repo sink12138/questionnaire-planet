@@ -319,7 +319,6 @@ public class DataController {
             }
             map.put("results", results);
             map.put("success", true);
-
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
