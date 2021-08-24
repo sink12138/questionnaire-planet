@@ -545,13 +545,9 @@ export default {
         });
     },
     loadChart: function() {
-      console.log(this.sumData)
       var ctx1 = document.getElementById('myChart');
       this.myChart = new Chart(ctx1, {
         type: 'bar',
-        "options": {
-          legend: {display: false},
-        },
         data: {
           labels: [],
           datasets: [{
@@ -573,10 +569,11 @@ export default {
       })
     },
     updateChart: function(item) {
+      this.loadChart()
       console.log('update',item)
-      this.myChart.data.labels = item.answers
-      this.myChart.data.datasets[0].data = item.counts
-      this.myChart.data.datasets[0].label = item.stem
+      this.myChart.data.labels = item['answers']
+      this.myChart.data.datasets[0].data = item['counts']
+      this.myChart.data.datasets[0].label = item['stem']
       this.myChart.update()
     }
   },
@@ -584,6 +581,9 @@ export default {
 </script>
 
 <style scoped>
+#quest {
+  height: 100%;
+}
 .voted {
   height: 80%;
   display: flex;
@@ -682,7 +682,7 @@ a:hover {
   font-size: 20px;
 }
 .chart {
-  height: 240px;
-  width: 600px;
+  height: 280px;
+  width: 560px;
 }
 </style>

@@ -869,8 +869,7 @@ a:hover {
 }
 .question-type .el-radio {
   height: 35px;
-  width: 80px;
-  margin: 0;
+  margin: 10px;
   padding: 9px 9px 6px 6px;
 }
 .questions {
