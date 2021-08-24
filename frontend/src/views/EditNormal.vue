@@ -387,7 +387,11 @@
                 </vuedraggable>
               </el-collapse>
               <div class="foot">
-                <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
+                <el-button
+                  icon="el-icon-circle-plus-outline"
+                  @click="addQuestion"
+                  >新增题目</el-button
+                >
               </div>
             </div>
           </el-form>
@@ -453,14 +457,32 @@ export default {
           response.data.quota == undefined
             ? (this.modelForm.quota = 0)
             : (this.modelForm.quota = response.data.quota);
-          var question = {};
+          var question = {
+            type: "0",
+            required: "",
+            questionName: "",
+            questionSummary: "",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            answers: [],
+          };
           var item = {};
           var i = 0;
           var j = 0;
-          var x = "";
-          var y = 0;
           for (i in response.data.questions) {
-            question = new Map();
+            question = {
+              type: "0",
+              required: "",
+              questionName: "",
+              questionSummary: "",
+              max: 2,
+              min: 1,
+              height: 1,
+              width: 800,
+              answers: [],
+            };
             item = response.data.questions[i];
             question.questionName = item.stem;
             question.questionSummary = item.description;
@@ -469,17 +491,11 @@ export default {
             } else {
               question.required = "true";
             }
-            question.answers = [];
-            question.height = 0;
-            question.width = 0;
-            question.max = 0;
-            question.min = 0;
             switch (item.type) {
               case "choice":
                 question.type = "0";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x ,scores: 0});
+                  question.answers.push({ value: item.choices[j], scores: 0 });
                 }
                 break;
               case "multi-choice":
@@ -487,30 +503,26 @@ export default {
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x ,scores: 0});
+                  question.answers.push({ value: item.choices[j], scores: 0 });
                 }
                 break;
               case "filling":
                 question.type = "2";
                 question.height = parseInt(item.height);
                 question.width = parseInt(item.width);
-                question.answers.push({ value: x ,scores: 0});
-                question.answers.push({ value: x ,scores: 0});
+                question.answers.push({ value: "", scores: 0 });
+                question.answers.push({ value: "", scores: 0 });
                 break;
               case "grade":
                 question.type = "3";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  y = item.scores[j];
-                  question.answers.push({ value: x, scores: y });
+                  question.answers.push({ value: item.choices[j], scores: item.scores[j] });
                 }
                 break;
               case "dropdown":
                 question.type = "4";
                 for (j in item.choices) {
-                  x = item.choices[j];
-                  question.answers.push({ value: x ,scores: 0 });
+                  question.answers.push({ value: item.choices[j], scores: 0 });
                 }
                 break;
             }
@@ -573,16 +585,19 @@ export default {
       this.template.height = this.modelForm.questions[index].height;
       this.template.width = this.modelForm.questions[index].width;
       var i = 0;
-      for (i in this.modelForm.questions[index].answers){
-        this.template.answers.push({value:this.modelForm.questions[index].answers[i].value,scores:this.modelForm.questions[index].answers[i].scores});
+      for (i in this.modelForm.questions[index].answers) {
+        this.template.answers.push({
+          value: this.modelForm.questions[index].answers[i].value,
+          scores: this.modelForm.questions[index].answers[i].scores,
+        });
       }
-      this.modelForm.questions.splice(index+1, 0, this.template);
+      this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({ value: "" ,scores: 0});
+      this.modelForm.questions[index].answers.push({ value: "", scores: 0 });
     },
     addQuestion() {
       // 新增题目
@@ -807,7 +822,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -922,7 +937,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota:parseInt(this.modelForm.quota),
+              quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
