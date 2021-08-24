@@ -951,6 +951,7 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
+                      this.qrData.text = window.location.host + "/fill?templateId=" + this.templateId;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
