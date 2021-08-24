@@ -85,7 +85,7 @@ public class TemplateController {
                 if (template.getDeleted())
                     throw new ExtraMessageException("已删除的问卷不能编辑");
             }
-
+            boolean hasSpecialQuestion = !type.equals("vote") && !(type.equals("sign-up") && quota == null);
             // Parameter checks of questions
             for (Map<String, Object> questionMap : questionMaps) {
                 String questionType;
@@ -201,6 +201,7 @@ public class TemplateController {
                     case "vote": {
                         if (!type.equals("vote"))
                             throw new ParameterFormatException();
+                        hasSpecialQuestion = true;
                         ArrayList<String> choices;
                         Integer max;
                         Integer min;
@@ -230,6 +231,7 @@ public class TemplateController {
                     case "sign-up": {
                         if (!type.equals("sign-up"))
                             throw new ParameterFormatException();
+                        hasSpecialQuestion = true;
                         ArrayList<String> choices;
                         ArrayList<Integer> quotas;
                         Integer max;
@@ -275,19 +277,21 @@ public class TemplateController {
                 String args = JSON.toJSONString(argsMap);
                 questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
             }
-
-            Template template = new Template(type, accountId, title, description, password, conclusion, quota);
+            if (!hasSpecialQuestion) {
+                throw new ExtraMessageException("特殊问卷未设置特殊题目");
+            }
+            Template newTemplate = new Template(type, accountId, title, description, password, conclusion, quota);
             if (templateId == 0) {
-                templateId = templateService.submitTemplate(template, questions);
+                templateId = templateService.submitTemplate(newTemplate, questions);
             }
             else {
-                template.setTemplateId(templateId);
-                templateService.modifyTemplate(template, questions);
+                newTemplate.setTemplateId(templateId);
+                templateService.modifyTemplate(newTemplate, questions);
             }
             map.put("success", true);
             map.put("templateId", templateId);
         }
-        catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
+        catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         }
