@@ -19,7 +19,6 @@
                   <el-button @click="publishQuestion" type="primary"
                     >发布问卷</el-button
                   >
-                  <el-button @click="dialogVisible = true">Qrcode</el-button>
                   <el-dialog
                     :append-to-body="true"
                     title="分享问卷"
@@ -135,88 +134,133 @@
                     v-for="(item, index_question) in questions"
                     :key="index_question"
                   >
+                    <el-divider content-position="left" style="margin-top: 15px"
+                      >第{{ index_question + 1 }}题</el-divider
+                    >
                     <div class="question-title">
-                      <div>
-                        第{{ index_question + 1 }}题,题目:{{ item.stem }}
-                      </div>
-                      <a>题目描述：{{ item.description }}</a>
+                      <div class="stem">{{ item.stem }}</div>
+                      <div class="description">{{ item.description }}</div>
                     </div>
                     <div class="question-content">
                       <div v-if="item.type == 'choice'">
-                        <el-radio-group
-                          v-model="answers[index_question]"
-                          v-for="(i, index) in item.choices"
-                          :key="index"
-                          @change="changeValue"
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
                         >
-                          <el-radio :label="index">{{ i }}</el-radio>
-                        </el-radio-group>
-                      </div>
-                      <div v-if="item.type == 'multi-choice'">
-                        <el-checkbox-group
-                          v-model="multi"
-                          v-for="(i, index) in item.choices"
-                          :min="item.min"
-                          :max="item.max"
-                          :key="index"
-                          @change="multiChangeValue(index_question)"
-                        >
-                          <el-checkbox :label="index" border>{{
-                            i
-                          }}</el-checkbox>
-                        </el-checkbox-group>
-                      </div>
-                      <div v-if="item.type == 'filling'">
-                        <el-input
-                          type="textarea"
-                          class="input"
-                          :rows="item.height"
-                          :style="{ '--width': item.width }"
-                          placeholder="请输入内容"
-                          v-model="answers[index_question]"
-                        >
-                        </el-input>
-                      </div>
-                      <div v-if="item.type == 'grade'">
-                        <el-radio-group
-                          v-model="answers[index_question]"
-                          v-for="(i, index) in item.choices"
-                          :key="index"
-                          @change="changeValue"
-                        >
-                          <el-radio :label="index"
-                            >{{ i }}({{ item.scores[index] }})</el-radio
-                          >
-                        </el-radio-group>
-                      </div>
-                      <div v-if="item.type == 'dropdown'">
-                        <el-select
-                          v-model="answers[index_question]"
-                          clearable
-                          placeholder="请选择"
-                        >
-                          <el-option
+                          <el-radio-group
+                            v-model="answers[index_question]"
                             v-for="(i, index) in item.choices"
                             :key="index"
-                            :label="i"
-                            :value="index"
+                            @change="changeValue"
                           >
-                          </el-option>
-                        </el-select>
+                            <el-radio class="option" :label="index">{{ i }}</el-radio>
+                          </el-radio-group>
+                        </el-form-item>
                       </div>
-                      <div v-if="item.type == 'vote'">
-                        <el-checkbox-group
-                          v-model="multi"
-                          v-for="(i, index) in item.choices"
-                          :min="item.min"
-                          :max="item.max"
-                          :key="index"
-                          @change="multiChangeValue(index_question)"
+                      <div class="multi" v-if="item.type == 'multi-choice'">
+                        至少选择{{ item.min }}项
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
                         >
-                          <el-checkbox :label="index" border>{{
-                            i
-                          }}</el-checkbox>
-                        </el-checkbox-group>
+                          <el-checkbox-group
+                            v-model="multi"
+                            v-for="(i, index) in item.choices"
+                            :min="0"
+                            :max="item.max"
+                            :key="index"
+                            @change="multiChangeValue(index_question)"
+                          >
+                            <el-checkbox class="option" :label="index" border>{{
+                              i
+                            }}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-form-item>
+                      </div>
+                      <div v-if="item.type == 'filling'">
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-input
+                            type="textarea"
+                            class="input"
+                            :rows="item.height"
+                            :style="{ '--width': item.width }"
+                            placeholder="请输入内容"
+                            v-model="answers[index_question]"
+                          >
+                          </el-input>
+                        </el-form-item>
+                      </div>
+                      <div v-if="item.type == 'grade'">
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-radio-group
+                            v-model="answers[index_question]"
+                            v-for="(i, index) in item.choices"
+                            :key="index"
+                            @change="changeValue"
+                          >
+                            <el-radio class="option" :label="index"
+                              >{{ i }}({{ item.scores[index] }})</el-radio
+                            >
+                          </el-radio-group>
+                        </el-form-item>
+                      </div>
+                      <div v-if="item.type == 'dropdown'">
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-select
+                            v-model="answers[index_question]"
+                            clearable
+                            placeholder="请选择"
+                          >
+                            <el-option
+                              v-for="(i, index) in item.choices"
+                              :key="index"
+                              :label="i"
+                              :value="index"
+                            >
+                            </el-option>
+                          </el-select>
+                        </el-form-item>
+                      </div>
+                      <div class="multi" v-if="item.type == 'vote'">
+                        至少选择{{ item.min }}项
+                        <el-form-item
+                          label="选项"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-checkbox-group
+                            v-model="multi"
+                            v-for="(i, index) in item.choices"
+                            :min="0"
+                            :max="item.max"
+                            :key="index"
+                            @change="multiChangeValue(index_question)"
+                          >
+                            <el-checkbox class="option" :label="index" border>{{
+                              i
+                            }}</el-checkbox>
+                          </el-checkbox-group>
+                        </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'sign-up'">
                         至少选择{{ item.min }}项
@@ -235,10 +279,10 @@
                             @change="multiChangeValue(index_question)"
                           >
                             <el-checkbox class="option" :label="index" border
-                              >{{ i }}共{{ item.quotas[index] }},剩余{{
+                              >{{ i }} 共{{ item.quotas[index] }},剩余{{
                                 item.remains[index]
-                              }}
-                            </el-checkbox>
+                              }}</el-checkbox
+                            >
                           </el-checkbox-group>
                         </el-form-item>
                       </div>
@@ -253,7 +297,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import logo from "../components/svg-logo.vue";
@@ -280,9 +323,10 @@ export default {
         conclusion: "",
         password: "",
         quota: 0,
+        questions: [],
       },
       qrData: {
-        text: window.location.host + "/questionnaire/" + this.templateId,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
@@ -468,20 +512,30 @@ a:hover {
   flex-direction: column;
   align-items: center;
 }
-.question-title {
-  font-family: 仿宋;
-  font-size: 20px;
+.question {
+  margin: 0 auto;
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.stem,
+.description {
+  margin: 20px;
+  font-family: 微软雅黑;
+}
+.stem {
+  font-size: 26px;
   font-weight: bolder;
 }
-.question-type .el-radio {
-  height: 35px;
-  width: 80px;
-  margin: 0;
-  padding: 9px 9px 6px 6px;
+.description {
+  font-size: 18px;
 }
-.questions {
-  width: 600px;
-  margin: 0 auto;
+.question-content {
+  margin: 25px;
+}
+.question-content .input {
+  width: var(--width);
 }
 .share {
   display: flex;
