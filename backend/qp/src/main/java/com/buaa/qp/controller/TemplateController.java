@@ -1,6 +1,7 @@
 package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.buaa.qp.dao.AnswerDao;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
@@ -304,6 +305,9 @@ public class TemplateController {
         return map;
     }
 
+    @Autowired
+    AnswerDao answerDao;
+
     @PostMapping("/adjust")
     public Map<String, Object> adjust(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
@@ -349,6 +353,9 @@ public class TemplateController {
                 throw new ExtraMessageException("已删除的问卷不能编辑");
             if (template.getReleased())
                 throw new ExtraMessageException("已发布的问卷不能编辑");
+            if (quota != null && quota < answerDao.selectCountByTid(templateId)) {
+                throw new ExtraMessageException("不能修改限额为小于已收集到的份数");
+            }
             template.setTitle(title);
             template.setDescription(description);
             template.setPassword(password);
