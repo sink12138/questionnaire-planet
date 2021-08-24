@@ -387,6 +387,9 @@
               </vuedraggable>
             </el-collapse>
           </div>
+          <div class="foot">
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
+          </div>
         </el-form>
       </el-main>
     </el-container>
@@ -419,20 +422,6 @@ export default {
         password: "",
         quota: undefined,
         questions: [
-          {
-            type: "0",
-            required: "",
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
-            ],
-          },
           {
             type: "0",
             required: "",
@@ -1044,5 +1033,16 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.foot .el-button {
+  margin-top: 15px;
+  font-size: 20px;
+  height: 60px;
+  width: 160px;
 }
 </style>
