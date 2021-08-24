@@ -386,7 +386,9 @@
             </el-collapse>
           </div>
           <div class="foot">
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion"
+              >新增题目</el-button
+            >
           </div>
         </el-form>
       </el-main>
@@ -472,17 +474,32 @@ export default {
     },
     copyQuestion(index) {
       //复制题目
-      this.modelForm.questions.push({
-        type: this.modelForm.questions[index].type,
-        required: this.modelForm.questions[index].required,
-        questionName: this.modelForm.questions[index].questionName,
-        questionSummary: this.modelForm.questions[index].quxestionSummary,
-        max: this.modelForm.questions[index].max,
-        min: this.modelForm.questions[index].min,
         height: this.modelForm.questions[index].height,
-        width: this.modelForm.questions[index].width,
-        answers: this.modelForm.questions[index].answers
-      });
+      this.template = {
+        type: "0",
+        required: "",
+        questionName: "",
+        questionSummary: "",
+        max: 2,
+        min: 1,
+        height: 1,
+        width: 800,
+        answers: [],
+      };
+      this.template.type = this.modelForm.questions[index].type;
+      this.template.required = this.modelForm.questions[index].required;
+      this.template.questionName = this.modelForm.questions[index].questionName;
+      this.template.questionSummary =
+        this.modelForm.questions[index].questionSummary;
+      this.template.max = this.modelForm.questions[index].max;
+      this.template.min = this.modelForm.questions[index].min;
+      this.template.height = this.modelForm.questions[index].height;
+      this.template.width = this.modelForm.questions[index].width;
+      var i = 0;
+      for (i in this.modelForm.questions[index].answers){
+        this.template.answers.push({value:this.modelForm.questions[index].answers[i].value,scores:this.modelForm.questions[index].answers[i].scores});
+      }
+      this.modelForm.questions.splice(index+1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
@@ -596,7 +613,10 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -707,7 +727,10 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -819,7 +842,10 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -846,7 +872,10 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
-                      this.qrData.text = window.location.host + "/fill?templateId=" + this.templateId;
+                      this.qrData.text =
+                        window.location.host +
+                        "/fill?templateId=" +
+                        this.templateId;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
