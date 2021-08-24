@@ -110,8 +110,11 @@ public class CollectionController {
 
             // Authority checks
             boolean allowed = false;
-            if (template.getOwner().equals(accountId))
+            boolean isOwner = false;
+            if (template.getOwner().equals(accountId)) {
                 allowed = true;
+                isOwner = true;
+            }
             else if (template.getReleased()) {
                 String pwd = template.getPassword();
                 if (pwd == null || pwd.equals(password))
@@ -121,16 +124,18 @@ public class CollectionController {
             }
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
-            if (template.getType().equals("vote") && !template.getOwner().equals(accountId)) {
+            Integer quota = template.getQuota();
+            if (isOwner) {
+                map.put("conclusion", template.getConclusion());
+                map.put("quota", quota);
+            }
+            if (template.getType().equals("vote") && !isOwner) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
-            if (template.getType().equals("sign-up") && template.getQuota() != null) {
-                if (template.getOwner().equals(accountId)) {
-                    map.put("quota", template.getQuota());
-                }
-                map.put("remain", template.getQuota() - answerService.countAnswers(templateId));
+            if (template.getType().equals("sign-up") && quota != null) {
+                map.put("remain", quota - answerService.countAnswers(templateId));
             }
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
