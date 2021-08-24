@@ -9,8 +9,8 @@
           </div>
         </router-link>
 
-        <div>
-          <div v-if="this.$store.state.isLogin == false" class="butt1">
+        <div class="butt">
+          <div v-if="this.$store.state.isLogin == false">
             <el-dropdown>
               <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
@@ -22,7 +22,7 @@
               </el-dropdown-menu>
             </el-dropdown>
           </div>
-          <div v-else class="butt2">
+          <div v-else>
             <el-dropdown>
               <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
               </el-button>
@@ -197,17 +197,10 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.butt1 {
-  display: inline-flex;
+.butt {
+  position: absolute;
   float: right;
-  position: relative;
-  left: 1100px;
-}
-.butt2 {
-  display: inline-flex;
-  float: right;
-  position: relative;
-  left: 1100px;
+  right: 10px;
 }
 .web-title {
   margin-left: 15px;
