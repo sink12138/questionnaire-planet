@@ -27,7 +27,6 @@
               <el-button @click="publishQuestion" type="primary"
                 >发布问卷</el-button
               >
-              <el-button @click="dialogVisible = true">Qrcode</el-button>
               <el-dialog
                 :append-to-body="true"
                 title="分享问卷"
@@ -424,7 +423,7 @@ export default {
         questions: [],
       },
       qrData: {
-        text: window.location.host + "/questionnaire/" + this.templateId,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
@@ -1105,8 +1104,7 @@ a:hover {
 }
 .question-type .el-radio {
   height: 35px;
-  width: 80px;
-  margin: 0;
+  margin: 10px;
   padding: 9px 9px 6px 6px;
 }
 .questions {
