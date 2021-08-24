@@ -579,7 +579,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 100,
+        width: 800,
         answers: [
           { value: "", scores: 0 },
           { value: "", scores: 0 },
@@ -642,8 +642,8 @@ export default {
                 break;
               case "2":
                 quest.type = "filling";
-                quest.height = question.height;
-                quest.width = question.width;
+                quest.height = parseInt(question.height);
+                quest.width = parseInt(question.width);
                 break;
               case "3":
                 quest.type = "grade";
@@ -774,8 +774,8 @@ export default {
                 break;
               case "2":
                 quest.type = "filling";
-                quest.height = question.height;
-                quest.width = question.width;
+                quest.height = parseInt(question.height);
+                quest.width = parseInt(question.width);
                 break;
               case "3":
                 quest.type = "grade";
@@ -907,8 +907,8 @@ export default {
                 break;
               case "2":
                 quest.type = "filling";
-                quest.height = question.height;
-                quest.width = question.width;
+                quest.height = parseInt(question.height);
+                quest.width = parseInt(question.width);
                 break;
               case "3":
                 quest.type = "grade";
