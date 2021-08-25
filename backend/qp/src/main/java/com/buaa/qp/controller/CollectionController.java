@@ -349,7 +349,11 @@ public class CollectionController {
                     }
                 }
 
+                // Submit the answer
                 answerService.submitAnswer(answer);
+                // Close the questionnaire if the quota has been reached
+                if (quota != null && answerCount + 1 >= quota)
+                    templateService.releaseTemplate(templateId, false);
             }
 
             // Collect the conclusion and results after the submission
