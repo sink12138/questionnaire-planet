@@ -101,7 +101,7 @@ public class UserController {
                 throw new ParameterFormatException();
             }
             Account account = accountService.getAccountByEmail(email);
-            if (account == null || !account.getPassword().equals(password)) {
+            if (account == null || !account.getPassword().equals(password) || !account.getVerified()) {
                 throw new LoginVerificationException();
             }
             map.put("success", true);
