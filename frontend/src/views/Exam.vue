@@ -6,8 +6,7 @@
 
     <div class="timer">
       <p>截止时间：{{ deadlline }}</p>
-      <p>网页打开时间：{{ nowtime }}</p>
-      <p>剩余时间：{{ lefttime }}s --------- {{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+      <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
     </div>
 
     <div>
@@ -59,7 +58,7 @@ export default {
     this.lefttime = (new Date(this.deadlline).getTime() / 1000) - this.nowtime;
 
     this.timer = setInterval(()=>{
-        this.lefttimes--
+        this.lefttimes--;
 
         this.day = Math.floor(this.lefttime / (60 * 60 * 24));
         this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
