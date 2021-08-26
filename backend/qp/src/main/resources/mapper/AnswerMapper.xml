@@ -27,4 +27,7 @@
         where template_id = #{templateId} and submitter = #{submitter} and submitter is not null
         limit 1
     </select>
+    <select id="selectById" parameterType="Integer" resultType="Answer">
+        select * from answer where answer_id = #{answerId}
+    </select>
 </mapper>

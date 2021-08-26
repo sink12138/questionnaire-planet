@@ -7,9 +7,11 @@ import java.util.ArrayList;
 public interface AnswerService {
     ArrayList<Answer> getAnswersByTid(Integer TemplateId);
 
-    void getAnswerById(Integer answerId);
+    Answer getAnswerById(Integer answerId);
 
     void clearAllAnswers(Integer templateId);
+
+    void deleteById(Integer answerId);
 
     void submitAnswer(Answer answer);
 

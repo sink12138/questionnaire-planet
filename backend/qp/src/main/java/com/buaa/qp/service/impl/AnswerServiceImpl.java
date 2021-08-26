@@ -20,13 +20,18 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void getAnswerById(Integer answerId) {
-        answerDao.deleteById(answerId);
+    public Answer getAnswerById(Integer answerId) {
+        return answerDao.selectById(answerId);
     }
 
     @Override
     public void clearAllAnswers(Integer templateId) {
         answerDao.deleteByTid(templateId);
+    }
+
+    @Override
+    public void deleteById(Integer answerId) {
+        answerDao.deleteById(answerId);
     }
 
     @Override

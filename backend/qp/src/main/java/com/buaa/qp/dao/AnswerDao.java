@@ -13,6 +13,8 @@ public interface AnswerDao {
 
     void insert(Answer answer);
 
+    Answer selectById(Integer answerId);
+
     ArrayList<Answer> selectByTid(Integer templateId);
 
     Integer selectCountByTid(Integer templateId);

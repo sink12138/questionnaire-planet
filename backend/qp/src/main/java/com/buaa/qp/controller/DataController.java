@@ -19,9 +19,7 @@ import jxl.write.Number;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -325,6 +323,66 @@ public class DataController {
             map.put("results", results);
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("/clear")
+    public Map<String, Object> clear(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // check login
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+            Integer templateId;
+            Integer answerId;
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+                answerId = (Integer) requestMap.get("answerId");
+            }
+            catch (ClassCastException cce) {
+                throw new ParameterFormatException();
+            }
+            if (templateId != null && answerId != null) {
+                throw new ParameterFormatException();
+            }
+            if (templateId != null) {
+                if (templateId <= 0)
+                    throw new ParameterFormatException();
+                Template template = templateService.getTemplate(templateId);
+                if (template == null || template.getDeleted()) {
+                    throw new ObjectNotFoundException();
+                } else if (!template.getOwner().equals(accountId)) {
+                    throw new LoginVerificationException();
+                }
+                answerService.clearAllAnswers(templateId);
+            } else if (answerId != null) {
+                if (answerId <= 0)
+                    throw new ParameterFormatException();
+                Answer answer = answerService.getAnswerById(answerId);
+                if (answer == null) {
+                    throw new ObjectNotFoundException();
+                }
+                Template template = templateService.getTemplate(answer.getTemplateId());
+                if (template == null || template.getDeleted()) {
+                    throw new ObjectNotFoundException();
+                } else if (!template.getOwner().equals(accountId)) {
+                    throw new LoginVerificationException();
+                }
+                answerService.deleteById(answerId);
+            } else {
+                throw new ParameterFormatException();
+            }
+            map.put("success", true);
+        } catch (LoginVerificationException | ObjectNotFoundException
+                | ParameterFormatException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
