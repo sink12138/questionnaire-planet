@@ -237,7 +237,7 @@ public class DataController {
             ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
             for (int t = 1; t < answersInFormat.size(); t++) {
                 ArrayList<String> answerInFormat = answersInFormat.get(t);
-                for (int i = 0; i < answerInFormat.size() - 3; i++) {
+                for (int i = 0; i < questions.size(); i++) {
                     switch (questions.get(i).getType()) {
                         case "vote": {
                         }
