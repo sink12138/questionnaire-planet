@@ -14,6 +14,7 @@
           prop="email"
         >
           <el-input
+            id="email"
             v-model="formData.email"
             autocomplete="off"
             style="width: 300px"
@@ -28,6 +29,7 @@
           prop="password"
         >
           <el-input
+            id="password"
             v-model="formData.password"
             autocomplete="off"
             show-password
@@ -417,6 +419,7 @@ export default {
       if (this.dialogFormVisible1 == true) {
         this.tologin();
         console.log(1111);
+        
       }
       if (this.dialogFormVisible2 == true) {
         this.unlock();
@@ -430,6 +433,9 @@ export default {
       this.$router.push("/");
     },
     tologin() {
+      document.getElementById("email").blur();
+      document.getElementById("password").blur();
+
       this.$axios({
         method: "post",
         url: "http://139.224.50.146/apis/login",
