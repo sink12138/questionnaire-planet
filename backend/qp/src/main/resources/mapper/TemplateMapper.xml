@@ -8,6 +8,7 @@
     <select id="selectByOwner" resultType="Template">
         select * from template
         where owner = #{owner}
+        order by template_id desc
     </select>
     <select id="selectQuotaById" resultType="Integer">
         select quota from template

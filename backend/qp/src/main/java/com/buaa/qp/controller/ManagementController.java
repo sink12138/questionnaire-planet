@@ -207,7 +207,7 @@ public class ManagementController {
 
             // clone
             Template newTemplate = new Template(template.getType(), template.getOwner(),
-                    template.getTitle(), template.getDescription(), template.getPassword(), template.getConclusion(), template.getQuota());
+                    template.getTitle() + "（副本）", template.getDescription(), template.getPassword(), template.getConclusion(), template.getQuota());
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Question> newQuestions = new ArrayList<>();
             for (Question question : questions) {
