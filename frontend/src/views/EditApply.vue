@@ -406,7 +406,7 @@
                     <el-form-item label="编辑题目">
                       <el-button
                         icon="el-icon-circle-plus"
-                        v-show="item.type != 2 && ietm.type != 3"
+                        v-show="item.type != 2 && item.type != 3"
                         @click="addDomain(index)"
                         >新增选项</el-button
                       >
