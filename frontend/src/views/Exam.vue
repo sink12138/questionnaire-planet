@@ -53,12 +53,7 @@ export default {
       console.log(res);
     });
     
-
-  },
-  mounted: function(){
     this.lefttime = Math.floor((new Date(this.deadlline).getTime() / 1000) - this.nowtime);
-    console.log(this.lefttime)
-    console.log(new Date(this.deadlline).getTime() / 1000)
 
     this.timer = setInterval(()=>{
       this.lefttime--;
@@ -73,6 +68,9 @@ export default {
         clearInterval(this.timer);
       }
     },1000)
+  },
+  mounted: function(){
+    
   },
   methods: {
     submit() {
