@@ -170,16 +170,15 @@
                 }"
               >
                 <el-radio-group
-                  v-model="answers[index_question]"
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  @change="changeValue"
-                >
-                  <el-radio class="option" :label="index"
-                    >{{ i }}({{ item.scores[index] }})</el-radio
-                  >
-                </el-radio-group></el-form-item
-              >
+                v-model="answers[index_question]"
+                v-for="(i, index) in item.choices"
+                :key="index"
+                @change="changeValue">
+                  <el-radio class="option" :label="index">
+                    {{ i }}({{ item.scores[index] }})
+                  </el-radio>
+                </el-radio-group>
+              </el-form-item>
             </div>
             <div v-if="item.type == 'dropdown'">
               <el-form-item
