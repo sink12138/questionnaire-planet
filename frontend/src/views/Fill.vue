@@ -51,7 +51,7 @@
       :close-on-click-modal="false"
       :before-close="goBack"
     >
-      <el-form :model="password">
+      <el-form :model="password" @submit.native.prevent>
         <el-form-item
           label="问卷密码"
           :label-width="formLabelWidth"
