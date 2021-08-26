@@ -171,37 +171,18 @@ public class TemplateController {
                         break;
                     }
                     case "grade": {
-                        ArrayList<String> choices;
-                        ArrayList<Integer> scores;
+                        ArrayList<String> grades;
                         try {
-                            choices = parser.toStringList(questionMap.get("choices"));
-                            scores = parser.toIntegerList(questionMap.get("scores"));
+                            grades = parser.toStringList(questionMap.get("grades"));
                         }
                         catch (ClassCastException | NumberFormatException e) {
                             throw new ParameterFormatException();
                         }
-                        if (choices == null || scores == null)
+                        if (grades == null)
                             throw new ParameterFormatException();
-                        if (choices.size() < 2 || choices.size() != scores.size())
+                        if (grades.size() != 5)
                             throw new ParameterFormatException();
-                        // Sort the two lists by scores
-                        for (int i = 0; i < scores.size(); ++i) {
-                            int min = i;
-                            for (int j = i + 1; j < scores.size(); ++j) {
-                                if (scores.get(j) < scores.get(min))
-                                    min = j;
-                            }
-                            if (min != i) {
-                                int tmpInt = scores.get(i);
-                                scores.set(i, scores.get(min));
-                                scores.set(min, tmpInt);
-                                String tmpStr = choices.get(i);
-                                choices.set(i, choices.get(min));
-                                choices.set(min, tmpStr);
-                            }
-                        }
-                        argsMap.put("choices", choices);
-                        argsMap.put("scores", scores);
+                        argsMap.put("grades", grades);
                         break;
                     }
                     case "vote": {

@@ -349,7 +349,7 @@ public class CollectionController {
                     }
                 }
 
-                // Submit the answer
+                // Insert the answer into the database
                 answerService.submitAnswer(answer);
                 // Close the questionnaire if the quota has been reached
                 if (quota != null && answerCount + 1 >= quota)
