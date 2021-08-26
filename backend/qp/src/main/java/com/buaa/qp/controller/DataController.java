@@ -399,7 +399,7 @@ public class DataController {
     private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
         ArrayList<String> firstRow = new ArrayList<>();
-        firstRow.add(null);
+        firstRow.add("序号");
         int indexOfStem = 1;
         for (Question question : questions) {
             firstRow.add(indexOfStem + "." + question.getStem());
@@ -415,7 +415,7 @@ public class DataController {
             for (int i = 0; i < questions.size(); i++) {
                 Question current_question = questions.get(i);
                 if (answerContents.get(i) == null) {
-                    answerInFormat.add("序号");
+                    answerInFormat.add("");
                 } else {
                     Map<String, Object> argsMap = JSON.parseObject(current_question.getArgs());
                     switch (current_question.getType()) {
