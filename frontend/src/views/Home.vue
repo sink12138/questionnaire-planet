@@ -201,7 +201,7 @@ export default {
             message: "登录成功！",
             type: "success",
           });
-          this.dialogFormVisible = false;
+          this.dialogFormVisible1 = false;
         } else {
           alert("用户名或密码错误！");
         }
