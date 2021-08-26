@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import ElementUI from 'element-ui'
 
+const Home = () => import("../views/Home.vue")
+const Main = () => import("../views/Main.vue")
 const Questionnaire = () => import("../views/Questionnaire.vue")
 const History = () => import("../views/History.vue")
 const Recycle = () => import("../views/Recycle.vue")
@@ -25,6 +27,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/main',
+    name: 'Main',
+    component: Main,
     children: [
       {
         path: '/questionnaire',
@@ -110,15 +117,18 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-/*路由拦截：请登录后操作。避免繁琐开发，先注释着。
 router.beforeEach((to, from, next) => {
-  if(sessionStorage.getItem("isLogin") === true || to.path === "/" || to.path === "/register") {
+  if(sessionStorage.getItem("isLogin") == true || to.path == "/") {
     next();
   }
   else {
+    console.log(sessionStorage.getItem("isLogin"));
     next("/");
-    alert("请登录后操作");
+    ElementUI.Notification({
+      title: '需要登录',
+      message: '请登录后再进行操作',
+      type: 'warning'
+    });
   }
 })
-*/
 export default router

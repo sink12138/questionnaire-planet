@@ -439,7 +439,7 @@
 
 
 <script>
-import logo from "../components/svg-logo.vue";
+import logo from "../components/svg_logo.vue";
 import vuedraggable from "vuedraggable";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";

@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import svg from "../components/svg-questionnaire.vue"
+import svg from "../components/svg_questionnaire.vue"
 //import vueSeamlessScroll from 'vue-seamless-scroll'
 export default {
     components: {
