@@ -70,10 +70,13 @@ public class DataController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
             ArrayList<Map<String, Object>> answerMaps = new ArrayList<>();
+            boolean hasUsername = !template.getType().equals("normal");
             for (int i = 0; i < answers.size(); i++) {
                 Map<String, Object> answerMap = new HashMap<>();
                 answerMap.put("answerId", answers.get(i).getAnswerId());
                 answerMap.put("answerTime", answersInFormat.get(i + 1).get(questions.size() + 1));
+                if (hasUsername)
+                    answerMap.put("username", answersInFormat.get(i + 1).get(questions.size() + 2));
                 for (int j = 0; j < questions.size(); j ++) {
                     answerMap.put(answersInFormat.get(0).get(j + 1), answersInFormat.get(i + 1).get(j + 1));
                 }
