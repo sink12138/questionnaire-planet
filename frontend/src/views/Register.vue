@@ -64,10 +64,6 @@
           if (value.length > 20) {
             callback(new Error("用户名过长"));
           }
-          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]*$/;
-          if (!this.formData.username.match(regx)) {
-            callback(new Error("请同时且仅包含字母数字"));
-          }
           callback();
         }
       };
@@ -89,37 +85,46 @@
     },
     methods: {
       register: function(){
-        var registerdata = {
-          username: this.formData.username,
-          email: this.formData.email,
-          password: this.formData.password,
-        };
+        this.$refs.formData.validate((valid) => {
+          if (valid) {
+            var registerdata = {
+              username: this.formData.username,
+              email: this.formData.email,
+              password: this.formData.password,
+            };
 
-        this.$axios({
-          method: "post",
-          url: "http://139.224.50.146/apis/register",
-          data: JSON.stringify(registerdata),
-        })
-          .then((res) => {
-            console.log(res);
-            console.log(registerdata);
-            if (res.data.success == false) {
-              this.$message({
-                showClose: true,
-                message: res.data.message,
-               });
-               alert("请填入合适的信息后再试。")
-            } else {
-              this.$message({
-                showClose: true,
-                message: "注册完毕，请查看邮箱验证账号",
-                 type: "success",
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146/apis/register",
+              data: JSON.stringify(registerdata),
+            })
+              .then((res) => {
+                console.log(res);
+                console.log(registerdata);
+                if (res.data.success == false) {
+                  this.$message({
+                    showClose: true,
+                    message: res.data.message,
+                  });
+                } else {
+                  this.$message({
+                    showClose: true,
+                    message: "注册完毕，请查看邮箱验证账号",
+                    type: "success",
+                  });
+                  this.$router.push('/')
+                }
+              })
+              .catch((error) => {
+                console.log(error);
               });
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+          }
+          else {
+            console.log("error submit!!");
+            return false;
+          }
+        });
+        
       },
       goBack: function(){
         this.$router.push('/')

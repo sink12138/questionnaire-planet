@@ -1,439 +1,417 @@
 <template>
   <div class="normal">
     <el-container>
-      <el-aside width="200px">
-        <div class="editor">
-          <router-link to="/questionnaire">
-            <div class="logo">
-              <Logo></Logo>
-              <div class="web-title">问卷星球</div>
-            </div>
-          </router-link>
-          <div class="info">拖拽题目以改变顺序</div>
-          <div class="editor-add">
-            <el-button @click="addQuestion">新增题目</el-button>
-          </div>
-          <div class="editor-save">
-            <el-button @click="addSubmit()">保存问卷</el-button>
-          </div>
-          <div class="editor-reset">
-            <el-button @click="resetForm('modelForm')">重置</el-button>
-          </div>
-          <div class="preview">
-            <el-button @click="preview()">预览</el-button>
-          </div>
-          <div class="publish">
-            <el-button @click="publishQuestion" type="primary"
-              >发布问卷</el-button
-            >
-            <el-dialog
-              :append-to-body="true"
-              title="分享问卷"
-              :visible.sync="dialogVisible"
-              width="30%"
-              :before-close="handleClose"
-              center
-            >
-              <div class="share">
-                <div>
-                  <vue-qr
-                    ref="Qrcode"
-                    :text="qrData.text"
-                    :logoSrc="qrData.logo"
-                  >
-                  </vue-qr>
-                </div>
-                <div>
-                  <el-button
-                    style="margin: 10px"
-                    class="tag-copy"
-                    @click="copyShareLink"
-                    :data-clipboard-text="qrData.text"
-                  >
-                    复制链接
-                  </el-button>
-                  <a
-                    style="margin: 10px"
-                    :href="exportLink"
-                    @click="downloadImg"
-                    :download="downloadFilename"
-                  >
-                    <el-button>下载二维码</el-button>
-                  </a>
-                </div>
+      <el-container>
+        <el-aside width="200px">
+          <div class="editor">
+            <router-link to="/history">
+              <div class="logo">
+                <Logo></Logo>
+                <div class="web-title">问卷星球</div>
               </div>
-            </el-dialog>
-          </div>
-        </div>
-      </el-aside>
-      <el-main>
-        <el-form
-          ref="modelForm"
-          :rule="rules"
-          :model="modelForm"
-          label-position="right"
-          label-width="150px"
-        >
-          <div class="basic">
-            <!-- 问卷题目 -->
-            <el-form-item
-              label="问卷题目"
-              :rules="{
-                required: true,
-              }"
-            >
-              <el-input
-                v-model="modelForm.title"
-                style="width: 258px"
-                clearable
-                placeholder="请填写问卷题目"
-              />
-            </el-form-item>
-            <!-- 问卷描述 -->
-            <el-form-item label="问卷描述">
-              <el-input
-                v-model="modelForm.description"
-                style="width: 258px"
-                type="textarea"
-                :autosize="{ minRows: 2, maxRows: 6 }"
-                placeholder="请填写问卷描述"
-              />
-            </el-form-item>
-            <!-- 显示题号 -->
-            <el-form-item label="是否显示题号">
-              <el-switch
-                v-model="modelForm.showIndex"
-                active-color="#13ce66"
-                inactive-color="#ff4949"
+            </router-link>
+            <div class="info">拖拽题目以改变顺序</div>
+            <div class="editor-add">
+              <el-button @click="addQuestion">新增题目</el-button>
+            </div>
+            <div class="editor-save">
+              <el-button @click="addSubmit()">保存问卷</el-button>
+            </div>
+            <div class="editor-reset">
+              <el-button @click="resetForm('modelForm')">重置</el-button>
+            </div>
+            <div class="preview">
+              <el-button @click="preview()">预览</el-button>
+            </div>
+            <div class="publish">
+              <el-button @click="publishQuestion" type="primary"
+                >发布问卷</el-button
               >
-              </el-switch>
-            </el-form-item>
-            <!-- 结束语 -->
-            <el-form-item label="结束语">
-              <el-input
-                v-model="modelForm.conclusion"
-                style="width: 258px"
-                clearable
-                placeholder="答卷后展示"
-              />
-            </el-form-item>
-            <!-- 问卷密码 -->
-            <el-form-item label="问卷密码">
-              <el-input
-                v-model="modelForm.password"
-                style="width: 258px"
-                clearable
-                placeholder="可为空"
-              />
-            </el-form-item>
-            <!-- 问卷限额 -->
-            <el-form-item
-              label="问卷限额"
-              :rules="{
-                type: 'number',
-                message: '请输入数字',
-                trigger: 'blur',
-              }"
-            >
-              <el-input
-                v-model="modelForm.quota"
-                style="width: 258px"
-                clearable
-                placeholder="若无限额请输入0"
-              />
-            </el-form-item>
-          </div>
-          <div>
-            <el-collapse v-model="activeNames">
-              <vuedraggable
-                v-model="modelForm.questions"
-                class="wrapper"
-                @end="end"
+              <el-dialog
+                :append-to-body="true"
+                title="分享问卷"
+                :visible.sync="dialogVisible"
+                width="30%"
+                :before-close="handleClose"
+                center
               >
-                <el-collapse-item
-                  v-for="(item, index) in modelForm.questions"
-                  :key="index"
-                  :name="index"
-                  class="questions"
+                <div class="share">
+                  <div>
+                    <vue-qr
+                      ref="Qrcode"
+                      :text="qrData.text"
+                      :logoSrc="qrData.logo"
+                    >
+                    </vue-qr>
+                  </div>
+                  <div>
+                    <el-button
+                      style="margin: 10px"
+                      class="tag-copy"
+                      @click="copyShareLink"
+                      :data-clipboard-text="qrData.text"
+                    >
+                      复制链接
+                    </el-button>
+                    <a
+                      style="margin: 10px"
+                      :href="exportLink"
+                      @click="downloadImg"
+                      :download="downloadFilename"
+                    >
+                      <el-button>下载二维码</el-button>
+                    </a>
+                  </div>
+                </div>
+              </el-dialog>
+            </div>
+          </div>
+        </el-aside>
+        <el-main>
+          <el-form
+            ref="modelForm"
+            :rule="rules"
+            :model="modelForm"
+            label-position="right"
+            label-width="150px"
+          >
+            <div class="basic">
+              <!-- 问卷题目 -->
+              <el-form-item
+                label="问卷题目"
+                :rules="{
+                  required: true,
+                }"
+              >
+                <el-input
+                  v-model="modelForm.title"
+                  style="width: 258px"
+                  clearable
+                  placeholder="请填写问卷题目"
+                />
+              </el-form-item>
+              <!-- 问卷描述 -->
+              <el-form-item label="问卷描述">
+                <el-input
+                  v-model="modelForm.description"
+                  style="width: 258px"
+                  type="textarea"
+                  :autosize="{ minRows: 2, maxRows: 6 }"
+                  placeholder="请填写问卷描述"
+                />
+              </el-form-item>
+              <!-- 显示题号 -->
+              <el-form-item label="是否显示题号">
+                <el-switch
+                  v-model="modelForm.showIndex"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
                 >
-                  <template slot="title">
-                    <div class="question-index" v-show="modelForm.showIndex">
-                      第{{ index + 1 }}题
-                    </div>
-                    <div class="question-title">
-                      题目:{{ item.questionName }}
-                    </div>
-                  </template>
-                  <!-- 问题类型 -->
-                  <el-form-item
-                    :prop="`questions.${index}.type`"
-                    :label="`问题${index + 1}类型`"
-                    :rules="{
-                      required: true,
-                      message: '请选择问题类型',
-                      trigger: 'change',
-                    }"
+                </el-switch>
+              </el-form-item>
+              <!-- 结束语 -->
+              <el-form-item label="结束语">
+                <el-input
+                  v-model="modelForm.conclusion"
+                  style="width: 258px"
+                  clearable
+                  placeholder="答卷后展示"
+                />
+              </el-form-item>
+              <!-- 问卷密码 -->
+              <el-form-item label="问卷密码">
+                <el-input
+                  v-model="modelForm.password"
+                  style="width: 258px"
+                  clearable
+                  placeholder="可为空"
+                />
+              </el-form-item>
+              <!-- 问卷限额 -->
+              <el-form-item
+                label="问卷限额"
+                :rules="{
+                  type: 'number',
+                  message: '请输入数字',
+                  trigger: 'blur',
+                }"
+              >
+                <el-input
+                  v-model="modelForm.quota"
+                  style="width: 258px"
+                  clearable
+                  placeholder="若无限额请输入0"
+                />
+              </el-form-item>
+            </div>
+            <div>
+              <el-collapse v-model="activeNames">
+                <vuedraggable
+                  v-model="modelForm.questions"
+                  class="wrapper"
+                  @end="end"
+                >
+                  <el-collapse-item
+                    v-for="(item, index) in modelForm.questions"
+                    :key="index"
+                    :name="index"
+                    class="questions"
                   >
-                    <el-radio-group v-model="item.type" class="question-type">
-                      <el-radio label="0" border>单选题</el-radio>
-                      <el-radio label="1" border>多选题</el-radio>
-                      <el-radio label="2" border>填空题</el-radio>
-                      <el-radio label="3" border>评分题</el-radio>
-                      <el-radio label="4" border>下拉题</el-radio>
-                      <el-radio label="5" border>报名题</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
-                  <!-- 是否必填 -->
-                  <el-form-item
-                    :prop="`questions.${index}.required`"
-                    :label="`是否必填`"
-                    :rules="{
-                      required: true,
-                      message: '请选择是否必填',
-                      trigger: 'change',
-                    }"
-                  >
-                    <el-switch
-                      v-model="item.required"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949"
-                    >
-                    </el-switch>
-                  </el-form-item>
-                  <!-- 问题题目 -->
-                  <el-form-item
-                    :prop="`questions.${index}.questionName`"
-                    label="问题"
-                    :rules="{
-                      required: true,
-                      message: '请填写问题',
-                      trigger: 'change',
-                    }"
-                  >
-                    <el-input
-                      v-model="item.questionName"
-                      style="width: 258px"
-                      clearable
-                      placeholder="请填写问题"
-                    />
-                  </el-form-item>
-                  <!-- 问题描述 -->
-                  <el-form-item
-                    :prop="`questions.${index}.questionSummary`"
-                    label="问题描述"
-                  >
-                    <el-input
-                      v-model="item.questionSummary"
-                      style="width: 258px"
-                      clearable
-                      placeholder="请填写问题描述"
-                    />
-                  </el-form-item>
-                  <el-row>
-                    <!-- 最小选项 -->
-                    <el-col :span="10">
-                      <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
-                        :prop="`questions.${index}.min`"
-                        label="最小选项"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请填写最小选项个数',
-                            trigger: 'blur',
-                          },
-                          { validator: isNum, trigger: 'blur' },
-                        ]"
-                      >
-                        <el-input
-                          v-model="item.min"
-                          style="width: 125px"
-                          clearable
-                          placeholder="请填写最小选项个数"
-                        />
-                      </el-form-item>
-                    </el-col>
-                    <!-- 最大选项 -->
-                    <el-col :span="10">
-                      <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
-                        :prop="`questions.${index}.max`"
-                        label="最大选项"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请填写最大选项个数',
-                            trigger: 'blur',
-                          },
-                          { validator: isNum, trigger: 'blur' },
-                        ]"
-                      >
-                        <el-input
-                          v-model="item.max"
-                          style="width: 125px"
-                          clearable
-                          placeholder="请填写最大选项个数"
-                        />
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                  <el-row>
-                    <!-- 高度 -->
-                    <el-col :span="10">
-                      <el-form-item
-                        v-if="item.type == 2"
-                        :prop="`questions.${index}.height`"
-                        label="填空框高度（行）"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请填写填空框高度',
-                            trigger: 'blur',
-                          },
-                          { validator: isNum, trigger: 'blur' },
-                        ]"
-                      >
-                        <el-input
-                          v-model="item.height"
-                          style="width: 125px"
-                          clearable
-                          placeholder="请填写填空框高度"
-                        />
-                      </el-form-item>
-                    </el-col>
-                    <!-- 宽度 -->
-                    <el-col :span="10">
-                      <el-form-item
-                        v-if="item.type == 2"
-                        :prop="`questions.${index}.width`"
-                        label="宽度（px）"
-                        :rules="[
-                          {
-                            required: true,
-                            message: '请填写填空框宽度',
-                            trigger: 'blur',
-                          },
-                          { validator: isNum, trigger: 'blur' },
-                        ]"
-                      >
-                        <el-input
-                          v-model="item.width"
-                          style="width: 125px"
-                          clearable
-                          placeholder="请填写填空框宽度"
-                        />
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                  <!-- 答案 -->
-                  <el-row v-if="item.type != 2">
+                    <template slot="title">
+                      <div class="question-index" v-show="modelForm.showIndex">
+                        第{{ index + 1 }}题
+                      </div>
+                      <div class="question-title">
+                        题目:{{ item.questionName }}
+                      </div>
+                    </template>
+                    <!-- 问题类型 -->
                     <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`选项${idx + 1}`"
-                      :prop="`questions.${index}.answers.${idx}.value`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入选项',
-                          trigger: 'blur',
-                        },
-                      ]"
+                      :prop="`questions.${index}.type`"
+                      :label="`问题${index + 1}类型`"
+                      :rules="{
+                        required: true,
+                        message: '请选择问题类型',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-radio-group v-model="item.type" class="question-type">
+                        <el-radio label="0" border>单选题</el-radio>
+                        <el-radio label="1" border>多选题</el-radio>
+                        <el-radio label="2" border>填空题</el-radio>
+                        <el-radio label="3" border>评分题</el-radio>
+                        <el-radio label="4" border>下拉题</el-radio>
+                        <el-radio label="5" border>投票题</el-radio>
+                      </el-radio-group>
+                    </el-form-item>
+                    <!-- 是否必填 -->
+                    <el-form-item
+                      :prop="`questions.${index}.required`"
+                      :label="`是否必填`"
+                      :rules="{
+                        required: true,
+                        message: '请选择是否必填',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-switch
+                        v-model="item.required"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                      >
+                      </el-switch>
+                    </el-form-item>
+                    <!-- 问题题目 -->
+                    <el-form-item
+                      :prop="`questions.${index}.questionName`"
+                      label="问题"
+                      :rules="{
+                        required: true,
+                        message: '请填写问题',
+                        trigger: 'change',
+                      }"
                     >
                       <el-input
-                        v-model="opt.value"
-                        style="width: 200px"
+                        v-model="item.questionName"
+                        style="width: 258px"
                         clearable
-                        placeholder="请输入选项"
+                        placeholder="请填写问题"
                       />
+                    </el-form-item>
+                    <!-- 问题描述 -->
+                    <el-form-item
+                      :prop="`questions.${index}.questionSummary`"
+                      label="问题描述"
+                    >
+                      <el-input
+                        v-model="item.questionSummary"
+                        style="width: 258px"
+                        clearable
+                        placeholder="请填写问题描述"
+                      />
+                    </el-form-item>
+                    <el-row>
+                      <!-- 最小选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-if="item.type == 1 || item.type == 5"
+                          :prop="`questions.${index}.min`"
+                          label="最小选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最小选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model="item.min"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最小选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 最大选项 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-if="item.type == 1 || item.type == 5"
+                          :prop="`questions.${index}.max`"
+                          label="最大选项"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写最大选项个数',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model="item.max"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写最大选项个数"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                    <el-row>
+                      <!-- 高度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-if="item.type == 2"
+                          :prop="`questions.${index}.height`"
+                          label="填空框高度（行）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框高度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model="item.height"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框高度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <!-- 宽度 -->
+                      <el-col :span="10">
+                        <el-form-item
+                          v-if="item.type == 2"
+                          :prop="`questions.${index}.width`"
+                          label="宽度（px）"
+                          :rules="[
+                            {
+                              required: true,
+                              message: '请填写填空框宽度',
+                              trigger: 'blur',
+                            },
+                            { validator: isNum, trigger: 'blur' },
+                          ]"
+                        >
+                          <el-input
+                            v-model="item.width"
+                            style="width: 125px"
+                            clearable
+                            placeholder="请填写填空框宽度"
+                          />
+                        </el-form-item>
+                      </el-col>
+                    </el-row>
+                    <!-- 答案 -->
+                    <el-row v-if="item.type != 2">
+                      <el-form-item
+                        v-for="(opt, idx) in item.answers"
+                        :key="idx"
+                        :label="`选项${idx + 1}`"
+                        :prop="`questions.${index}.answers.${idx}.value`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入选项',
+                            trigger: 'blur',
+                          },
+                        ]"
+                      >
+                        <el-input
+                          v-model="opt.value"
+                          style="width: 200px"
+                          clearable
+                          placeholder="请输入选项"
+                        />
+                        <el-button
+                          style="margin-left: 20px"
+                          @click.prevent="removeDomain(index, idx)"
+                          >删除</el-button
+                        >
+                      </el-form-item>
+                    </el-row>
+                    <el-row v-if="item.type == 3">
+                      <el-form-item
+                        v-for="(opt, idx) in item.answers"
+                        :key="idx"
+                        :label="`第${idx + 1}项评分`"
+                        :prop="`questions.${index}.answers.${idx}.scores`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入评分',
+                            trigger: 'blur',
+                          },
+                          {
+                            validator: isNum,
+                            trigger: 'blur',
+                          },
+                        ]"
+                      >
+                        <el-input
+                          v-model="opt.scores"
+                          style="width: 120px; margin-left: 10px"
+                          clearable
+                          placeholder="请输入评分"
+                        />
+                      </el-form-item>
+                    </el-row>
+                    <el-form-item label="编辑题目">
                       <el-button
-                        style="margin-left: 20px"
-                        @click.prevent="removeDomain(index, idx)"
-                        >删除</el-button
+                        icon="el-icon-circle-plus"
+                        v-show="item.type != 2"
+                        @click="addDomain(index)"
+                        >新增选项</el-button
+                      >
+                      <el-button
+                        icon="el-icon-s-order"
+                        @click="copyQuestion(index)"
+                        >复制题目</el-button
+                      >
+                      <el-button
+                        icon="el-icon-delete-solid"
+                        @click="removeQuestion(index)"
+                        >删除题目</el-button
                       >
                     </el-form-item>
-                  </el-row>
-                  <el-row v-if="item.type == 3">
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`第${idx + 1}项评分`"
-                      :prop="`questions.${index}.answers.${idx}.scores`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入评分',
-                          trigger: 'blur',
-                        },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
-                      ]"
-                    >
-                      <el-input
-                        v-model="opt.scores"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入评分"
-                      />
-                    </el-form-item>
-                  </el-row>
-                  <el-row v-if="item.type == 5">
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`第${idx + 1}项名额`"
-                      :prop="`questions.${index}.answers.${idx}.number`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入名额',
-                          trigger: 'blur',
-                        },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
-                      ]"
-                    >
-                      <el-input
-                        v-model="opt.number"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入名额"
-                      />
-                    </el-form-item>
-                  </el-row>
-                  <el-form-item label="编辑题目">
-                    <el-button
-                      icon="el-icon-circle-plus"
-                      v-show="item.type != 2"
-                      @click="addDomain(index)"
-                      >新增选项</el-button
-                    >
-                    <el-button
-                      icon="el-icon-s-order"
-                      @click="copyQuestion(index)"
-                      >复制题目</el-button
-                    >
-                    <el-button
-                      icon="el-icon-delete-solid"
-                      @click="removeQuestion(index)"
-                      >删除题目</el-button
-                    >
-                  </el-form-item>
-                </el-collapse-item>
-              </vuedraggable>
-            </el-collapse>
-          </div>
-          <div class="foot">
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion"
-              >新增题目</el-button
-            >
-          </div>
-        </el-form>
-      </el-main>
+                  </el-collapse-item>
+                </vuedraggable>
+              </el-collapse>
+              <div class="foot">
+                <el-button
+                  icon="el-icon-circle-plus-outline"
+                  @click="addQuestion"
+                  >新增题目</el-button
+                >
+              </div>
+            </div>
+          </el-form>
+        </el-main>
+      </el-container>
     </el-container>
   </div>
 </template>
@@ -453,7 +431,8 @@ export default {
   },
   data() {
     return {
-      activeNames: [0, 1],
+      quest: 0,
+      activeNames: [],
       template: {},
       rules: {},
       templateId: 0,
@@ -463,37 +442,8 @@ export default {
         conclusion: "",
         showIndex: true,
         password: "",
-        quota: undefined,
-        questions: [
-          {
-            type: "0",
-            required: true,
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0, number: 0 },
-              { value: "", scores: 0, number: 0 },
-            ],
-          },
-          {
-            type: "0",
-            required: true,
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            answers: [
-              { value: "", scores: 0, number: 0 },
-              { value: "", scores: 0, number: 0 },
-            ],
-          },
-        ],
+        quota: 0,
+        questions: [],
       },
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
@@ -503,6 +453,110 @@ export default {
       downloadFilename: "",
       dialogVisible: false,
     };
+  },
+  created: function () {
+    this.templateId = this.$route.query.templateId;
+    if (this.templateId == undefined) this.templateId = 0;
+    console.log(this.templateId);
+    this.$axios({
+      method: "get",
+      url: "http://139.224.50.146:80/apis/details",
+      params: { templateId: this.templateId, password: "" },
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.data.success == true) {
+          this.modelForm.title = response.data.title;
+          this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.password = response.data.password;
+          response.data.quota == undefined
+            ? (this.modelForm.quota = 0)
+            : (this.modelForm.quota = response.data.quota);
+          var question = {
+            type: "0",
+            required: true,
+            questionName: "",
+            questionSummary: "",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            answers: [],
+          };
+          var item = {};
+          var i = 0;
+          var j = 0;
+          for (i in response.data.questions) {
+            question = {
+              type: "0",
+              required: true,
+              questionName: "",
+              questionSummary: "",
+              max: 2,
+              min: 1,
+              height: 1,
+              width: 800,
+              answers: [],
+            };
+            item = response.data.questions[i];
+            question.questionName = item.stem;
+            question.questionSummary = item.description;
+            question.required = item.required;
+            switch (item.type) {
+              case "choice":
+                question.type = "0";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j], scores: 0 });
+                }
+                break;
+              case "multi-choice":
+                question.type = "1";
+                question.max = item.max;
+                question.min = item.min;
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j], scores: 0 });
+                }
+                break;
+              case "filling":
+                question.type = "2";
+                question.height = item.height;
+                question.width = parseInt(item.width);
+                question.answers.push({ value: "", scores: 0 });
+                break;
+              case "grade":
+                question.type = "3";
+                for (j in item.choices) {
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: item.scores[j],
+                  });
+                }
+                break;
+              case "dropdown":
+                question.type = "4";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j], scores: 0 });
+                }
+                break;
+              case "vote":
+                question.type = "5";
+                question.max = item.max;
+                question.min = item.min;
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j], scores: 0 });
+                }
+                break;
+            }
+            console.log(question);
+            this.modelForm.questions.push(question);
+            this.activeNames.push(this.modelForm.questions.length - 1);
+          }
+        } else {
+          console.log(response.data.message);
+        }
+      })
+      .catch((err) => console.log(err));
   },
   methods: {
     isNum: (rule, value, callback) => {
@@ -558,6 +612,7 @@ export default {
         this.template.answers.push({
           value: this.modelForm.questions[index].answers[i].value,
           scores: this.modelForm.questions[index].answers[i].scores,
+          number: this.modelForm.questions[index].answers[i].number,
         });
       }
       this.modelForm.questions.splice(index + 1, 0, this.template);
@@ -566,11 +621,7 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({
-        value: "",
-        scores: 0,
-        number: 0,
-      });
+      this.modelForm.questions[index].answers.push({ value: "", scores: 0 });
     },
     addQuestion() {
       // 新增题目
@@ -584,8 +635,8 @@ export default {
         height: 1,
         width: 800,
         answers: [
-          { value: "", scores: 0, number: 0 },
-          { value: "", scores: 0, number: 0 },
+          { value: "", scores: 0 },
+          { value: "", scores: 0 },
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -661,8 +712,7 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
+                quest.type = "vote";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
@@ -677,7 +727,6 @@ export default {
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
                 }
                 break;
             }
@@ -685,21 +734,21 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          if (this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota:
-                this.modelForm.quota == undefined
-                  ? 0
-                  : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
               questions: templateQuestions,
             }),
           }).then(
@@ -792,8 +841,7 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
+                quest.type = "vote";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
@@ -808,7 +856,6 @@ export default {
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
                 }
                 break;
             }
@@ -816,21 +863,21 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          if (this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota:
-                this.modelForm.quota == undefined
-                  ? 0
-                  : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
               questions: templateQuestions,
             }),
           }).then(
@@ -924,8 +971,7 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
+                quest.type = "vote";
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
@@ -940,7 +986,6 @@ export default {
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
                 }
                 break;
             }
@@ -948,21 +993,21 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          if (this.modelForm.quota == undefined) {
+            this.modelForm.quota = 0;
+          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota:
-                this.modelForm.quota == undefined
-                  ? 0
-                  : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota: parseInt(this.modelForm.quota),
+              type: "vote",
               questions: templateQuestions,
             }),
           }).then(
@@ -988,10 +1033,6 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
-                      this.qrData.text =
-                        window.location.host +
-                        "/fill?templateId=" +
-                        this.templateId;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
@@ -1113,8 +1154,7 @@ a:hover {
 }
 .question-type .el-radio {
   height: 35px;
-  width: 80px;
-  margin: 0;
+  margin: 10px;
   padding: 9px 9px 6px 6px;
 }
 .questions {

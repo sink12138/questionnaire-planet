@@ -6,13 +6,13 @@ import axios from 'axios'
 import router from './router'
 import store from './store'
 import vuedraggable from 'vuedraggable'
-
+import vueToPdf from 'vue-to-pdf';
 
 Vue.prototype.$axios = axios
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
-
+Vue.use(vueToPdf);
 
 new Vue({
   router,

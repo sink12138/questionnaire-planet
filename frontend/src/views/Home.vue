@@ -8,20 +8,43 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div v-if="this.$store.state.isLogin == false">
-          <el-button type="success" @click="dialogFormVisible = true">登录/注册</el-button>
-        </div>
-        <div v-else>
-          <el-button type="success" @click="logout">退出登录</el-button>
-        </div>
 
+        <div class="butt">
+          <div v-if="this.$store.state.isLogin == false">
+            <el-dropdown>
+              <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <router-link to="/">
+                  <el-dropdown-item>主页</el-dropdown-item>
+                </router-link>
+                <el-dropdown-item @click.native="dialogFormVisible = true">登录/注册</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+          <div v-else>
+            <el-dropdown>
+              <el-button class="user" icon="el-icon-user" style="font-size:30px; border:none">
+              </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <router-link to="/">
+                  <el-dropdown-item>主页</el-dropdown-item>
+                </router-link>
+                <router-link to="/personal">
+                  <el-dropdown-item>个人信息</el-dropdown-item>
+                </router-link>
+                <el-dropdown-item @click.native="logout()">登出</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+        </div>
         <el-dialog title="欢迎来到问卷星球！" :visible.sync="dialogFormVisible" style="text-align:left; width:1050px; margin:auto">
           <el-form :model="formData" :rules="rules" ref="formData">
             <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus></el-input>
+              <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" v-focus @keyup.enter.native="login"></el-input>
             </el-form-item>
             <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
-              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
+              <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码" @keyup.enter.native="login"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -38,6 +61,7 @@
             class="el-menu-vertical-demo"
             @open="handleOpen"
             @close="handleClose"
+            style="margin: 0"
             router>
             <el-menu-item index="/questionnaire">
               <i class="el-icon-circle-plus"></i>
@@ -45,7 +69,7 @@
             </el-menu-item>
             <el-menu-item index="/history">
               <i class="el-icon-s-order"></i>
-              <span slot="title">历史问卷</span>
+              <span slot="title">我的问卷</span>
             </el-menu-item>
             <el-menu-item index="/recycle">
               <i class="el-icon-delete-solid"></i>
@@ -82,12 +106,12 @@ export default {
           if (value.length < 6 || value.length > 20) {
             callback(new Error("请输入六至二十位"));
           }
-    var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
-      if (!this.formData.password.match(regx)) {
-        callback(new Error("请同时包含字母数字"));
+          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
+          if (!this.formData.password.match(regx)) {
+            callback(new Error("请同时包含字母数字"));
+          }
+          callback();
       }
-      callback();
-    }
     };
     return {
       formData: {
@@ -102,12 +126,13 @@ export default {
       formLabelWidth: '100px'
     }
   },
-  mounted: function(){
-    if (sessionStorage.getItem("isLogin") == undefined)
+  created(){
+    var login = sessionStorage.getItem("isLogin")
+    if (login == undefined)
       sessionStorage.setItem("isLogin", false);
-    if (sessionStorage.getItem("isLogin") == true) {
+    if (login == "true") {
       this.$store.commit("login");
-    } else if (sessionStorage.getItem("isLogin") == false) {
+    } else if (login == "false") {
       this.$store.commit("logout");
     }
   },
@@ -146,6 +171,9 @@ export default {
       this.$message({
         message: "退出登录成功！",
       });
+    },
+    topersonal: function(){
+      this.$router.push("/personal")
     }
   },
   directives: {
@@ -168,6 +196,11 @@ export default {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+}
+.butt {
+  position: absolute;
+  float: right;
+  right: 10px;
 }
 .web-title {
   margin-left: 15px;

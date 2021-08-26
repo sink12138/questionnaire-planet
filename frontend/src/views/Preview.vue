@@ -1,82 +1,214 @@
 <template>
-  <div>
-    <div id="quest" ref="quest">
-      <div class="head">
-        <h1>
-          {{ title }}
-        </h1>
-        <h3>
-          {{ description }}
-        </h3>
-      </div>
-      <div class="question">
-        <div v-for="(item, index_question) in questions" :key="index_question">
-          <div class="question-title">
-            <div>第{{ index_question + 1 }}题,题目:{{ item.stem }}</div>
-            <a>题目描述：{{ item.description }}</a>
+  <el-container>
+    <el-aside width="200px">
+      <div class="editor">
+        <router-link to="/history">
+          <div class="logo">
+            <Logo></Logo>
+            <div class="web-title">问卷星球</div>
           </div>
-          <div class="question-content">
-            <div v-if="item.type == 'choice'">
-              <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio :label="index">{{ i }}</el-radio>
-              </el-radio-group>
-            </div>
-            <div v-if="item.type == 'multi-choice'">
-              <el-checkbox-group
-              v-model="multi" 
-              v-for="(i, index) in item.choices"
-              :min = "item.min"
-              :max = "item.max"
-              :key="index" 
-              @change="multiChangeValue(index_question)">
-                <el-checkbox :label="index" border>{{ i }}</el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <div v-if="item.type == 'filling'">
-              <el-input
-              type="textarea"
-              class="input"
-              :rows="item.height"
-              :style="{'--width': item.width}"
-              placeholder="请输入内容"
-              v-model="answers[index_question]">
-              </el-input>
-            </div>
-            <div v-if="item.type == 'grade'">
-              <el-radio-group v-model="answers[index_question]" v-for="(i, index) in item.choices" :key="index" @change="changeValue">
-                <el-radio :label="index">{{ i }}({{item.scores[ index ]}})</el-radio>
-              </el-radio-group>
-            </div>
-            <div v-if="item.type == 'dropdown'">
-              <el-select v-model="answers[index_question]" clearable placeholder="请选择">
-                <el-option
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  :label="i"
-                  :value="index">
-                </el-option>
-              </el-select>
-            </div>
-          </div>
+        </router-link>
+        <div class="info">填写问卷的用户将看到右侧的界面</div>
+        <div class="export">
+          <el-button
+            type="primary"
+            class="button"
+            @click="exportQuest()"
+            icon="el-icon-download"
+            >导出</el-button
+          >
         </div>
       </div>
-    </div>
-
-    <br />
-    <div class="export">
-      <el-button
-        type="primary"
-        class="button"
-        @click="exportQuest()"
-        icon="el-icon-download"
-        >导出</el-button
-      >
-    </div>
-  </div>
+    </el-aside>
+    <el-main>
+      <div id="quest" ref="quest">
+        <div class="head">
+          <h1>
+            {{ title }}
+          </h1>
+          <h3>
+            {{ description }}
+          </h3>
+        </div>
+        <div class="question">
+          <el-form
+            :model="answers"
+            :rules="rules"
+            ref="ruleForm"
+            label-width="100px"
+            class="ruleForm"
+          >
+            <div
+              v-for="(item, index_question) in questions"
+              :key="index_question"
+            >
+              <el-divider content-position="left" style="margin-top: 15px"
+                ><div v-show="showIndex">第{{ index_question + 1 }}题</div></el-divider
+              >
+              <div class="question-title">
+                <div class="stem">{{ item.stem }}</div>
+                <div class="description">{{ item.description }}</div>
+              </div>
+              <div class="question-content">
+                <div v-if="item.type == 'choice'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-radio-group
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :key="index"
+                      @change="changeValue"
+                    >
+                      <el-radio class="option" :label="index">{{ i }}</el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+                </div>
+                <div class="multi" v-if="item.type == 'multi-choice'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      v-model="multi"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border>{{
+                        i
+                      }}</el-checkbox>
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'filling'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-input
+                      type="textarea"
+                      class="input"
+                      :rows="item.height"
+                      :style="{ '--width': item.width }"
+                      placeholder="请输入内容"
+                      v-model="answers[index_question]"
+                    >
+                    </el-input>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'grade'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-radio-group
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :key="index"
+                      @change="changeValue"
+                    >
+                      <el-radio class="option" :label="index"
+                        >{{ i }}({{ item.scores[index] }})</el-radio
+                      >
+                    </el-radio-group>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'dropdown'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-select
+                      v-model="answers[index_question]"
+                      clearable
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="(i, index) in item.choices"
+                        :key="index"
+                        :label="i"
+                        :value="index"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </div>
+                <div class="multi" v-if="item.type == 'vote'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      v-model="multi"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border>{{
+                        i
+                      }}</el-checkbox>
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
+                <div class="multi" v-if="item.type == 'sign-up'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      v-model="multi"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border
+                        >{{ i }} 共{{ item.quotas[index] }},剩余{{
+                          item.remains[index]
+                        }}</el-checkbox
+                      >
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
+              </div>
+            </div>
+          </el-form>
+        </div>
+      </div>
+    </el-main>
+  </el-container>
 </template>
 
 <script>
+import logo from "../components/svg-logo.vue";
 export default {
+  components: {
+    Logo: logo,
+  },
   data() {
     return {
       templateId: 0,
@@ -84,69 +216,58 @@ export default {
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      showIndex: true,
       password: "",
       questions: [
         {
           type: "choice",
-          stem: "1",
-          description: "testtesttesttesttest",
+          stem: "这题什么意思？",
+          description: "题目描述，题目描述，描述一下题目",
           required: true,
-          choices: [
-            "hello","question","whats up"
-          ],
+          choices: ["生异形", "生瓜蛋子", "What's up?", "萨日朗"],
         },
         {
           type: "choice",
-          stem: "666",
-          description: "testtesttesttesttest",
+          stem: "你的姓名？",
+          description: "",
           required: true,
-          choices: [
-            "hello","question","whats up"
-          ],
+          choices: ["华强", "大鹏", "有一个人"],
         },
         {
           type: "multi-choice",
-          stem: "2",
-          description: "testtesttesttesttest",
+          stem: "哪些词形容你合适？",
+          description: "请用恰当的词来形容你",
           required: true,
-          choices: [
-            "question","hello","whats up"
-          ],
+          choices: ["沉鱼落雁", "玉树临风", "惊天动地"],
           max: 2,
           min: 0,
         },
         {
           type: "filling",
-          stem: "3",
-          description: "testtesttesttesttest",
+          stem: "华强买的瓜多少钱一斤？",
+          description: "华强买瓜多少钱一斤？",
           required: true,
           height: 3,
-          width: '1000px',
+          width: "600px",
         },
         {
           type: "grade",
-          stem: "4",
-          description: "testtesttesttesttest",
+          stem: "瓜店老板态度怎样？",
+          description: "给态度打分",
           required: true,
-          choices: [
-            "good","very good","very very good"
-          ],
-          scores: [
-            1,2,3
-          ]
+          choices: ["good", "very good", "very very good"],
+          scores: [10, 50, 100],
         },
         {
           type: "dropdown",
-          stem: "5",
-          description: "testtesttesttesttest",
+          stem: "瓜是什么做的?",
+          description: "",
           required: true,
-          choices: [
-            "hello","question","whats up"
-          ]
-        }
+          choices: ["(C2H5O)n", "Au", "Fe"],
+        },
       ],
       multi: [],
-      answers: []
+      answers: [],
     };
   },
   created: function () {
@@ -155,7 +276,7 @@ export default {
     console.log(this.templateId);
     this.$axios({
       method: "get",
-      url: "http://139.224.50.146:80/apis/locked",
+      url: "http://139.224.50.146:80/apis/attempt",
       params: { templateId: this.templateId },
     })
       .then((response) => {
@@ -178,6 +299,7 @@ export default {
           this.title = response.data.title;
           this.type = response.data.type;
           this.description = response.data.description;
+          this.showIndex = response.data.showIndex;
           this.password = response.data.password;
           this.questions = response.data.questions;
         } else {
@@ -191,18 +313,99 @@ export default {
       this.$PDFSave(this.$refs.quest, this.title);
     },
     changeValue() {
-      console.log(this.answers)
+      console.log(this.answers);
     },
     multiChangeValue(index) {
-      this.answers[index] = this.multi
-      console.log(this.multi)
-    }
+      this.answers[index] = this.multi;
+      console.log(this.multi);
+    },
   },
 };
 </script>
 
 <style scoped>
+.editor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #f3f3f3;
+  display: flex;
+  width: 200px;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  font-family: 仿宋;
+  font-size: 18px;
+  font-weight: bolder;
+}
+.logo {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 40px;
+  margin-bottom: 60px;
+}
+.web-title {
+  margin-left: 15px;
+  font-family: 仿宋;
+  font-weight: 800;
+  font-size: 26px;
+  position: relative;
+}
+.export {
+  position: fixed;
+  bottom: 60px;
+}
+.router-link-active {
+  text-decoration: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+a:hover {
+  color: rgba(46, 140, 219, 0.94);
+}
+.editor .el-button {
+  font-family: 仿宋;
+  height: 50px;
+  width: 120px;
+  color: #000000;
+  font-size: 20px;
+  font-weight: bolder;
+  margin: 20px;
+}
+.question {
+  margin: 0 auto;
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.stem,
+.description {
+  margin: 20px;
+  font-family: 微软雅黑;
+}
+.stem {
+  font-size: 26px;
+  font-weight: bolder;
+}
+.description {
+  font-size: 18px;
+}
+.question-content {
+  margin: 25px;
+}
 .question-content .input {
-  width: var(--width)
+  width: var(--width);
+}
+.multi {
+  display: flex;
+  flex-direction: row;
+}
+.option {
+  margin-left: 10px;
+  margin-right: 30px;
 }
 </style>
