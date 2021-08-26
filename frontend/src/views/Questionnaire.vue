@@ -1,5 +1,6 @@
 <template>
-  <div id="Questionnaire">
+    <div class="questionnaire">
+        <Header></Header>
         <div class="banner">
             <div class="type create_by_normal">
                 <div class="inner">
@@ -63,15 +64,17 @@
             </ul>
         </vue-seamless-scroll>
         -->
-    <router-view></router-view>
-  </div>
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
+import Header from "../components/Header.vue"
 import svg from "../components/svg_questionnaire.vue"
 //import vueSeamlessScroll from 'vue-seamless-scroll'
 export default {
     components: {
+        Header: Header,
         'question-pic': svg,
         //vueSeamlessScroll
     },
@@ -88,6 +91,12 @@ export default {
 </script>
 
 <style scoped>
+.questionnaire {
+    background-image: url("../assets/Main_bg.jpg");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    height: 100%;
+}
 .banner {
     position: relative;
     height: 400px;
@@ -118,28 +127,26 @@ export default {
 .el-button {
     height: 50px;
     width: 120px;
-    color: #ffffffdd;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.66);
+    color: rgba(255, 255, 255, 0.66);
     font-size: 20px;
 }
 .el-button:hover {
-    border-color: #000000;
-    color: #000000;
+    background: rgba(184, 184, 184, 0.3);
+    color: #ffffff;
 }
-.create_by_normal,
-.create_by_normal .el-button {
-    background-color: rgba(46, 140, 219, 0.94);
+.create_by_normal {
+    background-color: rgba(46, 140, 219, 0.66);
 }
-.create_by_vote,
-.create_by_vote .el-button {
-    background-color: rgba(71, 157, 230, 0.94);
+.create_by_vote {
+    background-color: rgba(71, 157, 230, 0.66);
 }
-.create_by_apply,
-.create_by_apply .el-button {
-    background-color: rgba(144, 214, 126, 0.94);
+.create_by_apply {
+    background-color: rgba(144, 214, 126, 0.66);
 }
-.create_by_exam,
-.create_by_exam .el-button {
-    background-color: rgba(46, 219, 161, 0.94);
+.create_by_exam {
+    background-color: rgba(46, 219, 161, 0.66);
 }
 </style>
 
