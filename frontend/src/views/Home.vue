@@ -67,7 +67,7 @@
               <el-input v-model="registerData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码" @keyup.enter.native="register"></el-input>
             </el-form-item>
             <el-form-item label="确认密码" :label-width="formLabelWidth" prop="checkpassword">
-              <el-input v-model="registerData.password" autocomplete="off" show-password style="width: 300px" placeholder="请再次输入密码" @keyup.enter.native="register"></el-input>
+              <el-input v-model="registerData.checkpassword" autocomplete="off" show-password style="width: 300px" placeholder="请再次输入密码" @keyup.enter.native="register"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
