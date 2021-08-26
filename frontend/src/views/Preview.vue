@@ -43,7 +43,7 @@
               :key="index_question"
             >
               <el-divider content-position="left" style="margin-top: 15px"
-                >第{{ index_question + 1 }}题</el-divider
+                ><div v-show="showIndex">第{{ index_question + 1 }}题</div></el-divider
               >
               <div class="question-title">
                 <div class="stem">{{ item.stem }}</div>
@@ -216,6 +216,7 @@ export default {
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      showIndex: true,
       password: "",
       questions: [
         {
@@ -298,6 +299,7 @@ export default {
           this.title = response.data.title;
           this.type = response.data.type;
           this.description = response.data.description;
+          this.showIndex = response.data.showIndex;
           this.password = response.data.password;
           this.questions = response.data.questions;
         } else {

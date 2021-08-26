@@ -100,6 +100,15 @@
                   placeholder="请填写问卷描述"
                 />
               </el-form-item>
+              <!-- 显示题号 -->
+              <el-form-item label="是否显示题号">
+                <el-switch
+                  v-model="modelForm.showIndex"
+                  active-color="#13ce66"
+                  inactive-color="#ff4949"
+                >
+                </el-switch>
+              </el-form-item>
               <!-- 结束语 -->
               <el-form-item label="结束语">
                 <el-input
@@ -149,9 +158,12 @@
                     class="questions"
                   >
                     <template slot="title">
-                      <div class="question-title">
-                        第{{ index + 1 }}题,题目:{{ item.questionName }}
-                      </div>
+                      <div class="question-index" v-show="modelForm.showIndex">
+                      第{{ index + 1 }}题
+                    </div>
+                    <div class="question-title">
+                      题目:{{ item.questionName }}
+                    </div>
                     </template>
                     <!-- 问题类型 -->
                     <el-form-item
@@ -181,10 +193,12 @@
                         trigger: 'change',
                       }"
                     >
-                      <el-radio-group v-model="item.required">
-                        <el-radio label="true">是</el-radio>
-                        <el-radio label="false">否</el-radio>
-                      </el-radio-group>
+                      <el-switch
+                        v-model="item.required"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                      >
+                      </el-switch>
                     </el-form-item>
                     <!-- 问题题目 -->
                     <el-form-item
@@ -425,6 +439,7 @@ export default {
         title: "新的问卷",
         description: "",
         conclusion: "",
+        showIndex: true,
         password: "",
         quota: 0,
         questions: [],
@@ -459,7 +474,7 @@ export default {
             : (this.modelForm.quota = response.data.quota);
           var question = {
             type: "0",
-            required: "",
+            required: true,
             questionName: "",
             questionSummary: "",
             max: 2,
@@ -474,7 +489,7 @@ export default {
           for (i in response.data.questions) {
             question = {
               type: "0",
-              required: "",
+              required: true,
               questionName: "",
               questionSummary: "",
               max: 2,
@@ -486,11 +501,7 @@ export default {
             item = response.data.questions[i];
             question.questionName = item.stem;
             question.questionSummary = item.description;
-            if (item.required == false) {
-              question.required = "false";
-            } else {
-              question.required = "true";
-            }
+            question.required = item.required;
             switch (item.type) {
               case "choice":
                 question.type = "0";
@@ -516,7 +527,10 @@ export default {
               case "grade":
                 question.type = "3";
                 for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j], scores: item.scores[j] });
+                  question.answers.push({
+                    value: item.choices[j],
+                    scores: item.scores[j],
+                  });
                 }
                 break;
               case "dropdown":
@@ -566,7 +580,7 @@ export default {
       //复制题目
       this.template = {
         type: "0",
-        required: "",
+        required: true,
         questionName: "",
         questionSummary: "",
         max: 2,
@@ -603,7 +617,7 @@ export default {
       // 新增题目
       this.modelForm.questions.push({
         type: "0",
-        required: "",
+        required: true,
         questionName: "",
         questionSummary: "",
         max: 2,
@@ -638,11 +652,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -707,6 +717,7 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
@@ -752,11 +763,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -821,6 +828,7 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
@@ -867,11 +875,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -936,6 +940,7 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
@@ -1072,6 +1077,11 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.question-index {
+  font-family: 仿宋;
+  font-size: 20px;
+  font-weight: bolder;
 }
 .question-title {
   font-family: 仿宋;
