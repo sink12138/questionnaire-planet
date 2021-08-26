@@ -46,6 +46,7 @@ export default {
       if (res.data.success == true) {
         this.nowtime = new Date(res.data.time).getTime() / 1000;
         console.log(this.nowtime)
+        console.log(new Date().getTime() / 1000)
       } else {
         this.$message.error(res.data.message);
       }
