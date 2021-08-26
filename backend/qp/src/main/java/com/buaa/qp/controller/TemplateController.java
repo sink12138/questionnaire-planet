@@ -71,8 +71,8 @@ public class TemplateController {
                 if (quota != null && quota <= 0) quota = null;
                 String startStr = (String) requestMap.get("startTime");
                 String endStr = (String) requestMap.get("endTime");
-                if (startStr != null) startTime = sdf.parse(startStr);
-                if (endStr != null) endTime = sdf.parse(endStr);
+                if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
+                if (endStr != null && !endStr.isEmpty()) endTime = sdf.parse(endStr);
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException | ParseException cce) {
@@ -191,7 +191,7 @@ public class TemplateController {
                         try {
                             grades = parser.toStringList(questionMap.get("grades"));
                         }
-                        catch (ClassCastException | NumberFormatException e) {
+                        catch (ClassCastException e) {
                             throw new ParameterFormatException();
                         }
                         if (grades == null)
@@ -340,8 +340,8 @@ public class TemplateController {
                 showIndex = (Boolean) requestMap.get("showIndex");
                 String startStr = (String) requestMap.get("startTime");
                 String endStr = (String) requestMap.get("endTime");
-                if (startStr != null) startTime = sdf.parse(startStr);
-                if (endStr != null) endTime = sdf.parse(endStr);
+                if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
+                if (endStr != null && !endStr.isEmpty()) endTime = sdf.parse(endStr);
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
