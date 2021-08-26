@@ -36,22 +36,23 @@ export default {
     }
   },
   created: function() {
+    /*获取本地系统时间*/
     this.nowtime = new Date().getTime() / 1000
 
-    /*获取服务器时间
+    /*获取服务器时间*/
     this.$axios({
       method: "get",
       url: "http://139.224.50.146/apis/time",
     }).then((res) => {
       if (res.data.success == true) {
-        this.nowtime = new Date(res.data.time).getTime() / 1000;
+        /*this.nowtime = new Date(res.data.time).getTime() / 1000;*/
         console.log(this.nowtime)
       } else {
         this.$message.error(res.data.message);
       }
       console.log(res);
     });
-    */
+    
 
   },
   mounted: function(){
