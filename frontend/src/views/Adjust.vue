@@ -244,7 +244,7 @@
                           }"
                         >
                           <el-rate
-                            v-model="value"
+                            v-model="answers[index_question]"
                             show-text
                             :texts="item.grades"
                           >

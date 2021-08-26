@@ -169,7 +169,7 @@
                   required: item.required,
                 }"
               >
-                <el-rate v-model="value" show-text :texts="item.grades">
+                <el-rate v-model="answers[index_question]" show-text :texts="item.grades">
                 </el-rate>
               </el-form-item>
             </div>
