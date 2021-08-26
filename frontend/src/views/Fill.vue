@@ -65,6 +65,8 @@
             show-password
             style="width: 300px"
             placeholder="请输入问卷密码"
+            v-focus
+            
           ></el-input>
         </el-form-item>
       </el-form>
@@ -605,6 +607,13 @@ export default {
       this.myChart.update()
     }
   },
+  directives: {
+    focus: {
+      inserted: function(el) {
+        el.querySelector('input').focus();
+      }
+    }
+  }
 };
 </script>
 
