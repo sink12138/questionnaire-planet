@@ -435,6 +435,7 @@ export default {
       template: {},
       rules: {},
       templateId: 0,
+      code: "",
       modelForm: {
         title: "新的问卷",
         description: "",
@@ -455,12 +456,13 @@ export default {
   },
   created: function () {
     this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { templateId: this.templateId, password: "" },
+      params: { password: "" ,code: this.code},
     })
       .then((response) => {
         console.log(response);
@@ -969,6 +971,11 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
+                      this.code = response.data.code;
+                      this.qrData.text =
+                        window.location.host +
+                        "/fill?code=" +
+                        this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
