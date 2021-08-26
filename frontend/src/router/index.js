@@ -118,7 +118,7 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  if(sessionStorage.getItem("isLogin") === true || to.path === "/") {
+  if(sessionStorage.getItem("isLogin") == true || to.path == "/") {
     next();
   }
   else {
