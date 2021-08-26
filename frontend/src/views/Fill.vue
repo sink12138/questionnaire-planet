@@ -302,7 +302,7 @@ export default {
       }
     };
     return {
-      templateId: 0,
+      code: "",
       submitted: false,
       isVote: false,
       locked: false,
@@ -335,13 +335,13 @@ export default {
     };
   },
   created: function () {
-    this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/attempt",
-      params: { templateId: this.templateId },
+      params: { code: this.code },
     })
       .then((response) => {
         console.log(response);
@@ -362,7 +362,7 @@ export default {
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
-                params: { templateId: this.templateId, visitor: true },
+                params: { code: this.code, visitor: true },
               })
                 .then((response) => {
                   console.log(response);

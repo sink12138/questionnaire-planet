@@ -316,7 +316,9 @@ export default {
         this.code = row.code;
         this.quest = row.templateId;
         console.log(this.quest);
-        this.$router.push("/adjust?templateId=" + this.quest + "&code=" + this.code);
+        this.$router.push(
+          "/adjust?templateId=" + this.quest + "&code=" + this.code
+        );
       } else {
         this.$message({
           message: "问卷已发布！",
@@ -329,7 +331,9 @@ export default {
           this.code = row.code;
           this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/normal/edit?templateId=" + this.quest + "&code=" + this.code);
+          this.$router.push(
+            "/normal/edit?templateId=" + this.quest + "&code=" + this.code
+          );
         } else {
           this.$message({
             message: "问卷已发布！",
@@ -340,7 +344,9 @@ export default {
           this.code = row.code;
           this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/vote/edit?templateId=" + this.quest + "&code=" + this.code);
+          this.$router.push(
+            "/vote/edit?templateId=" + this.quest + "&code=" + this.code
+          );
         } else {
           this.$message({
             message: "问卷已发布！",
@@ -351,7 +357,9 @@ export default {
           this.code = row.code;
           this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/apply/edit?templateId=" + this.quest + "&code=" + this.code);
+          this.$router.push(
+            "/apply/edit?templateId=" + this.quest + "&code=" + this.code
+          );
         } else {
           this.$message({
             message: "问卷已发布！",
@@ -374,9 +382,8 @@ export default {
               message: "问卷发布成功！",
               type: "success",
             });
-            this.templateId = row.templateId;
-            this.qrData.text =
-              window.location.host + "/fill?templateId=" + this.templateId;
+            this.code = response.data.code;
+            this.qrData.text = window.location.host + "/fill?code=" + this.code;
             this.dialogVisible = true;
             row.released = true;
           }
@@ -387,9 +394,8 @@ export default {
       );
     },
     qr(row) {
-      this.templateId = row.templateId;
-      this.qrData.text =
-        window.location.host + "/fill?templateId=" + this.templateId;
+      this.code = row.code;
+      this.qrData.text = window.location.host + "/fill?code=" + this.code;
       this.dialogVisible = true;
     },
     close(row) {
@@ -478,7 +484,9 @@ export default {
       this.quest = row.templateId;
       this.code = row.code;
       console.log(this.quest);
-      this.$router.push("/preview?templateId=" + this.quest + "&code=" + this.code);
+      this.$router.push(
+        "/preview?templateId=" + this.quest + "&code=" + this.code
+      );
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");

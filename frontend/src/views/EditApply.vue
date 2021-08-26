@@ -1093,6 +1093,11 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
+                      this.code = response.data.code;
+                      this.qrData.text =
+                        window.location.host +
+                        "/fill?code=" +
+                        this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({

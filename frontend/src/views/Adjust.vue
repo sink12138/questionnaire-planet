@@ -142,7 +142,9 @@
                     :key="index_question"
                   >
                     <el-divider content-position="left" style="margin-top: 15px"
-                      ><div v-show="modelForm.showIndex">第{{ index_question + 1 }}题</div></el-divider
+                      ><div v-show="modelForm.showIndex">
+                        第{{ index_question + 1 }}题
+                      </div></el-divider
                     >
                     <div class="question-title">
                       <div class="stem">{{ item.stem }}</div>
@@ -353,7 +355,7 @@ export default {
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { password: "" ,code: this.code},
+      params: { password: "", code: this.code },
     })
       .then((response) => {
         console.log(response);
@@ -433,6 +435,8 @@ export default {
               message: "问卷发布成功！",
               type: "success",
             });
+            this.code = response.data.code;
+            this.qrData.text = window.location.host + "/fill?code=" + this.code;
             this.dialogVisible = true;
           } else {
             this.$message({
