@@ -113,6 +113,7 @@ public class ManagementController {
             if (template.getDeleted())
                 throw new ExtraMessageException("无法操作已删除的问卷");
 
+            // TODO: 2021/8/26 Set start_time to null
             templateService.releaseTemplate(templateId, true);
             map.put("code", template.getCode());
             map.put("success", true);

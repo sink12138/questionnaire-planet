@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +30,9 @@ public class TemplateController {
 
     @Autowired
     private TemplateService templateService;
+
+    @Autowired
+    AnswerDao answerDao;
 
     @PostMapping("/submit")
     public Map<String, Object> submit(@RequestBody Map<String, Object> requestMap) {
@@ -45,16 +51,20 @@ public class TemplateController {
             String conclusion;
             Integer quota;
             Boolean showIndex;
+            Date startTime = null;
+            Date endTime = null;
             ArrayList<Map<String, Object>> questionMaps;
             ClassParser parser = new ClassParser();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
             // Parameter checks of template
             try {
                 templateId = (Integer) requestMap.get("templateId");
                 title = (String) requestMap.get("title");
                 type = (String) requestMap.get("type");
-                description = (String) requestMap.get("description");
                 showIndex = (Boolean) requestMap.get("showIndex");
+                if (showIndex == null) showIndex = true;
+                description = (String) requestMap.get("description");
                 if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
                 if (password != null && password.isEmpty()) password = null;
@@ -62,22 +72,30 @@ public class TemplateController {
                 if (conclusion != null && conclusion.isEmpty()) conclusion = null;
                 quota = (Integer) requestMap.get("quota");
                 if (quota != null && quota <= 0) quota = null;
+                String startStr = (String) requestMap.get("startTime");
+                String endStr = (String) requestMap.get("endTime");
+                if (startStr != null) startTime = sdf.parse(startStr);
+                if (endStr != null) endTime = sdf.parse(endStr);
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
-            catch (ClassCastException cce) {
+            catch (ClassCastException | ParseException cce) {
                 throw new ParameterFormatException();
             }
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
                 throw new ParameterFormatException();
-            if (showIndex == null)
-                throw new ParameterFormatException();
             if (questionMaps.isEmpty())
                 throw new ParameterFormatException();
             if (!type.equals("normal") && !type.equals("vote") && !type.equals("sign-up") && !type.equals("exam"))
                 throw new ParameterFormatException();
-            ArrayList<Question> questions = new ArrayList<>();
+            Date now = sdf.parse(sdf.format(new Date()));
+            if (startTime != null && !startTime.after(now))
+                throw new ExtraMessageException("自动发布时间不得早于当前时间");
+            if (endTime != null && !endTime.after(now))
+                throw new ExtraMessageException("自动关闭时间不得早于当前时间");
+            if (startTime != null && endTime != null && !startTime.before(endTime))
+                throw new ExtraMessageException("开始时间不得晚于结束时间");
 
             if (templateId > 0) {
                 Template template = templateService.getTemplate(templateId);
@@ -92,6 +110,7 @@ public class TemplateController {
             }
 
             // Parameter checks of questions
+            ArrayList<Question> questions = new ArrayList<>();
             boolean hasSpecialQuestion = !type.equals("vote") && !(type.equals("sign-up") && quota == null);
             for (Map<String, Object> questionMap : questionMaps) {
                 String questionType;
@@ -267,10 +286,10 @@ public class TemplateController {
             if (!hasSpecialQuestion) {
                 throw new ExtraMessageException("特殊问卷未设置特殊题目");
             }
-            Template newTemplate = new Template(type, accountId, title, description, password, conclusion, quota, showIndex);
+            Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
+                    quota, showIndex, startTime, endTime);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);
-
             }
             else {
                 newTemplate.setTemplateId(templateId);
@@ -293,9 +312,6 @@ public class TemplateController {
         return map;
     }
 
-    @Autowired
-    AnswerDao answerDao;
-
     @PostMapping("/adjust")
     public Map<String, Object> adjust(@RequestBody Map<String, Object> requestMap) {
         Map<String, Object> map = new HashMap<>();
@@ -312,6 +328,9 @@ public class TemplateController {
             String conclusion;
             Integer quota;
             Boolean showIndex;
+            Date startTime = null;
+            Date endTime = null;
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
             // Parameter checks of template
             try {
@@ -322,6 +341,10 @@ public class TemplateController {
                 conclusion = (String) requestMap.get("conclusion");
                 quota = (Integer) requestMap.get("quota");
                 showIndex = (Boolean) requestMap.get("showIndex");
+                String startStr = (String) requestMap.get("startTime");
+                String endStr = (String) requestMap.get("endTime");
+                if (startStr != null) startTime = sdf.parse(startStr);
+                if (endStr != null) endTime = sdf.parse(endStr);
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
@@ -336,6 +359,14 @@ public class TemplateController {
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
                 throw new ParameterFormatException();
+            Date now = sdf.parse(sdf.format(new Date()));
+            if (startTime != null && !startTime.after(now))
+                throw new ExtraMessageException("自动发布时间不得早于当前时间");
+            if (endTime != null && !endTime.after(now))
+                throw new ExtraMessageException("自动关闭时间不得早于当前时间");
+            if (startTime != null && endTime != null && !startTime.before(endTime))
+                throw new ExtraMessageException("开始时间不得晚于结束时间");
+
             Template template = templateService.getTemplate(templateId);
             if (template == null)
                 throw new ObjectNotFoundException();
@@ -345,15 +376,17 @@ public class TemplateController {
                 throw new ExtraMessageException("已删除的问卷不能编辑");
             if (template.getReleased())
                 throw new ExtraMessageException("已发布的问卷不能编辑");
-            if (quota != null && quota < answerDao.selectCountByTid(templateId)) {
-                throw new ExtraMessageException("不能修改限额为小于已收集到的份数");
-            }
+            if (quota != null && quota < answerDao.selectCountByTid(templateId))
+                throw new ExtraMessageException("限额不得少于已收集份数");
+
             template.setTitle(title);
             template.setDescription(description);
             template.setPassword(password);
             template.setConclusion(conclusion);
             template.setQuota(quota);
             template.setShowIndex(showIndex);
+            template.setStartTime(startTime);
+            template.setEndTime(endTime);
             templateService.adjustTemplate(template);
             map.put("success", true);
 

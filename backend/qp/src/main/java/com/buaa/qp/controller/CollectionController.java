@@ -43,12 +43,13 @@ public class CollectionController {
             // Parameter checks
             if (code == null)
                 throw new ParameterFormatException();
+
+            // Authority checks
             Template template = templateService.getTemplateByCode(code);
-            if (template == null || template.getDeleted()) {
+            if (template == null || template.getDeleted())
                 throw new ObjectNotFoundException();
-            } else if (!template.getReleased()) {
-                throw new ExtraMessageException("问卷尚未发布, 无法访问");
-            }
+            else if (!template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date()))
+                throw new ExtraMessageException("问卷尚未发布或已关闭");
             Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (template.getType().equals("vote")) {
@@ -56,6 +57,7 @@ public class CollectionController {
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
+
             Boolean locked = template.getPassword() != null;
             Boolean login = !template.getType().equals("normal") && accountId == null;
             map.put("success", true);
@@ -119,7 +121,7 @@ public class CollectionController {
                 allowed = true;
                 isOwner = true;
             }
-            else if (template.getReleased()) {
+            else if (template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date())) {
                 String pwd = template.getPassword();
                 if (pwd == null || pwd.equals(password))
                     allowed = true;
@@ -146,6 +148,13 @@ public class CollectionController {
                     throw new ExtraMessageException("名额已满");
                 map.put("remain", remain);
             }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            Date startTime = template.getStartTime();
+            Date endTime = template.getEndTime();
+            if (startTime != null)
+                map.put("startTime", sdf.format(startTime));
+            if (endTime != null)
+                map.put("endTime", sdf.format(endTime));
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
@@ -170,6 +179,7 @@ public class CollectionController {
                 map.put("description", dsc);
             if (pwd != null)
                 map.put("password", pwd);
+            map.put("showIndex", template.getShowIndex());
             map.put("questions", questionMaps);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
@@ -224,7 +234,7 @@ public class CollectionController {
 
             // Authority checks
             String pwd = template.getPassword();
-            if (!template.getReleased())
+            if (!template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date()))
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
