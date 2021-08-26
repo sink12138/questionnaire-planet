@@ -64,10 +64,6 @@
           if (value.length > 20) {
             callback(new Error("用户名过长"));
           }
-          var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]*$/;
-          if (!this.formData.username.match(regx)) {
-            callback(new Error("请同时且仅包含字母数字"));
-          }
           callback();
         }
       };
