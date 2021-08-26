@@ -45,11 +45,6 @@ const routes = [
     ]
   },
   {
-    path: '/register',
-    name: 'Register',
-    component: Register
-  },
-  {
     path: '/adjust',
     name: 'Adjust',
     component: Adjust
