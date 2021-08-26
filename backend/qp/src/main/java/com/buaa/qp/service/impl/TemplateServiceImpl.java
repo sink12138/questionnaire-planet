@@ -107,6 +107,8 @@ public class TemplateServiceImpl implements TemplateService {
     public String updateCode(Integer templateId) {
         Template template = templateDao.selectById(templateId);
         String code = generateCode();
+        if (template == null)
+            return null;
         while (templateDao.selectByCode(code) != null) {
             code = generateCode();
         }
@@ -123,11 +125,11 @@ public class TemplateServiceImpl implements TemplateService {
     private String generateCode() {
         String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
-        StringBuilder stringBuffer = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 10; i++) {
             int number = random.nextInt(62);
-            stringBuffer.append(str.charAt(number));
+            stringBuilder.append(str.charAt(number));
         }
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 }
