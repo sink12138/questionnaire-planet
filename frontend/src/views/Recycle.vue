@@ -33,69 +33,70 @@
     </div>
     <div class="questionnaire">
       <div class="list" style="margin-left: 1%; margin-right: 1%">
-        <div
-        class="cards"
-        v-for="item in allQuest"
-        :key="item.templateId"
-        :offset="1">
-          <el-card shadow="hover">
-            <div class="card">
-              <div class="banner">
-                <div class="title">
-                  <div v-if="item.released == true">
-                    {{ item.title }}(已发布)
-                  </div>
-                  <div v-else>{{ item.title }}(未发布)</div>
-                </div>
-                <div class="type_show">
-                  <question-pic></question-pic>
-                </div>
-              </div>
-              <div class="time">
-                <time> 创建时间:{{ item.creationTime }} </time>
-              </div>
-              <div class="time" v-if="item.releaseTime != undefined">
-                <time> 最后发布:{{ item.releaseTime }} </time>
-              </div>
-              <div class="time" v-else>
-                <time> 最后发布:未曾发布 </time>
-              </div>
-              <div class="time">
-                <time> 收集时长:{{ item.duration }} </time>
-              </div>
-              <div class="time">
-                <strong>收集数量:</strong>{{ item.answerCount }}
-              </div>
-              <div class="bottom clearfix">
-                <div v-if="item.released == true">已发布</div>
-                <div v-else>未发布</div>
+        <el-table :data="searchQue" border style="width: 100%">
+          <div class="title">
+            <el-table-column fixed prop="title" label="标题" width="150">
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="creationTime"
+              label="创建时间"
+              width="150"
+            >
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="releaseTime"
+              label="最后发布"
+              width="150"
+            >
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column fixed prop="duration" label="收集时长" width="150">
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="answerCount"
+              label="收集数量"
+              width="100"
+            >
+            </el-table-column>
+          </div>
+          <div class="bottom clearfix">
+            <el-table-column label="操作" width="200">
+              <template slot-scope="scope">
                 <el-button
                   type="text"
                   class="button"
-                  @click="deleteQuest(item)"
+                  @click="deleteQuest(scope.row)"
                   icon="el-icon-delete-solid"
-                ></el-button>
+                  >彻底删除</el-button
+                >
                 <el-button
                   type="text"
                   class="button"
-                  @click="recover(item)"
+                  @click="recover(scope.row)"
                   icon="el-icon-refresh"
-                ></el-button>
-              </div>
-            </div>
-          </el-card>
-        </div>
+                  >恢复问卷</el-button
+                >
+              </template>
+            </el-table-column>
+          </div>
+        </el-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import svg from "../components/svg-questionnaire.vue";
 export default {
-  components: {
-    "question-pic": svg,
-  },
   data() {
     return {
       search: "",
@@ -123,6 +124,12 @@ export default {
         } else {
           this.allQuest = [];
         }
+        var i = 0;
+        for (i in this.allQuest) {
+          if (this.allQuest[i].releaseTime == undefined) {
+            this.allQuest[i].releaseTime = "未曾发布";
+          }
+        }
         console.log(this.allQuest);
         this.searchQue = this.allQuest;
         console.log(this.searchQue);
@@ -135,7 +142,7 @@ export default {
     handleCurrentChange: function (currentPage) {
       this.current_page = currentPage;
     },
-    deleteQuest(item) {
+    deleteQuest(row) {
       this.$confirm("此操作将永久删除该问卷, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -146,7 +153,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/delete",
             data: JSON.stringify({
-              templateId: item.templateId,
+              templateId: row.templateId,
             }),
           }).then(
             (response) => {
@@ -171,12 +178,12 @@ export default {
           });
         });
     },
-    recover(item) {
+    recover(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/recover",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
@@ -196,7 +203,7 @@ export default {
     },
     creationTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.creationTime < b.creationTime) {
+        if (a.creationTime > b.creationTime) {
           return -1;
         } else if (a.creationTime == b.creationTime) {
           return 0;
@@ -207,7 +214,7 @@ export default {
     },
     releaseTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.releaseTime < b.releaseTime) {
+        if (a.releaseTime > b.releaseTime) {
           return -1;
         } else if (a.releaseTime == b.releaseTime) {
           return 0;

@@ -35,177 +35,182 @@
     </div>
     <div class="questionnaire">
       <div class="list" style="margin-left: 1%; margin-right: 1%">
-        <div
-        class="cards"
-        v-for="item in searchQue"
-        :key="item.templateId">
-          <el-card shadow="hover">
-            <div class="card">
-              <div class="banner">
-                <div class="title">
-                  <div v-if="item.released == true">
-                    {{ item.title }}(已发布)
-                  </div>
-                  <div v-else>{{ item.title }}(未发布)</div>
-                </div>
-                <div class="type_show">
-                  <question-pic></question-pic>
-                </div>
-              </div>
-              <div class="time">
-                <time> 创建时间:{{ item.creationTime }} </time>
-              </div>
-              <div class="time" v-if="item.releaseTime != undefined">
-                <time> 最后发布:{{ item.releaseTime }} </time>
-              </div>
-              <div class="time" v-else>
-                <time> 最后发布:未曾发布 </time>
-              </div>
-              <div class="time">
-                <time> 收集时长:{{ item.duration }} </time>
-              </div>
-              <div class="time">
-                <strong>收集数量:</strong>{{ item.answerCount }}
-              </div>
-              <div class="bottom clearfix">
-                <el-button-group>
+        <el-table :data="searchQue" border style="width: 100%">
+          <div class="title">
+            <el-table-column fixed prop="title" label="标题" width="150">
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="creationTime"
+              label="创建时间"
+              width="150"
+            >
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="releaseTime"
+              label="最后发布"
+              width="150"
+            >
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column fixed prop="duration" label="收集时长" width="150">
+            </el-table-column>
+          </div>
+          <div class="time">
+            <el-table-column
+              fixed
+              prop="answerCount"
+              label="收集数量"
+              width="100"
+            >
+            </el-table-column>
+          </div>
+          <div class="bottom clearfix">
+            <el-table-column label="操作" width="500">
+              <template slot-scope="scope">
+                <el-button
+                  @click="adjust(scope.row)"
+                  type="text"
+                  icon="el-icon-edit"
+                  >微调</el-button
+                >
+                <el-button
+                  type="text"
+                  @click="statistics(scope.row)"
+                  icon="el-icon-pie-chart"
+                  >数据分析</el-button
+                >
+                <el-button
+                  type="text"
+                  @click="release(scope.row)"
+                  icon="el-icon-video-play"
+                  v-if="scope.row.released == false"
+                  >发布</el-button
+                >
+                <el-button
+                  type="text"
+                  @click="close(scope.row)"
+                  icon="el-icon-video-pause"
+                  v-else
+                  >关闭</el-button
+                >
+                <el-dropdown>
                   <el-button
                     type="text"
-                    class="button"
-                    @click="adjust(item)"
-                    icon="el-icon-edit"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="statistics(item)"
-                    icon="el-icon-pie-chart"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="release(item)"
-                    icon="el-icon-video-play"
-                    v-if="item.released == false"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="close(item)"
-                    icon="el-icon-video-pause"
-                    v-else
-                  ></el-button>
-                  <el-dropdown>
-                    <el-button
-                      type="text"
-                      icon="el-icon-more"
-                      style="color: black"
-                    ></el-button>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item>
-                        <el-button
-                          type="text"
-                          class="button"
-                          @click="edit(item)"
-                          icon="el-icon-edit-outline"
-                          >编辑</el-button
-                        >
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="remove(item)"
-                          icon="el-icon-delete"
-                          >删除</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="clone(item)"
-                          icon="el-icon-document-copy"
-                          >复制</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="preview(item)"
-                          icon="el-icon-view"
-                          >预览</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item>
-                        <el-button 
+                    icon="el-icon-more"
+                    style="color: black"
+                    >更多操作</el-button
+                  >
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>
+                      <el-button
                         type="text"
                         class="button"
-                        @click="qr(item)"
-                        icon="el-icon-share">分享
-                        </el-button>
-                        <el-dialog
-                          :append-to-body="true"
-                          title="分享问卷"
-                          :visible.sync="dialogVisible"
-                          width="30%"
-                          :before-close="handleClose"
-                          center
-                        >
-                          <div class="share">
-                            <div>
-                              <vue-qr
-                                ref="Qrcode"
-                                :text="qrData.text"
-                                :logoSrc="qrData.logo"
-                              >
-                              </vue-qr>
-                            </div>
-                            <div>
-                              <el-button
-                                style="margin: 10px"
-                                class="tag-copy"
-                                @click="copyShareLink"
-                                :data-clipboard-text="qrData.text"
-                              >
-                                复制链接
-                              </el-button>
-                              <a
-                                style="margin: 10px"
-                                :href="exportLink"
-                                @click="downloadImg"
-                                :download="downloadFilename"
-                              >
-                                <el-button>下载二维码</el-button>
-                              </a>
-                            </div>
+                        @click="edit(scope.row)"
+                        icon="el-icon-edit-outline"
+                        >编辑</el-button
+                      >
+                    </el-dropdown-item>
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="remove(scope.row)"
+                        icon="el-icon-delete"
+                        >删除</el-button
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="clone(scope.row)"
+                        icon="el-icon-document-copy"
+                        >复制</el-button
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="preview(scope.row)"
+                        icon="el-icon-view"
+                        >预览</el-button
+                      ></el-dropdown-item
+                    >
+                    <el-dropdown-item>
+                      <el-button
+                        type="text"
+                        class="button"
+                        @click="qr(scope.row)"
+                        icon="el-icon-share"
+                        >分享
+                      </el-button>
+                      <el-dialog
+                        :append-to-body="true"
+                        title="分享问卷"
+                        :visible.sync="dialogVisible"
+                        width="30%"
+                        :before-close="handleClose"
+                        center
+                      >
+                        <div class="share">
+                          <div>
+                            <vue-qr
+                              ref="Qrcode"
+                              :text="qrData.text"
+                              :logoSrc="qrData.logo"
+                            >
+                            </vue-qr>
                           </div>
-                        </el-dialog>
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </el-button-group>
-              </div>
-            </div>
-          </el-card>
-        </div>
+                          <div>
+                            <el-button
+                              style="margin: 10px"
+                              class="tag-copy"
+                              @click="copyShareLink"
+                              :data-clipboard-text="qrData.text"
+                            >
+                              复制链接
+                            </el-button>
+                            <a
+                              style="margin: 10px"
+                              :href="exportLink"
+                              @click="downloadImg"
+                              :download="downloadFilename"
+                            >
+                              <el-button>下载二维码</el-button>
+                            </a>
+                          </div>
+                        </div>
+                      </el-dialog>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+              </template>
+            </el-table-column>
+          </div>
+        </el-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import svg from "../components/svg-history.vue";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";
 export default {
   components: {
-    "question-pic": svg,
     VueQr,
   },
   data() {
     return {
+      code: "",
       search: "",
       quest: 0,
       total: 0,
@@ -240,6 +245,12 @@ export default {
         } else {
           this.allQuest = [];
         }
+        var i = 0;
+        for (i in this.allQuest) {
+          if (this.allQuest[i].releaseTime == undefined) {
+            this.allQuest[i].releaseTime = "未曾发布";
+          }
+        }
         console.log(this.allQuest);
         this.searchQue = this.allQuest;
         console.log(this.searchQue);
@@ -248,7 +259,7 @@ export default {
     },
     creationTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.creationTime < b.creationTime) {
+        if (a.creationTime > b.creationTime) {
           return -1;
         } else if (a.creationTime == b.creationTime) {
           return 0;
@@ -259,7 +270,7 @@ export default {
     },
     releaseTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.releaseTime < b.releaseTime) {
+        if (a.releaseTime > b.releaseTime) {
           return -1;
         } else if (a.releaseTime == b.releaseTime) {
           return 0;
@@ -300,43 +311,47 @@ export default {
       }
       this.total = this.searchQue.length;
     },
-    adjust(item) {
-      if (item.released == false) {
-        this.quest = item.templateId;
+    adjust(row) {
+      if (row.released == false) {
+        this.code = row.code;
+        this.quest = row.templateId;
         console.log(this.quest);
-        this.$router.push("/adjust?templateId=" + this.quest);
+        this.$router.push("/adjust?templateId=" + this.quest + "&code=" + this.code);
       } else {
         this.$message({
           message: "问卷已发布！",
         });
       }
     },
-    edit(item) {
-      if (item.type == "normal") {
-        if (item.released == false) {
-          this.quest = item.templateId;
+    edit(row) {
+      if (row.type == "normal") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/normal/edit?templateId=" + this.quest);
+          this.$router.push("/normal/edit?templateId=" + this.quest + "&code=" + this.code);
         } else {
           this.$message({
             message: "问卷已发布！",
           });
         }
-      } else if (item.type == "vote") {
-        if (item.released == false) {
-          this.quest = item.templateId;
+      } else if (row.type == "vote") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/vote/edit?templateId=" + this.quest);
+          this.$router.push("/vote/edit?templateId=" + this.quest + "&code=" + this.code);
         } else {
           this.$message({
             message: "问卷已发布！",
           });
         }
-      } else if (item.type == "sign-up") {
-        if (item.released == false) {
-          this.quest = item.templateId;
+      } else if (row.type == "sign-up") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
           console.log(this.quest);
-          this.$router.push("/apply/edit?templateId=" + this.quest);
+          this.$router.push("/apply/edit?templateId=" + this.quest + "&code=" + this.code);
         } else {
           this.$message({
             message: "问卷已发布！",
@@ -344,12 +359,12 @@ export default {
         }
       }
     },
-    release(item) {
+    release(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/release",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
@@ -359,11 +374,11 @@ export default {
               message: "问卷发布成功！",
               type: "success",
             });
-            this.templateId = item.templateId;
+            this.templateId = row.templateId;
             this.qrData.text =
               window.location.host + "/fill?templateId=" + this.templateId;
             this.dialogVisible = true;
-            item.released = true;
+            row.released = true;
           }
         },
         (err) => {
@@ -371,18 +386,18 @@ export default {
         }
       );
     },
-    qr(item) {
-      this.templateId = item.templateId;
+    qr(row) {
+      this.templateId = row.templateId;
       this.qrData.text =
         window.location.host + "/fill?templateId=" + this.templateId;
       this.dialogVisible = true;
     },
-    close(item) {
+    close(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/close",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
@@ -400,12 +415,12 @@ export default {
         }
       );
     },
-    clone(item) {
+    clone(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/clone",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
@@ -423,7 +438,7 @@ export default {
         }
       );
     },
-    remove(item) {
+    remove(row) {
       this.$confirm("此操作将删除该问卷, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -434,7 +449,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/remove",
             data: JSON.stringify({
-              templateId: item.templateId,
+              templateId: row.templateId,
             }),
           }).then(
             (response) => {
@@ -459,10 +474,11 @@ export default {
           });
         });
     },
-    preview(item) {
-      this.quest = item.templateId;
+    preview(row) {
+      this.quest = row.templateId;
+      this.code = row.code;
       console.log(this.quest);
-      this.$router.push("/preview?templateId=" + this.quest);
+      this.$router.push("/preview?templateId=" + this.quest + "&code=" + this.code);
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");
@@ -481,11 +497,11 @@ export default {
       this.exportLink = Qrcode.$el.currentSrc;
       this.downloadFilename = "Questionnaire";
     },
-    statistics(item) {
-      this.quest = item.templateId;
+    statistics(row) {
+      this.quest = row.templateId;
       console.log(this.quest);
       this.$router.push("/statistics?templateId=" + this.quest);
-    }
+    },
   },
 };
 </script>
@@ -503,11 +519,6 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   flex-flow: row wrap;
-}
-.cards {
-  width: 16%;
-  margin-right: 5px;
-  margin-bottom: 5px;
 }
 .card {
   display: flex;
