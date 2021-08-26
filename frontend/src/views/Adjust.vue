@@ -274,23 +274,24 @@
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'vote'">
-                        至少选择{{ item.min }}项
                         <el-form-item
                           label="选项"
                           :rules="{
                             required: item.required,
                           }"
                         >
-                          <el-radio-group
-                            v-model="answers[index_question]"
+                          <el-checkbox-group
+                            v-model="multi"
                             v-for="(i, index) in item.choices"
+                            :min="0"
+                            :max="item.max"
                             :key="index"
-                            @change="changeValue"
+                            @change="multiChangeValue(index_question)"
                           >
-                            <el-radio class="option" :label="index">{{
+                            <el-checkbox class="option" :label="index" border>{{
                               i
-                            }}</el-radio>
-                          </el-radio-group>
+                            }}</el-checkbox>
+                          </el-checkbox-group>
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'sign-up'">
