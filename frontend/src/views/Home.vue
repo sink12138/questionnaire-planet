@@ -49,9 +49,6 @@ export default {
 </script>
 
 <style scoped>
-#svg1 {
-  color: #ffffff;
-}
 .home {
   background-image: url("../assets/Home_bg.jpg");
   background-size: 100%;
