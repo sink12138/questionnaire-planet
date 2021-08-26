@@ -58,23 +58,18 @@ export default {
     this.lefttime = Math.floor((new Date(this.deadlline).getTime() / 1000) - this.nowtime);
 
     this.timer = setInterval(()=>{
+      this.lefttime--;
 
-      console.log(typeof this.lefttime)
-      console.log(this.lefttime)
-      console.log(this.second)
+      this.day = Math.floor(this.lefttime / (60 * 60 * 24));
+      this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
+      this.minute = Math.floor(this.lefttime / 60) - 24 * 60 * this.day - 60 * this.hour;
+      this.second = Math.floor(this.lefttime) - 24 * 60 * 60 * this.day - 60 * 60 * this.hour - 60 * this.minute;
 
-        this.lefttimes--;
-
-        this.day = Math.floor(this.lefttime / (60 * 60 * 24));
-        this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
-        this.minute = Math.floor(this.lefttime / 60) - 24 * 60 * this.day - 60 * this.hour;
-        this.second = Math.floor(this.lefttime) - 24 * 60 * 60 * this.day - 60 * 60 * this.hour - 60 * this.minute;
-
-        if(this.lefttimes == 0){
-          this.submit();
-          clearInterval(this.timer);
-        }
-      },1000)
+      if(this.lefttime == 0){
+        this.submit();
+        clearInterval(this.timer);
+      }
+    },1000)
   },
   methods: {
     submit() {
