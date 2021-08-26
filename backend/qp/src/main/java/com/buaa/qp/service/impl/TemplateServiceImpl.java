@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -44,6 +45,12 @@ public class TemplateServiceImpl implements TemplateService {
     public Integer submitTemplate(Template template, ArrayList<Question> questions) {
         templateDao.insert(template);
         Integer templateId = template.getTemplateId();
+        String code = generateCode();
+        while (templateDao.selectByCode(code) != null) {
+            code = generateCode();
+        }
+        template.setCode(code);
+        templateDao.updateCode(template);
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
@@ -95,5 +102,33 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public void adjustTemplate(Template template) {
         templateDao.update(template);
+    }
+
+    @Override
+    public String updateCode(Integer templateId) {
+        Template template = templateDao.selectById(templateId);
+        String code = generateCode();
+        while (templateDao.selectByCode(code) != null) {
+            code = generateCode();
+        }
+        template.setCode(code);
+        templateDao.updateCode(template);
+        return code;
+    }
+
+    @Override
+    public Template getTemplateByCode(String code) {
+        return templateDao.selectByCode(code);
+    }
+
+    private String generateCode() {
+        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder stringBuffer = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            int number = random.nextInt(62);
+            stringBuffer.append(str.charAt(number));
+        }
+        return stringBuffer.toString();
     }
 }

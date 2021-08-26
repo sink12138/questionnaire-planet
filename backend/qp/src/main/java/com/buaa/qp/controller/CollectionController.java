@@ -36,27 +36,19 @@ public class CollectionController {
     private static final Object quotaLock = new Object();
 
     @GetMapping("/attempt")
-    public Map<String, Object> locked(@RequestParam(value = "templateId", required = false) String idStr) {
+    public Map<String, Object> locked(@RequestParam(value = "code", required = false) String code) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Parameter checks
-            int templateId;
-            if (idStr == null)
+            if (code == null)
                 throw new ParameterFormatException();
-            try {
-                templateId = Integer.parseInt(idStr);
-            } catch (Exception e) {
-                throw new ParameterFormatException();
-            }
-            if (templateId < 0) {
-                throw new ParameterFormatException();
-            }
-            Template template = templateService.getTemplate(templateId);
+            Template template = templateService.getTemplateByCode(code);
             if (template == null || template.getDeleted()) {
                 throw new ObjectNotFoundException();
             } else if (!template.getReleased()) {
                 throw new ExtraMessageException("问卷尚未发布, 无法访问");
             }
+            Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (template.getType().equals("vote")) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
@@ -80,31 +72,23 @@ public class CollectionController {
     }
 
     @GetMapping("/details")
-    public Map<String, Object> details(@RequestParam(value = "templateId", required = false) String idStr,
+    public Map<String, Object> details(@RequestParam(value = "code", required = false) String code,
                                        @RequestParam(value = "password", required = false) String password,
                                        @RequestParam(value = "visitor", required = false) String vStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Parameter checks
-            int templateId;
             boolean visitor = Boolean.parseBoolean(vStr);
-            if (idStr == null)
-                throw new ParameterFormatException();
-            try {
-                templateId = Integer.parseInt(idStr);
-            }
-            catch (NumberFormatException nfe) {
-                throw new ParameterFormatException();
-            }
-            if (templateId <= 0)
+            if (code == null)
                 throw new ParameterFormatException();
 
             if (password != null && password.isEmpty()) password = null;
 
             // Existence checks
-            Template template = templateService.getTemplate(templateId);
+            Template template = templateService.getTemplateByCode(code);
             if (template == null)
                 throw new ObjectNotFoundException();
+            int templateId = template.getTemplateId();
 
             // Login checks
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
@@ -191,19 +175,19 @@ public class CollectionController {
         Map<String, Object> map = new HashMap<>();
         try {
             // General parameter checks
-            Integer templateId;
+            String code;
             String password;
             ArrayList<Object> answers;
             ClassParser parser = new ClassParser();
             try {
-                templateId = (Integer) requestMap.get("templateId");
+                code = (String) requestMap.get("code");
                 password = (String) requestMap.get("password");
                 answers = parser.toObjectList(requestMap.get("answers"));
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
             }
-            if (templateId == null || templateId <= 0)
+            if (code == null)
                 throw new ParameterFormatException();
             if (answers == null)
                 throw new ParameterFormatException();
@@ -211,9 +195,10 @@ public class CollectionController {
             if (password != null && password.isEmpty()) password = null;
 
             // Existence checks
-            Template template = templateService.getTemplate(templateId);
+            Template template = templateService.getTemplateByCode(code);
             if (template == null)
                 throw new ObjectNotFoundException();
+            int templateId = template.getTemplateId();
 
             // Login checks
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");

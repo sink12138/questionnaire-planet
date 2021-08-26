@@ -23,4 +23,8 @@ public interface TemplateDao {
     int deleteByTid(Integer templateId);
 
     String selectDuration(Integer templateId);
+
+    Template selectByCode(String code);
+
+    void updateCode(Template template);
 }

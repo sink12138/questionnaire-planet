@@ -43,9 +43,11 @@ public class Template {
 
     private Boolean showIndex;
 
-    public Template() {
+    private String code;
 
+    public Template() {
     }
+
 
     public Template(String type, Integer owner, String title, String description, String password, String conclusion) {
         this.type = type;

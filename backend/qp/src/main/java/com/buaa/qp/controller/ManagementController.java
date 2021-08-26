@@ -58,6 +58,7 @@ public class ManagementController {
                         templateMap.put("releaseTime", sdf.format(releaseTime));
                     templateMap.put("duration", result.getDuration());
                     templateMap.put("answerCount", answerService.countAnswers(templateId));
+                    templateMap.put("code", result.getCode());
                     templates.add(templateMap);
                 }
             }
@@ -113,6 +114,7 @@ public class ManagementController {
                 throw new ExtraMessageException("无法操作已删除的问卷");
 
             templateService.releaseTemplate(templateId, true);
+            map.put("code", template.getCode());
             map.put("success", true);
         }
         catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException |
@@ -344,6 +346,45 @@ public class ManagementController {
 
         } catch (LoginVerificationException | ParameterFormatException |
                 ObjectNotFoundException | ExtraMessageException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @PostMapping("/code")
+    public Map<String, Object> code(@RequestBody Map<String, Object> requestMap) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Login checks
+            Integer accountId = accountService.getAccountBySession(request.getSession()).getAccountId();
+            Integer templateId;
+
+            // Parameter checks
+            try {
+                templateId = (Integer) requestMap.get("templateId");
+            } catch (Exception e) {
+                throw new ParameterFormatException();
+            }
+            if (templateId == null || templateId < 0) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(templateId);
+            if (template == null || template.getDeleted()) {
+                throw new ObjectNotFoundException();
+            } else if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new ParameterFormatException();
+            }
+
+            map.put("success", true);
+            map.put("code", templateService.updateCode(templateId));
+
+        } catch (LoginVerificationException | ParameterFormatException |
+                ObjectNotFoundException  exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {

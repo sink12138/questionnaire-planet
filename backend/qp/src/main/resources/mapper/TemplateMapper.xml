@@ -15,8 +15,8 @@
         where template_id = #{templateId}
     </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(type, owner, title, description, password, creation_time, conclusion, quota, show_index)
-        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion}, #{quota}, #{showIndex})
+        insert into template(type, owner, title, description, password, creation_time, conclusion, quota, show_index, code)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion}, #{quota}, #{showIndex}, #{code})
     </insert>
     <update id="update" parameterType="Template">
         update template
@@ -60,4 +60,10 @@
         from template
         where template_id = #{templateId}
     </select>
+    <select id="selectByCode" resultType="Template" parameterType="String">
+        select * from template where code = #{code}
+    </select>
+    <update id="updateCode" parameterType="Template">
+        update template set code = #{code} where template_id = #{templateId}
+    </update>
 </mapper>

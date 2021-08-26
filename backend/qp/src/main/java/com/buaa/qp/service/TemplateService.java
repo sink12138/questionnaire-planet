@@ -23,4 +23,8 @@ public interface TemplateService {
     void deleteTemplate(Integer templateId);
 
     void adjustTemplate(Template template);
+
+    String updateCode(Integer templateId);
+
+    Template getTemplateByCode(String code);
 }
