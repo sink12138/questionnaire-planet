@@ -908,12 +908,13 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.code = response.data.code;
                 this.templateId = response.data.templateId;
                 this.$message({
                   message: "问卷保存成功！",
                   type: "success",
                 });
-                this.$router.push("/preview?templateId=" + this.templateId);
+                this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$message({
                   message: response.data.message,

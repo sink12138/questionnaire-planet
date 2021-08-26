@@ -803,11 +803,12 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
+                this.code = response.data.code;
                 this.$message({
                   message: "问卷保存成功！",
                   type: "success",
                 });
-                this.$router.push("/preview?templateId=" + this.templateId);
+                this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$message({
                   message: response.data.message,
