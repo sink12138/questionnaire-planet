@@ -5,6 +5,7 @@
     </el-header>
 
     <div class="timer">
+      <el-input v-model="deadlline" autocomplete="off" style="width: 300px" placeholder="请输入截止日期"></el-input>
       <p>截止时间：{{ deadlline }}</p>
       <p>剩余时间：{{ lefttime }}s</p>
     </div>
@@ -24,7 +25,7 @@
 export default {
   data() {
     return {
-      deadlline: "2021-08-26 16:20:00",
+      deadlline: "",
       nowtime: "",
       lefttime: 0,
       counter: 0,
