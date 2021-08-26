@@ -308,9 +308,8 @@
     </div>
   </div>
 </template>
-
 <script>
-import logo from "../components/svg-logo.vue";
+import logo from "../components/svg_logo.vue";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";
 export default {
