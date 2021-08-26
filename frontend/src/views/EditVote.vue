@@ -11,60 +11,104 @@
               </div>
             </router-link>
             <div class="info">拖拽题目以改变顺序</div>
-            <div class="editor-add">
-              <el-button @click="addQuestion">新增题目</el-button>
-            </div>
-            <div class="editor-save">
-              <el-button @click="addSubmit()">保存问卷</el-button>
-            </div>
-            <div class="editor-reset">
-              <el-button @click="resetForm('modelForm')">重置</el-button>
-            </div>
-            <div class="preview">
-              <el-button @click="preview()">预览</el-button>
-            </div>
-            <div class="publish">
-              <el-button @click="publishQuestion" type="primary"
-                >发布问卷</el-button
-              >
-              <el-dialog
-                :append-to-body="true"
-                title="分享问卷"
-                :visible.sync="dialogVisible"
-                width="30%"
-                :before-close="handleClose"
-                center
-              >
-                <div class="share">
-                  <div>
-                    <vue-qr
-                      ref="Qrcode"
-                      :text="qrData.text"
-                      :logoSrc="qrData.logo"
-                    >
-                    </vue-qr>
+            <el-menu @open="handleOpen" @close="handleClose">
+            <el-submenu index="1">
+              <template slot="title">
+                <div class="editor-add"><el-button type="text">新增题目</el-button></div>
+              </template>
+              <el-menu-item-group>
+                <el-menu-item index="1-1"
+                  ><el-button @click="addQuestion(0)" type="text"
+                    >单选题</el-button
+                  ></el-menu-item
+                >
+                <el-menu-item index="1-2"
+                  ><el-button @click="addQuestion(1)" type="text"
+                    >多选题</el-button
+                  ></el-menu-item
+                >
+                <el-menu-item index="1-3"
+                  ><el-button @click="addQuestion(2)" type="text"
+                    >填空题</el-button
+                  ></el-menu-item
+                >
+                <el-menu-item index="1-4"
+                  ><el-button @click="addQuestion(3)" type="text"
+                    >评分题</el-button
+                  ></el-menu-item
+                >
+                <el-menu-item index="1-5"
+                  ><el-button @click="addQuestion(4)" type="text"
+                    >下拉题</el-button
+                  ></el-menu-item
+                >
+                <el-menu-item index="1-6"
+                  ><el-button @click="addQuestion(5)" type="text"
+                    >投票题</el-button
+                  ></el-menu-item
+                >
+              </el-menu-item-group>
+            </el-submenu>
+            <el-menu-item index="2">
+              <div class="editor-save">
+                <el-button @click="addSubmit()" type="text">保存问卷</el-button>
+              </div>
+            </el-menu-item>
+            <el-menu-item index="3" >
+              <div class="editor-reset">
+                <el-button @click="resetForm('modelForm')" type="text">重置</el-button>
+              </div>
+            </el-menu-item>
+            <el-menu-item index="4">
+              <div class="preview">
+                <el-button @click="preview()" type="text">预览</el-button>
+              </div>
+            </el-menu-item>
+            <el-menu-item index="5">
+              <div class="publish">
+                <el-button @click="publishQuestion" type="text"
+                  >发布问卷</el-button
+                >
+                <el-dialog
+                  :append-to-body="true"
+                  title="分享问卷"
+                  :visible.sync="dialogVisible"
+                  width="30%"
+                  :before-close="handleClose"
+                  center
+                >
+                  <div class="share">
+                    <div>
+                      <vue-qr
+                        ref="Qrcode"
+                        :text="qrData.text"
+                        :logoSrc="qrData.logo"
+                      >
+                      </vue-qr>
+                    </div>
+                    <div>
+                      <el-button
+                        style="margin: 10px"
+                        class="tag-copy"
+                        @click="copyShareLink"
+                        :data-clipboard-text="qrData.text"
+                      >
+                        复制链接
+                      </el-button>
+                      <a
+                        style="margin: 10px"
+                        :href="exportLink"
+                        @click="downloadImg"
+                        :download="downloadFilename"
+                      >
+                        <el-button>下载二维码</el-button>
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <el-button
-                      style="margin: 10px"
-                      class="tag-copy"
-                      @click="copyShareLink"
-                      :data-clipboard-text="qrData.text"
-                    >
-                      复制链接
-                    </el-button>
-                    <a
-                      style="margin: 10px"
-                      :href="exportLink"
-                      @click="downloadImg"
-                      :download="downloadFilename"
-                    >
-                      <el-button>下载二维码</el-button>
-                    </a>
-                  </div>
-                </div>
-              </el-dialog>
-            </div>
+                </el-dialog>
+              </div>
+            </el-menu-item>
+          </el-menu>
           </div>
         </el-aside>
         <el-main>
@@ -423,13 +467,6 @@
                   </el-collapse-item>
                 </vuedraggable>
               </el-collapse>
-              <div class="foot">
-                <el-button
-                  icon="el-icon-circle-plus-outline"
-                  @click="addQuestion"
-                  >新增题目</el-button
-                >
-              </div>
             </div>
           </el-form>
         </el-main>
@@ -683,10 +720,10 @@ export default {
       // 新增选项
       this.modelForm.questions[index].answers.push({ value: "" });
     },
-    addQuestion() {
+    addQuestion(index) {
       // 新增题目
       this.modelForm.questions.push({
-        type: "0",
+        type: index.toString(),
         required: true,
         questionName: "",
         questionSummary: "",
