@@ -270,13 +270,16 @@ public class TemplateController {
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion, quota, showIndex);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);
+
             }
             else {
                 newTemplate.setTemplateId(templateId);
                 templateService.modifyTemplate(newTemplate, questions);
             }
+            String code = templateService.getTemplate(templateId).getCode();
             map.put("success", true);
             map.put("templateId", templateId);
+            map.put("code", code);
         }
         catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
