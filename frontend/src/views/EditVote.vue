@@ -260,7 +260,7 @@
                       <!-- 最小选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-if="item.type == 1 || item.type == 5"
+                          v-if="item.type == 1"
                           :prop="`questions.${index}.min`"
                           label="最小选项"
                           :rules="[
@@ -283,7 +283,7 @@
                       <!-- 最大选项 -->
                       <el-col :span="10">
                         <el-form-item
-                          v-if="item.type == 1 || item.type == 5"
+                          v-if="item.type == 1"
                           :prop="`questions.${index}.max`"
                           label="最大选项"
                           :rules="[
@@ -462,18 +462,18 @@ export default {
             },
           },
           {
-            text: "昨天",
+            text: "明天",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              date.setTime(date.getTime() + 3600 * 1000 * 24);
               picker.$emit("pick", date);
             },
           },
           {
-            text: "一周前",
+            text: "一周后",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
               picker.$emit("pick", date);
             },
           },
@@ -596,8 +596,8 @@ export default {
                 break;
               case "vote":
                 question.type = "5";
-                question.max = item.max;
-                question.min = item.min;
+                question.max = 1;
+                question.min = 1;
                 for (j in item.choices) {
                   question.answers.push({ value: item.choices[j], scores: 0 });
                 }
@@ -769,17 +769,8 @@ export default {
                 break;
               case "5":
                 quest.type = "vote";
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
+                quest.max = 1;
+                quest.min = 1;
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
@@ -898,17 +889,8 @@ export default {
                 break;
               case "5":
                 quest.type = "vote";
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
+                quest.max = 1;
+                quest.min = 1;
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);
@@ -1028,17 +1010,8 @@ export default {
                 break;
               case "5":
                 quest.type = "vote";
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
+                quest.max = 1;
+                quest.min = 1;
                 for (j in question.answers) {
                   x = question.answers[j];
                   quest.choices.push(x.value);

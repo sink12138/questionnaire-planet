@@ -281,18 +281,16 @@
                             required: item.required,
                           }"
                         >
-                          <el-checkbox-group
-                            v-model="multi"
+                          <el-radio-group
+                            v-model="answers[index_question]"
                             v-for="(i, index) in item.choices"
-                            :min="0"
-                            :max="item.max"
                             :key="index"
-                            @change="multiChangeValue(index_question)"
+                            @change="changeValue"
                           >
-                            <el-checkbox class="option" :label="index" border>{{
+                            <el-radio class="option" :label="index">{{
                               i
-                            }}</el-checkbox>
-                          </el-checkbox-group>
+                            }}</el-radio>
+                          </el-radio-group>
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'sign-up'">

@@ -484,30 +484,30 @@ export default {
             },
           },
           {
-            text: "昨天",
+            text: "明天",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              date.setTime(date.getTime() + 3600 * 1000 * 24);
               picker.$emit("pick", date);
             },
           },
           {
-            text: "一周前",
+            text: "一周后",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              date.setTime(date.getTime() + 3600 * 1000 * 24 * 7);
               picker.$emit("pick", date);
             },
           },
         ],
       },
-      activeNames: [0, 1],
+      activeNames: [0,1,2],
       template: {},
       rules: {},
       templateId: 0,
       code: "",
       modelForm: {
-        title: "新的问卷",
+        title: "报名问卷",
         description: "",
         conclusion: "",
         showIndex: true,
@@ -515,10 +515,10 @@ export default {
         quota: undefined,
         questions: [
           {
-            type: "0",
+            type: "2",
             required: true,
-            questionName: "",
-            questionSummary: "",
+            questionName: "你的姓名是",
+            questionSummary: "请输入你的姓名",
             max: 2,
             min: 1,
             height: 1,
@@ -530,10 +530,10 @@ export default {
             ],
           },
           {
-            type: "0",
+            type: "2",
             required: true,
-            questionName: "",
-            questionSummary: "",
+            questionName: "你的手机号是",
+            questionSummary: "请输入你的手机号",
             max: 2,
             min: 1,
             height: 1,
@@ -542,6 +542,21 @@ export default {
             answers: [
               { value: "", number: 0 },
               { value: "", number: 0 },
+            ],
+          },
+          {
+            type: "5",
+            required: true,
+            questionName: "你要报名的活动是",
+            questionSummary: "请选择要报名的活动",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [
+              { value: "活动1", number: 10 },
+              { value: "活动2", number: 10 },
             ],
           },
         ],
