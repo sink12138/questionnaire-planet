@@ -118,12 +118,10 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
-  console.log(sessionStorage.getItem("isLogin"));
-  if(sessionStorage.getItem("isLogin") == true || to.path == "/") {
+  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/") {
     next();
   }
   else {
-    console.log(sessionStorage.getItem("isLogin"));
     next("/");
     ElementUI.Notification({
       title: '需要登录',
