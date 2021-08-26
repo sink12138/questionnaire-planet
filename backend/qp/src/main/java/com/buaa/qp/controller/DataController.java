@@ -73,7 +73,7 @@ public class DataController {
             for (int i = 0; i < answers.size(); i++) {
                 Map<String, Object> answerMap = new HashMap<>();
                 answerMap.put("answerId", answers.get(i).getAnswerId());
-                answerMap.put("answerTime", sdf.format(answers.get(i).getSubmitTime()));
+                answerMap.put("answerTime", answersInFormat.get(i + 1).get(questions.size() + 1));
                 for (int j = 0; j < questions.size(); j ++) {
                     answerMap.put(answersInFormat.get(0).get(j + 1), answersInFormat.get(i + 1).get(j + 1));
                 }
@@ -337,14 +337,16 @@ public class DataController {
 
     private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
-        ArrayList<String> stems = new ArrayList<>();
-        stems.add(null);
+        ArrayList<String> firstRow = new ArrayList<>();
+        firstRow.add(null);
         int indexOfStem = 1;
         for (Question question : questions) {
-            stems.add(indexOfStem + "." + question.getStem());
+            firstRow.add(indexOfStem + "." + question.getStem());
             indexOfStem += 1;
         }
-        answersInFormat.add(stems);
+        firstRow.add("提交时间");
+        firstRow.add("用户名");
+        answersInFormat.add(firstRow);
         for (Answer answer : answers) {
             ArrayList<String> answerInFormat = new ArrayList<>();
             answerInFormat.add(answer.getAnswerId().toString());
@@ -424,6 +426,7 @@ public class DataController {
                 }
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
             answerInFormat.add(sdf.format(answer.getSubmitTime()));
             Integer accountId = answer.getSubmitter();
             if (accountId != null) {
