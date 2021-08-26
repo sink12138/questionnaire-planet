@@ -196,7 +196,7 @@
             </el-table-column>
           </div>
         </el-table>
-      </div>../components/Svg-history.vue
+      </div>
     </div>
   </div>
 </template>

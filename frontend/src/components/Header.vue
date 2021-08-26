@@ -6,9 +6,11 @@
         <div class="web-title">问卷星球</div>
       </div>
     </router-link>
-    <div class="router">
-      创建问卷
-    </div>
+    <router-link to="/questionnaire">
+      <div class="router">
+        创建问卷
+      </div>
+    </router-link>
     <div class="router">
       个人问卷
     </div>
