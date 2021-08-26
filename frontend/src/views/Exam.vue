@@ -58,6 +58,8 @@ export default {
     this.lefttime = (new Date(this.deadlline).getTime() / 1000) - this.nowtime;
 
     this.timer = setInterval(()=>{
+      console.log(typeof this.lefttime)
+
         this.lefttimes--;
 
         this.day = Math.floor(this.lefttime / (60 * 60 * 24));
