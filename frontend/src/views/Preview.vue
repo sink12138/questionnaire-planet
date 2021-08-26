@@ -212,6 +212,7 @@ export default {
   data() {
     return {
       templateId: 0,
+      code: "",
       locked: false,
       title: "问卷标题",
       type: "normal",
@@ -272,26 +273,13 @@ export default {
   },
   created: function () {
     this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
-      url: "http://139.224.50.146:80/apis/attempt",
-      params: { templateId: this.templateId },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.data.success == true) {
-          this.locked = response.data.locked;
-        } else {
-          console.log(response.data.message);
-        }
-      })
-      .catch((err) => console.log(err));
-    this.$axios({
-      method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { templateId: this.templateId, password: "" },
+      params: { code: this.code, password: "" },
     })
       .then((response) => {
         console.log(response);

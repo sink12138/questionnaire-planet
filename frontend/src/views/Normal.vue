@@ -429,6 +429,7 @@ export default {
       template: {},
       rules: {},
       templateId: 0,
+      code: "",
       modelForm: {
         title: "新的问卷",
         description: "",
@@ -870,7 +871,7 @@ export default {
                   method: "post",
                   url: "http://139.224.50.146:80/apis/release",
                   data: JSON.stringify({
-                    templateId: parseInt(this.templateId),
+                    code: this.code,
                   }),
                 }).then(
                   (response) => {
@@ -880,10 +881,11 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
+                      this.code = response.data.code;
                       this.qrData.text =
                         window.location.host +
-                        "/fill?templateId=" +
-                        this.templateId;
+                        "/fill?code=" +
+                        this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({

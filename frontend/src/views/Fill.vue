@@ -19,7 +19,7 @@
             style="width: 300px"
             placeholder="请输入您的电子邮箱"
             v-focus
-            @keyup.enter.native="pressEnter"
+            @keyup.enter.native="tologin"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -33,7 +33,7 @@
             show-password
             style="width: 300px"
             placeholder="请输入密码"
-            @keyup.enter.native="pressEnter"
+            @keyup.enter.native="tologin"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -53,7 +53,7 @@
       :close-on-click-modal="false"
       :before-close="goBack"
     >
-      <el-form :model="password">
+      <el-form :model="password" @submit.native.prevent>
         <el-form-item
           label="问卷密码"
           :label-width="formLabelWidth"
@@ -66,7 +66,7 @@
             style="width: 300px"
             placeholder="请输入问卷密码"
             v-focus
-            @keyup.enter.native="pressEnter"
+            @keyup.enter.native="unlock"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -302,7 +302,7 @@ export default {
       }
     };
     return {
-      templateId: 0,
+      code: "",
       submitted: false,
       isVote: false,
       locked: false,
@@ -335,13 +335,13 @@ export default {
     };
   },
   created: function () {
-    this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/attempt",
-      params: { templateId: this.templateId },
+      params: { code: this.code },
     })
       .then((response) => {
         console.log(response);
@@ -362,7 +362,7 @@ export default {
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
-                params: { templateId: this.templateId, visitor: true },
+                params: { code: this.code, visitor: true },
               })
                 .then((response) => {
                   console.log(response);
@@ -412,16 +412,6 @@ export default {
     this.canvas = el;
   },
   methods: {
-    pressEnter: function () {
-      if (this.dialogFormVisible1 == true) {
-        this.tologin();
-        console.log(1111);
-      }
-      if (this.dialogFormVisible2 == true) {
-        this.unlock();
-        console.log("???");
-      }
-    },
     step: function (i) {
       return "step" + i;
     },
