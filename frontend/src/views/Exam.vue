@@ -36,6 +36,9 @@ export default {
     }
   },
   created: function() {
+    this.nowtime = new Date().getTime() / 1000
+
+    /*获取服务器时间
     this.$axios({
       method: "get",
       url: "http://139.224.50.146/apis/time",
@@ -48,7 +51,7 @@ export default {
       }
       console.log(res);
     });
-
+    */
 
   },
   mounted: function(){
