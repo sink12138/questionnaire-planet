@@ -523,7 +523,7 @@ export default {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
               let submitData = JSON.stringify({
-                templateId: parseInt(this.templateId),
+                code: this.code,
                 password: this.password,
                 answers: this.answers,
               });
