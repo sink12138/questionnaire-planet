@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
+const Home = () => import("../views/Home.vue")
+const Main = () => import("../views/Main.vue")
 const Questionnaire = () => import("../views/Questionnaire.vue")
 const History = () => import("../views/History.vue")
 const Recycle = () => import("../views/Recycle.vue")
@@ -26,6 +27,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/main',
+    name: 'Main',
+    component: Main,
     children: [
       {
         path: '/questionnaire',
