@@ -4,14 +4,14 @@
     </el-page-header>
 
     <el-form style="display:block; margin:3px 300px" :inline="false" :rules="rules" ref="formData" :model="formData">
-      <el-form-item label="用户名" :label-width="formLabelWidth" prop="username">
+      <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
+        <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" :disabled="true"></el-input>
+      </el-form-item>
+      <el-form-item label="用户昵称" :label-width="formLabelWidth" prop="username">
         <el-input v-model="formData.username" autocomplete="off" style="width: 300px" placeholder="请输入用户名" v-focus></el-input>
       </el-form-item>
       <el-form-item label="密码" :label-width="formLabelWidth" prop="password">
         <el-input v-model="formData.password" autocomplete="off" show-password style="width: 300px" placeholder="请输入密码"></el-input>
-      </el-form-item>
-      <el-form-item label="电子邮箱" :label-width="formLabelWidth" prop="email">
-        <el-input v-model="formData.email" autocomplete="off" style="width: 300px" placeholder="请输入您的电子邮箱" :disabled="true"></el-input>
       </el-form-item>
     </el-form>
     <el-button type="primary" @click="modify" style="display:block;margin:5px 5px 5px 750px">修改信息</el-button>

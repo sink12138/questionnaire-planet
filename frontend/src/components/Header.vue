@@ -11,9 +11,11 @@
         创建问卷
       </div>
     </router-link>
-    <div class="router">
-      个人问卷
-    </div>
+    <router-link to="/history">
+      <div class="router">
+        个人问卷
+      </div>
+    </router-link>
     <div class="router">
       数据统计
     </div>

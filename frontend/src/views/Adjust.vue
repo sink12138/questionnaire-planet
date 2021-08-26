@@ -135,6 +135,32 @@
                       placeholder="可为空"
                     />
                   </el-form-item>
+                  <!-- 发布时间 -->
+                  <el-form-item label="自动发布时间">
+                    <el-date-picker
+                      v-model="modelForm.startTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
+                  </el-form-item>
+                  <!-- 回收时间 -->
+                  <el-form-item label="自动回收时间">
+                    <el-date-picker
+                      v-model="modelForm.endTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
+                  </el-form-item>
                 </div>
                 <div class="question">
                   <div
@@ -194,7 +220,7 @@
                       </div>
                       <div v-if="item.type == 'filling'">
                         <el-form-item
-                          label="选项"
+                          label="答案"
                           :rules="{
                             required: item.required,
                           }"
@@ -212,21 +238,17 @@
                       </div>
                       <div v-if="item.type == 'grade'">
                         <el-form-item
-                          label="选项"
+                          label="评分"
                           :rules="{
                             required: item.required,
                           }"
                         >
-                          <el-radio-group
+                          <el-rate
                             v-model="answers[index_question]"
-                            v-for="(i, index) in item.choices"
-                            :key="index"
-                            @change="changeValue"
+                            show-text
+                            :texts="item.grades"
                           >
-                            <el-radio class="option" :label="index"
-                              >{{ i }}({{ item.scores[index] }})</el-radio
-                            >
-                          </el-radio-group>
+                          </el-rate>
                         </el-form-item>
                       </div>
                       <div v-if="item.type == 'dropdown'">
@@ -252,7 +274,6 @@
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'vote'">
-                        至少选择{{ item.min }}项
                         <el-form-item
                           label="选项"
                           :rules="{
@@ -366,6 +387,12 @@ export default {
           this.modelForm.showIndex = response.data.showIndex;
           this.modelForm.password = response.data.password;
           this.modelForm.quota = response.data.quota;
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
           this.questions = response.data.questions;
         } else {
           console.log(response.data.message);
@@ -395,6 +422,8 @@ export default {
           conclusion: this.modelForm.conclusion,
           showIndex: this.modelForm.showIndex,
           password: this.modelForm.password,
+          startTime: this.modelForm.startTime,
+          endTime: this.modelForm.endTime,
           quota:
             this.modelForm.quota == undefined
               ? 0

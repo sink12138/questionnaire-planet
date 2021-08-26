@@ -95,7 +95,9 @@
       >
         <div v-for="(item, index_question) in questions" :key="index_question">
           <el-divider content-position="left" style="margin-top: 15px"
-            ><div v-show="showIndex">第{{ index_question + 1 }}题</div></el-divider
+            ><div v-show="showIndex">
+              第{{ index_question + 1 }}题
+            </div></el-divider
           >
           <div class="question-title">
             <div class="stem">{{ item.stem }}</div>
@@ -162,20 +164,13 @@
             </div>
             <div v-if="item.type == 'grade'">
               <el-form-item
-                label="选项"
+                label="评分"
                 :rules="{
                   required: item.required,
                 }"
               >
-                <el-radio-group
-                v-model="answers[index_question]"
-                v-for="(i, index) in item.choices"
-                :key="index"
-                @change="changeValue">
-                  <el-radio class="option" :label="index">
-                    {{ i }}({{ item.scores[index] }})
-                  </el-radio>
-                </el-radio-group>
+                <el-rate v-model="answers[index_question]" show-text :texts="item.grades">
+                </el-rate>
               </el-form-item>
             </div>
             <div v-if="item.type == 'dropdown'">
@@ -201,7 +196,6 @@
               </el-form-item>
             </div>
             <div class="multi" v-if="item.type == 'vote'">
-              至少选择{{ item.min }}项
               <el-form-item
                 label="选项"
                 :rules="{
@@ -238,7 +232,11 @@
                   :key="index"
                   @change="multiChangeValue(index_question)"
                 >
-                  <el-checkbox class="option" :label="index" border :disabled="item.remains[index]==0?true:false"
+                  <el-checkbox
+                    class="option"
+                    :label="index"
+                    border
+                    :disabled="item.remains[index] == 0 ? true : false"
                     >{{ i }}共{{ item.quotas[index] }},剩余{{
                       item.remains[index]
                     }}
@@ -358,7 +356,7 @@ export default {
               this.dialogFormVisible2 = true;
             } else {
               console.log(33);
-              
+
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
@@ -377,7 +375,7 @@ export default {
                     this.$message({
                       message: response.data.message,
                       type: "warning",
-                      showClose: true
+                      showClose: true,
                     });
                   }
                 })
@@ -389,7 +387,7 @@ export default {
           this.$message({
             message: response.data.message,
             type: "warning",
-            showClose: true
+            showClose: true,
           });
         }
       })
@@ -444,8 +442,7 @@ export default {
       if (this.locked == true) {
         console.log(22);
         this.dialogFormVisible2 = true;
-      }
-      else {
+      } else {
         console.log(33);
         this.$axios({
           method: "get",
@@ -464,7 +461,7 @@ export default {
               this.$message({
                 message: response.data.message,
                 type: "warning",
-                showClose: true
+                showClose: true,
               });
             }
           })
@@ -475,7 +472,11 @@ export default {
       this.$axios({
         method: "get",
         url: "http://139.224.50.146:80/apis/details",
-        params: { templateId: this.templateId, password: this.password, visitor: true },
+        params: {
+          templateId: this.templateId,
+          password: this.password,
+          visitor: true,
+        },
       })
         .then((response) => {
           console.log(response);
@@ -494,7 +495,7 @@ export default {
             this.$message({
               message: response.data.message,
               type: "warning",
-              showClose: true
+              showClose: true,
             });
             this.dialogFormVisible2 = false;
           }
@@ -521,7 +522,7 @@ export default {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
               let submitData = JSON.stringify({
-                templateId: parseInt(this.templateId),
+                code: this.code,
                 password: this.password,
                 answers: this.answers,
               });
@@ -571,48 +572,48 @@ export default {
           });
         });
     },
-    loadChart: function() {
-      var ctx1 = document.getElementById('myChart');
+    loadChart: function () {
+      var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
-        type: 'bar',
+        type: "bar",
         data: {
           labels: [],
           datasets: [
             {
               data: [],
               backgroundColor: [
-                'rgba(2, 62, 138, 1)',
-                'rgba(0, 150, 199, 1)',
-                'rgba(72, 202, 228, 1)',
-                'rgba(144, 224, 239, 1)',
-                'rgba(173, 232, 244, 1)',
-                'rgba(202, 240, 248, 1)',
-                'rgba(68, 108, 179, 1)',
-                'rgba(52, 152, 219, 1)',
-                'rgba(89, 171, 227, 1)',
-                'rgba(137, 196, 244, 1)'
+                "rgba(2, 62, 138, 1)",
+                "rgba(0, 150, 199, 1)",
+                "rgba(72, 202, 228, 1)",
+                "rgba(144, 224, 239, 1)",
+                "rgba(173, 232, 244, 1)",
+                "rgba(202, 240, 248, 1)",
+                "rgba(68, 108, 179, 1)",
+                "rgba(52, 152, 219, 1)",
+                "rgba(89, 171, 227, 1)",
+                "rgba(137, 196, 244, 1)",
               ],
             },
           ],
         },
       });
     },
-    updateChart: function(item) {
-      this.loadChart()
-      console.log('update',item)
-      this.myChart.data.labels = item['answers']
-      this.myChart.data.datasets[0].data = item['counts']
-      this.myChart.data.datasets[0].label = item['stem']
-      this.myChart.update()
-    }
+    updateChart: function (item) {
+      this.loadChart();
+      console.log("update", item);
+      this.myChart.data.labels = item["answers"];
+      this.myChart.data.datasets[0].data = item["counts"];
+      this.myChart.data.datasets[0].label = item["stem"];
+      this.myChart.update();
+    },
   },
   directives: {
     focus: {
-      inserted: function(el) {
-        el.querySelector('input').focus();
-      }
-    }
-  }
+      inserted: function (el) {
+        el.querySelector("input").focus();
+      },
+    },
+  },
 };
 </script>
 

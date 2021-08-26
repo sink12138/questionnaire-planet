@@ -9,8 +9,6 @@
           <el-menu
             default-active="this.$route.path"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             style="margin: 0"
             router>
             <el-menu-item index="/questionnaire">
