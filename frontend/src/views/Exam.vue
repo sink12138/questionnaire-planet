@@ -7,7 +7,7 @@
     <div class="timer">
       <p>截止时间：{{ deadlline }}</p>
       <p>网页打开时间：{{ nowtime }}</p>
-      <p>剩余时间：{{ lefttime }}s --------- {{ day }}天{{ hour }}天{{ minute }}天{{ second }}天</p>
+      <p>剩余时间：{{ lefttime }}s --------- {{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
     </div>
 
     <div>
