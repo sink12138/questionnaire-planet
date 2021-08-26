@@ -58,7 +58,10 @@ export default {
     this.lefttime = (new Date(this.deadlline).getTime() / 1000) - this.nowtime;
 
     this.timer = setInterval(()=>{
+
       console.log(typeof this.lefttime)
+      console.log(this.lefttime)
+      console.log(this.second)
 
         this.lefttimes--;
 
