@@ -122,6 +122,7 @@ router.beforeEach((to, from, next) => {
     next();
   }
   else {
+    console.log(sessionStorage.getItem("isLogin"));
     next("/");
     ElementUI.Notification({
       title: '需要登录',
