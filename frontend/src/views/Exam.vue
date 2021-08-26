@@ -24,7 +24,7 @@
 export default {
   data() {
     return {
-      deadlline: "2021-08-26 16:10:00",
+      deadlline: "2021-08-26 16:12:00",
       nowtime: "",
       lefttime: 0,
       counter: 0,
