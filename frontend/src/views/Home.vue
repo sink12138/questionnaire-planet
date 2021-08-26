@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <Header></Header>
     <div class="block">
       <el-carousel height="510px" :interval="5000" arrow="hover">
         <el-carousel-item class="carousel">
@@ -20,16 +21,23 @@
         </el-carousel-item>
       </el-carousel>
     </div>
+    <div class="">
+      <el-button>进入个人主页</el-button>
+      <el-button>开始创建问卷</el-button>
+    </div>
   </div>
 </template>
 
 <script>
+import Header from "../components/Header.vue"
 export default {
-
+  components: {
+    "Header": Header
+  }
 }
 </script>
 
-<style>
+<style scoped>
 .block {
   background-image: url("../assets/Home_bg.jpg");
   background-size: 100%;

@@ -308,7 +308,7 @@
     </div>
   </div>
 </template>
-
+../components/Svg-logo.vue
 <script>
 import logo from "../components/svg-logo.vue";
 import VueQr from "vue-qr";

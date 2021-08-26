@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import logo from "../components/svg-logo.vue";
+import logo from "../components/svg_logo.vue";
 import Chart from 'chart.js/auto'
 Chart.defaults.font.size = 18;
 export default {
