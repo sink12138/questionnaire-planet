@@ -129,7 +129,7 @@ export default {
             callback(new Error("请输入六至二十位"));
           }
           var regx = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{6,20}$/;
-          if (!this.formData.password.match(regx)) {
+          if (!value.match(regx)) {
             callback(new Error("请同时包含字母数字"));
           }
           callback();
@@ -138,7 +138,7 @@ export default {
     var validatePass2 = (rule, value, callback) => {
         if (value === "") {
           callback(new Error("请再次输入密码"));
-        } else if (value !== this.formData.password) {
+        } else if (value !== this.registerData.password) {
           callback(new Error("两次输入密码不一致!"));
         } else {
           callback();
