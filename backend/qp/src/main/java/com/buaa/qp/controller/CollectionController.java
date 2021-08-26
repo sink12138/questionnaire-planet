@@ -311,7 +311,11 @@ public class CollectionController {
             }
 
             // Submit the answer
-            Answer answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
+            Answer answer;
+            if (template.getType().equals("normal"))
+                answer = new Answer(templateId, JSON.toJSONString(answers));
+            else
+                answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
             Integer quota = template.getQuota();
             if (quota == null && !template.getType().equals("sign-up"))
                 answerService.submitAnswer(answer);

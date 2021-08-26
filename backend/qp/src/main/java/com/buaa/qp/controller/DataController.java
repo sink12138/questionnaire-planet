@@ -415,7 +415,7 @@ public class DataController {
             for (int i = 0; i < questions.size(); i++) {
                 Question current_question = questions.get(i);
                 if (answerContents.get(i) == null) {
-                    answerInFormat.add("");
+                    answerInFormat.add("序号");
                 } else {
                     Map<String, Object> argsMap = JSON.parseObject(current_question.getArgs());
                     switch (current_question.getType()) {
@@ -430,10 +430,8 @@ public class DataController {
                             }
                             break;
                         }
-                        case "vote":{
-                        }
-                        case "sign-up": {
-                        }
+                        case "vote":
+                        case "sign-up":
                         case "multi-choice": {
                             ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                             String choiceStr = answerContents.get(i).toString();
@@ -486,9 +484,8 @@ public class DataController {
                     }
                 }
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-            answerInFormat.add(sdf.format(answer.getSubmitTime()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            answerInFormat.add(sdf.format(new Date(answer.getSubmitTime().getTime() - 28800000)));
             Integer accountId = answer.getSubmitter();
             if (accountId != null) {
                 Account account = accountService.getAccountById(accountId);
