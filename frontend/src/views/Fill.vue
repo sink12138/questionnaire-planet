@@ -605,6 +605,13 @@ export default {
       this.myChart.update()
     }
   },
+  directives: {
+    focus: {
+      inserted: function(el) {
+        el.querySelector('input').focus();
+      }
+    }
+  }
 };
 </script>
 
