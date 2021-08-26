@@ -8,6 +8,8 @@ import org.springframework.mail.MailException;
 import javax.servlet.http.HttpSession;
 
 public interface AccountService {
+    Account getAccountById(Integer accountId);
+
     void addAccount(Account account);
 
     /**

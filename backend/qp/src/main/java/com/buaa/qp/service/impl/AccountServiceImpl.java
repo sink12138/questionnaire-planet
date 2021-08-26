@@ -40,6 +40,11 @@ public class AccountServiceImpl implements AccountService {
     CheckDao checkDao;
 
     @Override
+    public Account getAccountById(Integer accountId) {
+        return accountDao.selectById(accountId);
+    }
+
+    @Override
     public void addAccount(Account account) {
         accountDao.insert(account);
     }

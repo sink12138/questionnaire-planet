@@ -8,7 +8,6 @@ import com.buaa.qp.entity.Template;
 import com.buaa.qp.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Random;
 

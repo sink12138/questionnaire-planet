@@ -2,6 +2,7 @@ package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.buaa.qp.entity.Account;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
@@ -9,6 +10,7 @@ import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
+import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
 import jxl.Workbook;
@@ -330,6 +332,9 @@ public class DataController {
         return map;
     }
 
+    @Autowired
+    AccountService accountService;
+
     private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
         ArrayList<String> stems = new ArrayList<>();
@@ -417,6 +422,13 @@ public class DataController {
                         }
                     }
                 }
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            answerInFormat.add(sdf.format(answer.getSubmitTime()));
+            Integer accountId = answer.getSubmitter();
+            if (accountId != null) {
+                Account account = accountService.getAccountById(accountId);
+                answerInFormat.add(account.getUsername());
             }
             answersInFormat.add(answerInFormat);
         }
