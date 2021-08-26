@@ -58,6 +58,7 @@ public class ManagementController {
                     templateMap.put("duration", result.getDuration());
                     templateMap.put("answerCount", answerService.countAnswers(templateId));
                     templateMap.put("code", result.getCode());
+                    templateMap.put("scheduled", result.getStartTime() != null);
                     templates.add(templateMap);
                 }
             }
