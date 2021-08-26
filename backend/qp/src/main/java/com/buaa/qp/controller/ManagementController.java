@@ -50,12 +50,11 @@ public class ManagementController {
                     templateMap.put("type", result.getType());
                     templateMap.put("title", result.getTitle());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                    sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-                    templateMap.put("creationTime", sdf.format(result.getCreationTime()));
+                    templateMap.put("creationTime", sdf.format(new Date(result.getCreationTime().getTime() - 28800000)));
                     templateMap.put("released", result.getReleased());
                     Date releaseTime = result.getReleaseTime();
                     if (releaseTime != null)
-                        templateMap.put("releaseTime", sdf.format(releaseTime));
+                        templateMap.put("releaseTime", sdf.format(new Date(releaseTime.getTime() - 28800000)));
                     templateMap.put("duration", result.getDuration());
                     templateMap.put("answerCount", answerService.countAnswers(templateId));
                     templateMap.put("code", result.getCode());
@@ -113,7 +112,6 @@ public class ManagementController {
             if (template.getDeleted())
                 throw new ExtraMessageException("无法操作已删除的问卷");
 
-            // TODO: 2021/8/26 Set start_time to null
             templateService.releaseTemplate(templateId, true);
             map.put("code", template.getCode());
             map.put("success", true);

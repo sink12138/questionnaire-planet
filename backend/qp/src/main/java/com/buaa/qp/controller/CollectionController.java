@@ -48,7 +48,7 @@ public class CollectionController {
             Template template = templateService.getTemplateByCode(code);
             if (template == null || template.getDeleted())
                 throw new ObjectNotFoundException();
-            else if (!template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date()))
+            else if (!template.getReleased())
                 throw new ExtraMessageException("问卷尚未发布或已关闭");
             Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
@@ -121,7 +121,7 @@ public class CollectionController {
                 allowed = true;
                 isOwner = true;
             }
-            else if (template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date())) {
+            else if (template.getReleased()) {
                 String pwd = template.getPassword();
                 if (pwd == null || pwd.equals(password))
                     allowed = true;
@@ -151,10 +151,11 @@ public class CollectionController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date startTime = template.getStartTime();
             Date endTime = template.getEndTime();
-            if (startTime != null)
-                map.put("startTime", sdf.format(startTime));
+            if (startTime != null) {
+                map.put("startTime", sdf.format(new Date(startTime.getTime() - 28800000)));
+            }
             if (endTime != null)
-                map.put("endTime", sdf.format(endTime));
+                map.put("endTime", sdf.format(new Date(endTime.getTime() - 28800000)));
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
@@ -234,7 +235,7 @@ public class CollectionController {
 
             // Authority checks
             String pwd = template.getPassword();
-            if (!template.getReleased() || template.getEndTime() != null && template.getEndTime().before(new Date()))
+            if (!template.getReleased())
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");

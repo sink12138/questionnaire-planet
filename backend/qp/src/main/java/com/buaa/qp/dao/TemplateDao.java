@@ -16,6 +16,8 @@ public interface TemplateDao {
 
     Integer update(Template template);
 
+    void createEvents(Template template);
+
     void updateReleased(Template template);
 
     void updateDeleted(Template template);
