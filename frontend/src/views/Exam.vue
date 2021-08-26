@@ -57,6 +57,8 @@ export default {
   },
   mounted: function(){
     this.lefttime = Math.floor((new Date(this.deadlline).getTime() / 1000) - this.nowtime);
+    console.log(this.lefttime)
+    console.log(new Date(this.deadlline).getTime() / 1000)
 
     this.timer = setInterval(()=>{
       this.lefttime--;
