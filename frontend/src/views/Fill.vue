@@ -14,13 +14,11 @@
           prop="email"
         >
           <el-input
-            id="email"
             v-model="formData.email"
             autocomplete="off"
             style="width: 300px"
             placeholder="请输入您的电子邮箱"
             v-focus
-            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -29,13 +27,11 @@
           prop="password"
         >
           <el-input
-            id="password"
             v-model="formData.password"
             autocomplete="off"
             show-password
             style="width: 300px"
             placeholder="请输入密码"
-            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -68,7 +64,6 @@
             style="width: 300px"
             placeholder="请输入问卷密码"
             v-focus
-            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -414,17 +409,6 @@ export default {
     this.canvas = el;
   },
   methods: {
-    pressEnter: function () {
-      if (this.dialogFormVisible1 == true) {
-        this.tologin();
-        console.log(1111);
-        
-      }
-      if (this.dialogFormVisible2 == true) {
-        this.unlock();
-        console.log("???");
-      }
-    },
     step: function (i) {
       return "step" + i;
     },
@@ -432,9 +416,6 @@ export default {
       this.$router.push("/");
     },
     tologin() {
-      document.getElementById("email").blur();
-      document.getElementById("password").blur();
-
       this.$axios({
         method: "post",
         url: "http://139.224.50.146/apis/login",
