@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import ElementUI from 'element-ui'
+import ElementUI from 'element-ui'
 
 const Home = () => import("../views/Home.vue")
 const Main = () => import("../views/Main.vue")
@@ -117,18 +117,18 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
-// router.beforeEach((to, from, next) => {
-//   var regx = /^\/fill.*?$/;
-//   if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx)) {
-//     next();
-//   }
-//   else {
-//     next("/");
-//     ElementUI.Notification({
-//       title: '需要登录',
-//       message: '请登录后再进行操作',
-//       type: 'warning'
-//     });
-//   }
-// })
+router.beforeEach((to, from, next) => {
+  var regx = /^\/fill.*?$/;
+  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx)) {
+    next();
+  }
+  else {
+    next("/");
+    ElementUI.Notification({
+      title: '需要登录',
+      message: '请登录后再进行操作',
+      type: 'warning'
+    });
+  }
+})
 export default router
