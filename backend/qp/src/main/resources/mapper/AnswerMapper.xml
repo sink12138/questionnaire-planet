@@ -9,7 +9,12 @@
         values (#{templateId}, #{content}, now(), #{submitter})
     </insert>
     <select id="selectByTid" parameterType="Integer" resultType="Answer">
-        select * from answer where template_id = #{templateId}
+        select answer_id, template_id, content, submit_time, submitter, (
+            select username from account
+            where account_id = answer.submitter
+            limit 1
+        ) as submitter_name
+        from answer where template_id = #{templateId}
     </select>
     <select id="selectCountByTid" parameterType="Integer" resultType="Integer">
         select count(*) from answer where template_id = #{templateId}

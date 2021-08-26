@@ -25,6 +25,12 @@ public class Answer {
 
     private Integer submitter;
 
+    /**
+     * This attribute does not exist in the database!
+     * Therefore, it shall not be used in any "insert" expressions.
+     */
+    private String submitterName;
+
     public Answer() {
 
     }
@@ -38,5 +44,22 @@ public class Answer {
         this.templateId = templateId;
         this.content = content;
         this.submitter = submitter;
+    }
+
+    public Answer(Integer templateId, String content, Date submitTime, Integer submitter, String submitterName) {
+        this.templateId = templateId;
+        this.content = content;
+        this.submitTime = submitTime;
+        this.submitter = submitter;
+        this.submitterName = submitterName;
+    }
+
+    public Answer(Integer answerId, Integer templateId, String content, Date submitTime, Integer submitter, String submitterName) {
+        this.answerId = answerId;
+        this.templateId = templateId;
+        this.content = content;
+        this.submitTime = submitTime;
+        this.submitter = submitter;
+        this.submitterName = submitterName;
     }
 }
