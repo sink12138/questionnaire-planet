@@ -91,7 +91,7 @@
           </div>
         </el-table>
       </div>
-    </div>
+    </div>../components/svg_questionnaire.vue
   </div>
 </template>
 
