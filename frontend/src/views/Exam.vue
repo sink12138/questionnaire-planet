@@ -7,7 +7,7 @@
     <div class="timer">
       <p>截止时间：{{ deadlline }}</p>
       <p>网页打开时间：{{ nowtime }}</p>
-      <p>剩余时间：{{ lefttime }}s</p>
+      <p>剩余时间：{{ lefttime }}s --------- {{ day }}天{{ hour }}天{{ minute }}天{{ second }}天</p>
     </div>
 
     <div>
@@ -25,9 +25,13 @@
 export default {
   data() {
     return {
-      deadlline: "2021-08-26 17:08:00",
+      deadlline: "2021-08-30 14:00:00",
       nowtime: "",
       lefttime: 0,
+      day: 0,
+      hour: 0,
+      minute: 0,
+      second: 0,
       counter: 0,
     }
   },
@@ -52,6 +56,12 @@ export default {
 
     this.timer = setInterval(()=>{
         this.lefttimes--
+
+        this.day = Math.floor(this.lefttime / (60 * 60 * 24));
+        this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
+        this.minute = Math.floor(this.lefttime / 60) - 24 * 60 * this.day - 60 * this.hour;
+        this.second = Math.floor(this.lefttime) - 24 * 60 * 60 * this.day - 60 * 60 * this.hour - 60 * this.minute;
+
         if(this.lefttimes == 0){
           this.submit();
           clearInterval(this.timer);
