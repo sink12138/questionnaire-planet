@@ -44,6 +44,7 @@ public class TemplateController {
             String password;
             String conclusion;
             Integer quota;
+            Boolean showIndex;
             ArrayList<Map<String, Object>> questionMaps;
             ClassParser parser = new ClassParser();
 
@@ -53,6 +54,7 @@ public class TemplateController {
                 title = (String) requestMap.get("title");
                 type = (String) requestMap.get("type");
                 description = (String) requestMap.get("description");
+                showIndex = (Boolean) requestMap.get("showIndex");
                 if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
                 if (password != null && password.isEmpty()) password = null;
@@ -68,6 +70,8 @@ public class TemplateController {
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
+                throw new ParameterFormatException();
+            if (showIndex == null)
                 throw new ParameterFormatException();
             if (questionMaps.isEmpty())
                 throw new ParameterFormatException();
@@ -282,7 +286,7 @@ public class TemplateController {
             if (!hasSpecialQuestion) {
                 throw new ExtraMessageException("特殊问卷未设置特殊题目");
             }
-            Template newTemplate = new Template(type, accountId, title, description, password, conclusion, quota);
+            Template newTemplate = new Template(type, accountId, title, description, password, conclusion, quota, showIndex);
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);
             }
@@ -323,6 +327,7 @@ public class TemplateController {
             String password;
             String conclusion;
             Integer quota;
+            Boolean showIndex;
 
             // Parameter checks of template
             try {
@@ -332,6 +337,7 @@ public class TemplateController {
                 password = (String) requestMap.get("password");
                 conclusion = (String) requestMap.get("conclusion");
                 quota = (Integer) requestMap.get("quota");
+                showIndex = (Boolean) requestMap.get("showIndex");
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
@@ -340,6 +346,8 @@ public class TemplateController {
             if (password != null && password.isEmpty()) password = null;
             if (conclusion != null && conclusion.isEmpty()) conclusion = null;
             if (quota != null && quota <= 0) quota = null;
+            if (showIndex == null)
+                throw new ParameterFormatException();
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
@@ -361,6 +369,7 @@ public class TemplateController {
             template.setPassword(password);
             template.setConclusion(conclusion);
             template.setQuota(quota);
+            template.setShowIndex(showIndex);
             templateService.adjustTemplate(template);
             map.put("success", true);
 
