@@ -6,6 +6,15 @@
         <div class="web-title">问卷星球</div>
       </div>
     </router-link>
+    <div class="router">
+      创建问卷
+    </div>
+    <div class="router">
+      个人问卷
+    </div>
+    <div class="router">
+      数据统计
+    </div>
     <div class="butt">
       <div v-if="this.$store.state.isLogin == false">
         <el-dropdown>
@@ -245,14 +254,23 @@ export default {
 
 <style scoped>
 .header {
+  background: #ffffff;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  height: 60px;
 }
 .logo {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  margin-left: 100px;
+}
+.router {
+  font-size: 18px;
+  font-weight: lighter;
+  margin-left: 30px;
+  margin-right: 30px;
 }
 .butt {
   position: absolute;
@@ -261,8 +279,7 @@ export default {
 }
 .web-title {
   margin-left: 15px;
-  font-family: 仿宋;
-  font-weight: 800;
+  margin-right: 30px;
   font-size: 30px;
   position: relative;
 }

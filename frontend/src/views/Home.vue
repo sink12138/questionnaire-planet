@@ -2,7 +2,7 @@
   <div class="home">
     <Header></Header>
     <div class="block">
-      <el-carousel height="510px" :interval="5000" arrow="hover">
+      <el-carousel height="600px" :interval="5000" arrow="hover">
         <el-carousel-item class="carousel">
           <div class="title_1">创建编辑多种问卷</div>
           <div class="title_2">自由创建普通、投票、报名等多类型问卷</div>
@@ -20,10 +20,9 @@
           <div class="title_2">想不出来怎么说，反正挺简单的</div>
         </el-carousel-item>
       </el-carousel>
-    </div>
-    <div class="footer">
-      <el-button>进入个人主页</el-button>
-      <el-button>开始创建问卷</el-button>
+      <router-link to="/questionnaire">
+        <el-button icon="el-icon-plus" style="margin-top: 15px">创建问卷</el-button>
+      </router-link>
     </div>
   </div>
 </template>
@@ -38,19 +37,29 @@ export default {
 </script>
 
 <style scoped>
-.block {
+.home {
   background-image: url("../assets/Home_bg.jpg");
   background-size: 100%;
   background-repeat: no-repeat;
+  height: 100%;
 }
-.footer .el-button {
+.block .el-button {
+  height: 52px;
   font-size: 20px;
+  background: rgba(207, 207, 207, 0.66);
+  border: rgba(207, 207, 207, 0.66);
+  color: #ffffff;
+}
+.block .el-button:hover {
+  background: rgba(158, 158, 158, 0.66);
+  color: #ffffff;
 }
 .carousel {
   color: #ffffff;
 }
 .title_1 {
   font-size: 48px;
+  margin: 24px;
 }
 .title_2 {
   font-size: 24px;

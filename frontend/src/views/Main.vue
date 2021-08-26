@@ -49,6 +49,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  padding: 0;
 }
 .el-menu {
   margin-top: 20px;
