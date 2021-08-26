@@ -416,9 +416,11 @@ export default {
     pressEnter: function () {
       if (this.dialogFormVisible1 == true) {
         this.tologin();
+        console.log(1111);
       }
       if (this.dialogFormVisible2 == true) {
         this.unlock();
+        console.log("???");
       }
     },
     step: function (i) {
