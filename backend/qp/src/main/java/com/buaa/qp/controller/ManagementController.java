@@ -112,6 +112,8 @@ public class ManagementController {
             // Other checks
             if (template.getDeleted())
                 throw new ExtraMessageException("无法操作已删除的问卷");
+            if (template.getQuota() != null && template.getQuota() < answerService.countAnswers(templateId))
+                throw new ExtraMessageException("该问卷收集量已到最大限额");
 
             templateService.releaseTemplate(templateId, true);
             map.put("code", template.getCode());
