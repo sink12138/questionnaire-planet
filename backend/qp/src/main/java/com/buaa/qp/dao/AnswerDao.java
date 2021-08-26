@@ -9,6 +9,8 @@ import java.util.ArrayList;
 public interface AnswerDao {
     void deleteByTid(Integer templateId);
 
+    void deleteById(Integer answerId);
+
     void insert(Answer answer);
 
     ArrayList<Answer> selectByTid(Integer templateId);

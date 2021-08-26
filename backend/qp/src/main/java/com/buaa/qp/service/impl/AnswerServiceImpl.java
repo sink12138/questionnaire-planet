@@ -20,7 +20,12 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void deleteAnswersByTid(Integer templateId) {
+    public void getAnswerById(Integer answerId) {
+        answerDao.deleteById(answerId);
+    }
+
+    @Override
+    public void clearAllAnswers(Integer templateId) {
         answerDao.deleteByTid(templateId);
     }
 

@@ -182,7 +182,7 @@ public class DataController {
             try {
                 if (bis != null) bis.close();
                 if (fis != null) fis.close();
-                if (!file.delete()) System.out.println("Failed to delete file");
+                if (file.exists() && !file.delete()) System.out.println("Failed to delete file");
             }
             catch (Exception e) {
                 e.printStackTrace();

@@ -4,6 +4,9 @@
     <delete id="deleteByTid" parameterType="Integer">
         delete from answer where template_id = #{templateId}
     </delete>
+    <delete id="deleteById" parameterType="Integer">
+        delete from answer where answer_id = #{answerId}
+    </delete>
     <insert id="insert" parameterType="Answer" keyProperty="answerId" useGeneratedKeys="true">
         insert into answer(template_id, content, submit_time, submitter)
         values (#{templateId}, #{content}, now(), #{submitter})
