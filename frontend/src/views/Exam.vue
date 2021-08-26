@@ -5,8 +5,8 @@
     </el-header>
 
     <div class="timer">
-      <el-input v-model="deadlline" autocomplete="off" style="width: 300px" placeholder="请输入截止日期"></el-input>
       <p>截止时间：{{ deadlline }}</p>
+      <p>网页打开时间：{{ nowtime }}</p>
       <p>剩余时间：{{ lefttime }}s</p>
     </div>
 
@@ -25,7 +25,7 @@
 export default {
   data() {
     return {
-      deadlline: "",
+      deadlline: "2021-08-26 17:08:00",
       nowtime: "",
       lefttime: 0,
       counter: 0,
@@ -38,6 +38,7 @@ export default {
     }).then((res) => {
       if (res.data.success == true) {
         this.nowtime = new Date(res.data.time).getTime() / 1000;
+        console.log(this.nowtime)
       } else {
         this.$message.error(res.data.message);
       }
@@ -51,7 +52,7 @@ export default {
 
     this.timer = setInterval(()=>{
         this.lefttimes--
-        if(this.lefttimes===0){
+        if(this.lefttimes == 0){
           this.submit();
           clearInterval(this.timer);
         }
