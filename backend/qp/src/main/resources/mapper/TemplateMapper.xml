@@ -14,9 +14,17 @@
         select quota from template
         where template_id = #{templateId}
     </select>
+    <select id="selectDuration" parameterType="Integer" resultType="String">
+        select if(released, addtime(duration, timediff(now(), release_time)), duration) as duration
+        from template
+        where template_id = #{templateId}
+    </select>
+    <select id="selectByCode" resultType="Template" parameterType="String">
+        select * from template where code = #{code}
+    </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(type, owner, title, description, password, creation_time, conclusion, quota, show_index, code)
-        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion}, #{quota}, #{showIndex}, #{code})
+        insert into template(type, owner, title, description, password, creation_time, conclusion, quota, show_index, code, start_time, end_time)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(), #{conclusion}, #{quota}, #{showIndex}, #{code}, #{startTime}, #{endTime})
     </insert>
     <update id="update" parameterType="Template">
         update template
@@ -27,6 +35,8 @@
             conclusion = #{conclusion},
             quota = #{quota},
             show_index = #{showIndex},
+            start_time = #{startTime},
+            end_time = #{endTime},
             <if test="duration != null">
                 duration = #{duration}
             </if>
@@ -51,19 +61,11 @@
         set deleted = #{deleted}
         where template_id = #{templateId}
     </update>
+    <update id="updateCode" parameterType="Template">
+        update template set code = #{code} where template_id = #{templateId}
+    </update>
     <delete id="deleteByTid" parameterType="Integer">
         delete from template
         where template_id = #{templateId}
     </delete>
-    <select id="selectDuration" parameterType="Integer" resultType="String">
-        select if(released, addtime(duration, timediff(now(), release_time)), duration) as duration
-        from template
-        where template_id = #{templateId}
-    </select>
-    <select id="selectByCode" resultType="Template" parameterType="String">
-        select * from template where code = #{code}
-    </select>
-    <update id="updateCode" parameterType="Template">
-        update template set code = #{code} where template_id = #{templateId}
-    </update>
 </mapper>

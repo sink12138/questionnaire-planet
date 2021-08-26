@@ -41,6 +41,10 @@ public class Template {
 
     private Integer quota;
 
+    private Date startTime;
+
+    private Date endTime;
+
     private Boolean showIndex;
 
     private String code;
@@ -58,7 +62,8 @@ public class Template {
         this.conclusion = conclusion;
     }
 
-    public Template(String type, Integer owner, String title, String description, String password, String conclusion, Integer quota, Boolean showIndex) {
+    public Template(String type, Integer owner, String title, String description, String password, String conclusion,
+                    Integer quota, Boolean showIndex) {
         this.type = type;
         this.owner = owner;
         this.title = title;
@@ -67,6 +72,20 @@ public class Template {
         this.conclusion = conclusion;
         this.quota = quota;
         this.showIndex = showIndex;
+    }
+
+    public Template(String type, Integer owner, String title, String description, String password, String conclusion,
+                    Integer quota, Boolean showIndex, Date startTime, Date endTime) {
+        this.type = type;
+        this.owner = owner;
+        this.title = title;
+        this.description = description;
+        this.password = password;
+        this.conclusion = conclusion;
+        this.quota = quota;
+        this.showIndex = showIndex;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration) {
@@ -81,5 +100,25 @@ public class Template {
         this.creationTime = creationTime;
         this.releaseTime = releaseTime;
         this.duration = duration;
+    }
+
+    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration, String conclusion, Integer quota, Date startTime, Date endTime, Boolean showIndex, String code) {
+        this.templateId = templateId;
+        this.type = type;
+        this.owner = owner;
+        this.title = title;
+        this.description = description;
+        this.password = password;
+        this.released = released;
+        this.deleted = deleted;
+        this.creationTime = creationTime;
+        this.releaseTime = releaseTime;
+        this.duration = duration;
+        this.conclusion = conclusion;
+        this.quota = quota;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.showIndex = showIndex;
+        this.code = code;
     }
 }

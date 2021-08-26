@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -64,6 +65,22 @@ public class CollectionController {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @GetMapping("/time")
+    public Map<String, Object> time() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            map.put("time", sdf.format(new Date()));
+            map.put("success", true);
+        }
+        catch (Exception exception) {
             exception.printStackTrace();
             map.put("success", false);
             map.put("message", "操作失败");
