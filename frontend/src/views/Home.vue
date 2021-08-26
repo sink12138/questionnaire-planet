@@ -21,7 +21,7 @@
         </el-carousel-item>
       </el-carousel>
     </div>
-    <div class="">
+    <div class="footer">
       <el-button>进入个人主页</el-button>
       <el-button>开始创建问卷</el-button>
     </div>
@@ -42,6 +42,9 @@ export default {
   background-image: url("../assets/Home_bg.jpg");
   background-size: 100%;
   background-repeat: no-repeat;
+}
+.footer .el-button {
+  font-size: 20px;
 }
 .carousel {
   color: #ffffff;
