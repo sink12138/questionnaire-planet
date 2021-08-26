@@ -142,6 +142,32 @@
                 placeholder="若无限额请输入0"
               />
             </el-form-item>
+            <!-- 发布时间 -->
+            <el-form-item label="自动发布时间">
+              <el-date-picker
+                v-model="modelForm.startTime"
+                value-format="yyyy-MM-dd HH:mm:00"
+                format="yyyy-MM-dd HH:mm"
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions"
+              >
+              </el-date-picker>
+            </el-form-item>
+            <!-- 回收时间 -->
+            <el-form-item label="自动回收时间">
+              <el-date-picker
+                v-model="modelForm.endTime"
+                value-format="yyyy-MM-dd HH:mm:00"
+                format="yyyy-MM-dd HH:mm"
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions"
+              >
+              </el-date-picker>
+            </el-form-item>
           </div>
           <div>
             <el-collapse v-model="activeNames">
@@ -326,7 +352,7 @@
                     </el-col>
                   </el-row>
                   <!-- 答案 -->
-                  <el-row v-if="item.type != 2">
+                  <el-row v-if="item.type != 2 && item.type != 3">
                     <el-form-item
                       v-for="(opt, idx) in item.answers"
                       :key="idx"
@@ -355,24 +381,20 @@
                   </el-row>
                   <el-row v-if="item.type == 3">
                     <el-form-item
-                      v-for="(opt, idx) in item.answers"
+                      v-for="(opt, idx) in item.grades"
                       :key="idx"
-                      :label="`第${idx + 1}项评分`"
-                      :prop="`questions.${index}.answers.${idx}.scores`"
+                      :label="`第${idx + 1}级评分`"
+                      :prop="`questions.${index}.grades.${idx}`"
                       :rules="[
                         {
                           required: true,
                           message: '请输入评分',
                           trigger: 'blur',
                         },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
                       ]"
                     >
                       <el-input
-                        v-model="opt.scores"
+                        v-model="item.grades[idx]"
                         style="width: 120px; margin-left: 10px"
                         clearable
                         placeholder="请输入评分"
@@ -382,7 +404,7 @@
                   <el-form-item label="编辑题目">
                     <el-button
                       icon="el-icon-circle-plus"
-                      v-show="item.type != 2"
+                      v-show="item.type != 2 && item.type != 3"
                       @click="addDomain(index)"
                       >新增选项</el-button
                     >
@@ -427,6 +449,32 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "今天",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "昨天",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "一周前",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
       activeNames: [0, 1],
       template: {},
       rules: {},
@@ -439,6 +487,8 @@ export default {
         showIndex: true,
         password: "",
         quota: undefined,
+        startTime: "",
+        endTime: "",
         questions: [
           {
             type: "0",
@@ -449,10 +499,8 @@ export default {
             min: 1,
             height: 1,
             width: 800,
-            answers: [
-              { value: "", scores: 0 },
-              { value: "", scores: 0 },
-            ],
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
           },
         ],
       },
@@ -503,6 +551,7 @@ export default {
         min: 1,
         height: 1,
         width: 800,
+        grades: [],
         answers: [],
       };
       this.template.type = this.modelForm.questions[index].type;
@@ -521,6 +570,10 @@ export default {
           scores: this.modelForm.questions[index].answers[i].scores,
           number: this.modelForm.questions[index].answers[i].number,
         });
+      }
+      i = 0;
+      for (i in this.modelForm.questions[index].grades) {
+        this.template.grades.push(this.modelForm.questions[index].grades[i]);
       }
       this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -541,10 +594,8 @@ export default {
         min: 1,
         height: 1,
         width: 800,
-        answers: [
-          { value: "", scores: 0 },
-          { value: "", scores: 0 },
-        ],
+        grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+        answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
     },
@@ -604,11 +655,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -651,6 +700,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota:
                 this.modelForm.quota == undefined
                   ? 0
@@ -733,11 +784,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -780,6 +829,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota:
                 this.modelForm.quota == undefined
                   ? 0
@@ -863,11 +914,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -910,6 +959,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota:
                 this.modelForm.quota == undefined
                   ? 0
@@ -942,9 +993,7 @@ export default {
                       });
                       this.code = response.data.code;
                       this.qrData.text =
-                        window.location.host +
-                        "/fill?code=" +
-                        this.code;
+                        window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({

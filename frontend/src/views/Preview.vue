@@ -43,7 +43,9 @@
               :key="index_question"
             >
               <el-divider content-position="left" style="margin-top: 15px"
-                ><div v-show="showIndex">第{{ index_question + 1 }}题</div></el-divider
+                ><div v-show="showIndex">
+                  第{{ index_question + 1 }}题
+                </div></el-divider
               >
               <div class="question-title">
                 <div class="stem">{{ item.stem }}</div>
@@ -91,7 +93,7 @@
                 </div>
                 <div v-if="item.type == 'filling'">
                   <el-form-item
-                    label="选项"
+                    label="答案"
                     :rules="{
                       required: item.required,
                     }"
@@ -109,21 +111,12 @@
                 </div>
                 <div v-if="item.type == 'grade'">
                   <el-form-item
-                    label="选项"
+                    label="评分"
                     :rules="{
                       required: item.required,
                     }"
                   >
-                    <el-radio-group
-                      v-model="answers[index_question]"
-                      v-for="(i, index) in item.choices"
-                      :key="index"
-                      @change="changeValue"
-                    >
-                      <el-radio class="option" :label="index"
-                        >{{ i }}({{ item.scores[index] }})</el-radio
-                      >
-                    </el-radio-group>
+                    <el-rate v-model="value" show-text :texts="item.grades"> </el-rate>
                   </el-form-item>
                 </div>
                 <div v-if="item.type == 'dropdown'">
@@ -256,8 +249,13 @@ export default {
           stem: "瓜店老板态度怎样？",
           description: "给态度打分",
           required: true,
-          choices: ["good", "very good", "very very good"],
-          scores: [10, 50, 100],
+          grades: [
+            "非常不满意",
+            "不满意",
+            "一般",
+            "very good",
+            "very very good",
+          ],
         },
         {
           type: "dropdown",
