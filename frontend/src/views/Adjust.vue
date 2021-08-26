@@ -194,7 +194,7 @@
                       </div>
                       <div v-if="item.type == 'filling'">
                         <el-form-item
-                          label="选项"
+                          label="答案"
                           :rules="{
                             required: item.required,
                           }"
@@ -212,21 +212,17 @@
                       </div>
                       <div v-if="item.type == 'grade'">
                         <el-form-item
-                          label="选项"
+                          label="评分"
                           :rules="{
                             required: item.required,
                           }"
                         >
-                          <el-radio-group
-                            v-model="answers[index_question]"
-                            v-for="(i, index) in item.choices"
-                            :key="index"
-                            @change="changeValue"
+                          <el-rate
+                            v-model="value"
+                            show-text
+                            :texts="item.grades"
                           >
-                            <el-radio class="option" :label="index"
-                              >{{ i }}({{ item.scores[index] }})</el-radio
-                            >
-                          </el-radio-group>
+                          </el-rate>
                         </el-form-item>
                       </div>
                       <div v-if="item.type == 'dropdown'">

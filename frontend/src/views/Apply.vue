@@ -326,7 +326,7 @@
                     </el-col>
                   </el-row>
                   <!-- 答案 -->
-                  <el-row v-if="item.type != 2">
+                  <el-row v-if="item.type != 2 && item.type != 3">
                     <el-form-item
                       v-for="(opt, idx) in item.answers"
                       :key="idx"
@@ -355,24 +355,20 @@
                   </el-row>
                   <el-row v-if="item.type == 3">
                     <el-form-item
-                      v-for="(opt, idx) in item.answers"
+                      v-for="(opt, idx) in item.grades"
                       :key="idx"
-                      :label="`第${idx + 1}项评分`"
-                      :prop="`questions.${index}.answers.${idx}.scores`"
+                      :label="`第${idx + 1}级评分`"
+                      :prop="`questions.${index}.grades.${idx}`"
                       :rules="[
                         {
                           required: true,
                           message: '请输入评分',
                           trigger: 'blur',
                         },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
                       ]"
                     >
                       <el-input
-                        v-model="opt.scores"
+                        v-model="item.grades[idx]"
                         style="width: 120px; margin-left: 10px"
                         clearable
                         placeholder="请输入评分"
@@ -408,7 +404,7 @@
                   <el-form-item label="编辑题目">
                     <el-button
                       icon="el-icon-circle-plus"
-                      v-show="item.type != 2"
+                      v-show="item.type != 2 && item.type != 3"
                       @click="addDomain(index)"
                       >新增选项</el-button
                     >
@@ -475,9 +471,10 @@ export default {
             min: 1,
             height: 1,
             width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
             answers: [
-              { value: "", scores: 0, number: 0 },
-              { value: "", scores: 0, number: 0 },
+              { value: "", number: 0 },
+              { value: "", number: 0 },
             ],
           },
           {
@@ -489,9 +486,10 @@ export default {
             min: 1,
             height: 1,
             width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
             answers: [
-              { value: "", scores: 0, number: 0 },
-              { value: "", scores: 0, number: 0 },
+              { value: "", number: 0 },
+              { value: "", number: 0 },
             ],
           },
         ],
@@ -543,6 +541,7 @@ export default {
         min: 1,
         height: 1,
         width: 800,
+        grades: [],
         answers: [],
       };
       this.template.type = this.modelForm.questions[index].type;
@@ -561,6 +560,10 @@ export default {
           scores: this.modelForm.questions[index].answers[i].scores,
         });
       }
+      i = 0;
+      for (i in this.modelForm.questions[index].grades) {
+        this.template.grades.push(this.modelForm.questions[index].grades[i]);
+      }
       this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
@@ -569,7 +572,6 @@ export default {
       // 新增选项
       this.modelForm.questions[index].answers.push({
         value: "",
-        scores: 0,
         number: 0,
       });
     },
@@ -584,9 +586,10 @@ export default {
         min: 1,
         height: 1,
         width: 800,
+        grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
         answers: [
-          { value: "", scores: 0, number: 0 },
-          { value: "", scores: 0, number: 0 },
+          { value: "", number: 0 },
+          { value: "", number: 0 },
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
@@ -647,11 +650,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -778,11 +779,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -910,11 +909,9 @@ export default {
                 break;
               case "3":
                 quest.type = "grade";
-                quest.scores = [];
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.scores.push(x.scores);
+                quest.grades = [];
+                for (j in question.grades) {
+                  quest.grades.push(question.grades[j]);
                 }
                 break;
               case "4":
@@ -991,9 +988,7 @@ export default {
                       });
                       this.code = response.data.code;
                       this.qrData.text =
-                        window.location.host +
-                        "/fill?code=" +
-                        this.code;
+                        window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
