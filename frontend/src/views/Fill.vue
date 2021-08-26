@@ -95,7 +95,7 @@
       >
         <div v-for="(item, index_question) in questions" :key="index_question">
           <el-divider content-position="left" style="margin-top: 15px"
-            >第{{ index_question + 1 }}题</el-divider
+            ><div v-show="showIndex">第{{ index_question + 1 }}题</div></el-divider
           >
           <div class="question-title">
             <div class="stem">{{ item.stem }}</div>
@@ -313,6 +313,7 @@ export default {
       type: "normal",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
       conclusion: "谢谢",
+      showIndex: true,
       remain: "∞",
       password: "",
       formData: {
@@ -370,6 +371,7 @@ export default {
                     this.title = response.data.title;
                     this.type = response.data.type;
                     this.description = response.data.description;
+                    this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
                   } else {
                     console.log(response.data.message);

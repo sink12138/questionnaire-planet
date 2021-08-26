@@ -83,9 +83,7 @@
                     />
                   </el-form-item>
                   <!-- 问卷描述 -->
-                  <el-form-item
-                    label="问卷描述"
-                  >
+                  <el-form-item label="问卷描述">
                     <el-input
                       v-model="modelForm.description"
                       style="width: 258px"
@@ -93,6 +91,15 @@
                       :autosize="{ minRows: 2, maxRows: 6 }"
                       placeholder="请填写问卷描述"
                     />
+                  </el-form-item>
+                  <!-- 显示题号 -->
+                  <el-form-item label="是否显示题号">
+                    <el-switch
+                      v-model="modelForm.showIndex"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                    >
+                    </el-switch>
                   </el-form-item>
                   <!-- 结束语 -->
                   <el-form-item label="结束语">
@@ -135,7 +142,7 @@
                     :key="index_question"
                   >
                     <el-divider content-position="left" style="margin-top: 15px"
-                      >第{{ index_question + 1 }}题</el-divider
+                      ><div v-show="modelForm.showIndex">第{{ index_question + 1 }}题</div></el-divider
                     >
                     <div class="question-title">
                       <div class="stem">{{ item.stem }}</div>
@@ -155,7 +162,9 @@
                             :key="index"
                             @change="changeValue"
                           >
-                            <el-radio class="option" :label="index">{{ i }}</el-radio>
+                            <el-radio class="option" :label="index">{{
+                              i
+                            }}</el-radio>
                           </el-radio-group>
                         </el-form-item>
                       </div>
@@ -321,6 +330,7 @@ export default {
         title: "新的问卷",
         description: "",
         conclusion: "",
+        showIndex: true,
         password: "",
         quota: undefined,
         questions: [],
@@ -350,6 +360,7 @@ export default {
           this.type = response.data.type;
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.showIndex = response.data.showIndex;
           this.modelForm.password = response.data.password;
           this.modelForm.quota = response.data.quota;
           this.questions = response.data.questions;
@@ -379,8 +390,12 @@ export default {
           title: this.modelForm.title,
           description: this.modelForm.description,
           conclusion: this.modelForm.conclusion,
+          showIndex: this.modelForm.showIndex,
           password: this.modelForm.password,
-          quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+          quota:
+            this.modelForm.quota == undefined
+              ? 0
+              : parseInt(this.modelForm.quota),
         }),
       }).then(
         (response) => {

@@ -99,6 +99,15 @@
                 placeholder="请填写问卷描述"
               />
             </el-form-item>
+            <!-- 显示题号 -->
+            <el-form-item label="是否显示题号">
+              <el-switch
+                v-model="modelForm.showIndex"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+              >
+              </el-switch>
+            </el-form-item>
             <!-- 结束语 -->
             <el-form-item label="结束语">
               <el-input
@@ -148,8 +157,11 @@
                   class="questions"
                 >
                   <template slot="title">
+                    <div class="question-index" v-show="modelForm.showIndex">
+                      第{{ index + 1 }}题
+                    </div>
                     <div class="question-title">
-                      第{{ index + 1 }}题,题目:{{ item.questionName }}
+                      题目:{{ item.questionName }}
                     </div>
                   </template>
                   <!-- 问题类型 -->
@@ -181,10 +193,12 @@
                       trigger: 'change',
                     }"
                   >
-                    <el-radio-group v-model="item.required">
-                      <el-radio label="true">是</el-radio>
-                      <el-radio label="false">否</el-radio>
-                    </el-radio-group>
+                    <el-switch
+                      v-model="item.required"
+                      active-color="#13ce66"
+                      inactive-color="#ff4949"
+                    >
+                    </el-switch>
                   </el-form-item>
                   <!-- 问题题目 -->
                   <el-form-item
@@ -414,7 +428,9 @@
             </el-collapse>
           </div>
           <div class="foot">
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion">新增题目</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion"
+              >新增题目</el-button
+            >
           </div>
         </el-form>
       </el-main>
@@ -445,12 +461,13 @@ export default {
         title: "新的问卷",
         description: "",
         conclusion: "",
+        showIndex: true,
         password: "",
         quota: undefined,
         questions: [
           {
             type: "0",
-            required: "",
+            required: true,
             questionName: "",
             questionSummary: "",
             max: 2,
@@ -464,7 +481,7 @@ export default {
           },
           {
             type: "0",
-            required: "",
+            required: true,
             questionName: "",
             questionSummary: "",
             max: 2,
@@ -518,7 +535,7 @@ export default {
       //复制题目
       this.template = {
         type: "0",
-        required: "",
+        required: true,
         questionName: "",
         questionSummary: "",
         max: 2,
@@ -537,10 +554,13 @@ export default {
       this.template.height = this.modelForm.questions[index].height;
       this.template.width = this.modelForm.questions[index].width;
       var i = 0;
-      for (i in this.modelForm.questions[index].answers){
-        this.template.answers.push({value:this.modelForm.questions[index].answers[i].value,scores:this.modelForm.questions[index].answers[i].scores});
+      for (i in this.modelForm.questions[index].answers) {
+        this.template.answers.push({
+          value: this.modelForm.questions[index].answers[i].value,
+          scores: this.modelForm.questions[index].answers[i].scores,
+        });
       }
-      this.modelForm.questions.splice(index+1, 0, this.template);
+      this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
@@ -556,7 +576,7 @@ export default {
       // 新增题目
       this.modelForm.questions.push({
         type: "0",
-        required: "",
+        required: true,
         questionName: "",
         questionSummary: "",
         max: 2,
@@ -591,11 +611,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -677,8 +693,12 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -722,11 +742,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -808,8 +824,12 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -854,11 +874,7 @@ export default {
             console.log(question);
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
-            if (question.required == "false") {
-              quest.required = false;
-            } else {
-              quest.required = true;
-            }
+            quest.required = question.required;
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -940,8 +956,12 @@ export default {
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
+              showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
-              quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
             }),
@@ -968,7 +988,10 @@ export default {
                         message: "问卷发布成功！",
                         type: "success",
                       });
-                      this.qrData.text = window.location.host + "/fill?templateId=" + this.templateId;
+                      this.qrData.text =
+                        window.location.host +
+                        "/fill?templateId=" +
+                        this.templateId;
                       this.dialogVisible = true;
                     } else {
                       this.$message({
@@ -1077,6 +1100,11 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.question-index {
+  font-family: 仿宋;
+  font-size: 20px;
+  font-weight: bolder;
 }
 .question-title {
   font-family: 仿宋;
