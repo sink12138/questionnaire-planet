@@ -144,6 +144,32 @@
                   placeholder="若无限额请输入0"
                 />
               </el-form-item>
+              <!-- 发布时间 -->
+              <el-form-item label="自动发布时间">
+                <el-date-picker
+                  v-model="modelForm.startTime"
+                  value-format="yyyy-MM-dd HH:mm:00"
+                  format="yyyy-MM-dd HH:mm"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  align="right"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </el-form-item>
+              <!-- 回收时间 -->
+              <el-form-item label="自动回收时间">
+                <el-date-picker
+                  v-model="modelForm.endTime"
+                  value-format="yyyy-MM-dd HH:mm:00"
+                  format="yyyy-MM-dd HH:mm"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  align="right"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -454,6 +480,32 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "今天",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "昨天",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "一周前",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
       quest: 0,
       activeNames: [],
       template: {},
@@ -486,7 +538,7 @@ export default {
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { password: "" ,code: this.code},
+      params: { password: "", code: this.code },
     })
       .then((response) => {
         console.log(response);
@@ -498,6 +550,12 @@ export default {
           response.data.quota == undefined
             ? (this.modelForm.quota = 0)
             : (this.modelForm.quota = response.data.quota);
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
           var question = {
             type: "0",
             required: true,
@@ -661,7 +719,7 @@ export default {
         });
       }
       i = 0;
-      for(i in this.modelForm.questions[index].grades) {
+      for (i in this.modelForm.questions[index].grades) {
         this.template.grades.push(this.modelForm.questions[index].grades[i]);
       }
       this.modelForm.questions.splice(index + 1, 0, this.template);
@@ -685,8 +743,8 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,        
-        grades: ["非常不满意","不满意","一般","满意","非常满意"] ,
+        width: 800,
+        grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
         answers: [
           { value: "", number: 0 },
           { value: "", number: 0 },
@@ -800,6 +858,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
@@ -929,6 +989,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
@@ -1059,6 +1121,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
               questions: templateQuestions,
@@ -1088,9 +1152,7 @@ export default {
                       });
                       this.code = response.data.code;
                       this.qrData.text =
-                        window.location.host +
-                        "/fill?code=" +
-                        this.code;
+                        window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
                       this.$message({

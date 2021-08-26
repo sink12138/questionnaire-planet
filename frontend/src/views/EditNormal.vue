@@ -143,6 +143,32 @@
                   placeholder="若无限额请输入0"
                 />
               </el-form-item>
+              <!-- 发布时间 -->
+              <el-form-item label="自动发布时间">
+                <el-date-picker
+                  v-model="modelForm.startTime"
+                  value-format="yyyy-MM-dd HH:mm:00"
+                  format="yyyy-MM-dd HH:mm"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  align="right"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </el-form-item>
+              <!-- 回收时间 -->
+              <el-form-item label="自动回收时间">
+                <el-date-picker
+                  v-model="modelForm.endTime"
+                  value-format="yyyy-MM-dd HH:mm:00"
+                  format="yyyy-MM-dd HH:mm"
+                  type="datetime"
+                  placeholder="选择日期时间"
+                  align="right"
+                  :picker-options="pickerOptions"
+                >
+                </el-date-picker>
+              </el-form-item>
             </div>
             <div>
               <el-collapse v-model="activeNames">
@@ -426,6 +452,32 @@ export default {
   },
   data() {
     return {
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "今天",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "昨天",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "一周前",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
       quest: 0,
       activeNames: [],
       template: {},
@@ -439,6 +491,8 @@ export default {
         showIndex: true,
         password: "",
         quota: 0,
+        startTime: "",
+        endTime: "",
         questions: [],
       },
       qrData: {
@@ -470,6 +524,12 @@ export default {
           response.data.quota == undefined
             ? (this.modelForm.quota = 0)
             : (this.modelForm.quota = response.data.quota);
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
           var question = {
             type: "0",
             required: true,
@@ -613,7 +673,7 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({ value: ""});
+      this.modelForm.questions[index].answers.push({ value: "" });
     },
     addQuestion() {
       // 新增题目
@@ -717,6 +777,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
@@ -826,6 +888,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
@@ -936,6 +1000,8 @@ export default {
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
               password: this.modelForm.password,
+              startTime: this.modelForm.startTime,
+              endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,

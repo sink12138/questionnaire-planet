@@ -135,6 +135,32 @@
                       placeholder="可为空"
                     />
                   </el-form-item>
+                  <!-- 发布时间 -->
+                  <el-form-item label="自动发布时间">
+                    <el-date-picker
+                      v-model="modelForm.startTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
+                  </el-form-item>
+                  <!-- 回收时间 -->
+                  <el-form-item label="自动回收时间">
+                    <el-date-picker
+                      v-model="modelForm.endTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
+                  </el-form-item>
                 </div>
                 <div class="question">
                   <div
@@ -363,6 +389,12 @@ export default {
           this.modelForm.showIndex = response.data.showIndex;
           this.modelForm.password = response.data.password;
           this.modelForm.quota = response.data.quota;
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
           this.questions = response.data.questions;
         } else {
           console.log(response.data.message);
@@ -392,6 +424,8 @@ export default {
           conclusion: this.modelForm.conclusion,
           showIndex: this.modelForm.showIndex,
           password: this.modelForm.password,
+          startTime: this.modelForm.startTime,
+          endTime: this.modelForm.endTime,
           quota:
             this.modelForm.quota == undefined
               ? 0
