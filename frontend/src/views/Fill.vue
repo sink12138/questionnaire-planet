@@ -19,7 +19,7 @@
             style="width: 300px"
             placeholder="请输入您的电子邮箱"
             v-focus
-            @keyup.enter.native="tologin"
+            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -33,7 +33,7 @@
             show-password
             style="width: 300px"
             placeholder="请输入密码"
-            @keyup.enter.native="tologin"
+            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -66,7 +66,7 @@
             style="width: 300px"
             placeholder="请输入问卷密码"
             v-focus
-            
+            @keyup.enter.native="pressEnter"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -411,6 +411,14 @@ export default {
     this.canvas = el;
   },
   methods: {
+    pressEnter: function () {
+      if (this.dialogFormVisible1 == true) {
+        this.tologin();
+      }
+      if (this.dialogFormVisible2 == true) {
+        this.unlock();
+      }
+    },
     step: function (i) {
       return "step" + i;
     },
