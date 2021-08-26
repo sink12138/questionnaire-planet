@@ -274,7 +274,6 @@
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'vote'">
-                        至少选择{{ item.min }}项
                         <el-form-item
                           label="选项"
                           :rules="{
