@@ -84,6 +84,12 @@
         {{ description }}
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
+
+      <div v-if="type==='exam'" class="timer" style="position: absolute;float: right;right: 10px;">
+        <p>截止时间：{{ deadlline }}</p>
+        <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+      </div>
+
     </div>
     <div class="question" v-if="submitted == false">
       <el-form
@@ -313,6 +319,13 @@ export default {
       showIndex: true,
       remain: "∞",
       password: "",
+      deadlline: "",
+      nowtime: "",
+      lefttime: 0,
+      day: 0,
+      hour: 0,
+      minute: 0,
+      second: 0,
       formData: {
         email: "",
         password: "",
@@ -364,6 +377,8 @@ export default {
                     this.description = response.data.description;
                     this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
+                    this.deadlline = response.data.endTime;
+                    this.settime();
                     var i = 0;
                     for (i in this.questions) {
                       if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
@@ -410,6 +425,50 @@ export default {
     this.canvas = el;
   },
   methods: {
+    forceSubmit: function () {
+      
+    },
+    settime: function () {
+      if (this.type==="exam") {
+        /*获取服务器时间*/
+        this.$axios({
+          method: "get",
+          url: "http://139.224.50.146/apis/time",
+        }).then((res) => {
+          if (res.data.success == true) {
+            this.nowtime = new Date(res.data.time).getTime() / 1000;
+            this.lefttime = Math.floor(
+              new Date(this.deadlline).getTime() / 1000 - this.nowtime
+            );
+
+            this.lefttime++;
+            this.timer = setInterval(() => {
+              this.lefttime--;
+
+              this.day = Math.floor(this.lefttime / (60 * 60 * 24));
+              this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
+              this.minute =
+                Math.floor(this.lefttime / 60) -
+                24 * 60 * this.day -
+                60 * this.hour;
+              this.second =
+                Math.floor(this.lefttime) -
+                24 * 60 * 60 * this.day -
+                60 * 60 * this.hour -
+                60 * this.minute;
+
+              if (this.lefttime == 0) {
+                this.submit();
+                clearInterval(this.timer);
+              }
+            }, 1000);
+          } else {
+            this.$message.error(res.data.message);
+          }
+          console.log(res);
+        });
+      }
+    },
     step: function (i) {
       return "step" + i;
     },
@@ -454,6 +513,14 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
+              this.deadlline = response.data.endTime;
+              this.settime();
+              var i = 0;
+              for (i in this.questions) {
+                if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                  this.answers[i] = [];
+                }
+              }
             } else {
               console.log(response.data.message);
               this.$message({
@@ -478,11 +545,20 @@ export default {
       })
         .then((response) => {
           if (response.data.success == true) {
+            console.log(response)
             this.title = response.data.title;
             this.type = response.data.type;
             this.description = response.data.description;
             this.questions = response.data.questions;
+            this.deadlline = response.data.endTime;
+            this.settime();
             this.dialogFormVisible2 = false;
+            var i = 0;
+            for (i in this.questions) {
+              if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                this.answers[i] = [];
+              }
+            }
           } else {
             if (response.data.message === "密码错误") {
               alert("问卷密码错误！");
