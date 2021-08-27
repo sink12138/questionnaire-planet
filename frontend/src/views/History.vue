@@ -1,82 +1,75 @@
 <template>
-  <div class="reviewer">
+  <div class="history">
     <div class="top">
       <div class="search">
-        <el-dropdown trigger="click">
-          <span class="el-dropdown-link">
-            <el-button><i class="el-icon-s-operation"></i></el-button>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="creationTime()"
-                >创建时间</el-button
-              ></el-dropdown-item
-            >
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="releaseTime()"
-                >发布时间</el-button
-              ></el-dropdown-item
-            >
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="duration()"
-                >持续时间</el-button
-              ></el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </el-dropdown>
         <el-input
-          v-model.trim="search"
-          style="width: 250px"
-          clearable
-          placeholder="请输入要搜索的问卷"
-        />
-        <el-button icon="el-icon-search" @click="searchQuest"></el-button>
+        v-model.trim="search"
+        style="width: 320px"
+        clearable
+        placeholder="请输入要搜索的问卷">
+          <el-dropdown trigger="click" slot="prepend" placement="bottom">
+            <span class="el-dropdown-link">
+              <el-button><i class="el-icon-s-operation"></i></el-button>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="creationTime()"
+                  >创建时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="releaseTime()"
+                  >发布时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="duration()"
+                  >持续时间</el-button
+                ></el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+          <el-button slot="append" icon="el-icon-search" @click="searchQuest"></el-button>
+        </el-input>
       </div>
-      <el-button-group>
-        <el-button icon="el-icon-s-unfold"></el-button>
-        <el-button icon="el-icon-menu"></el-button>
-      </el-button-group>
+      <ButtonGroup size="large">
+        <Button icon="md-menu"></Button>
+        <Button icon="ios-apps"></Button>
+      </ButtonGroup>
     </div>
     <div class="questionnaire">
-      <div class="list" style="margin-left: 1%; margin-right: 1%">
+      <div class="table" style="margin-left: 1%; margin-right: 1%">
         <el-table :data="searchQue" border style="width: 100%">
-          <div class="title">
             <el-table-column fixed prop="title" label="标题" width="150">
             </el-table-column>
-          </div>
-          <div class="time">
             <el-table-column
-              fixed
-              prop="creationTime"
-              label="创建时间"
-              width="150"
+              prop="released"
+              label="状态"
+              width="100"
             >
             </el-table-column>
-          </div>
-          <div class="time">
             <el-table-column
-              fixed
-              prop="releaseTime"
-              label="最后发布"
-              width="150"
-            >
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column fixed prop="duration" label="收集时长" width="150">
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column
-              fixed
               prop="answerCount"
               label="收集数量"
               width="100"
             >
             </el-table-column>
-          </div>
+            <el-table-column
+              prop="creationTime"
+              label="创建时间"
+              width="150"
+            >
+            </el-table-column>
+            <el-table-column
+              prop="releaseTime"
+              label="最后发布"
+              width="150"
+            >
+            </el-table-column>
+            <el-table-column prop="duration" label="收集时长" width="150">
+            </el-table-column>
           <div class="bottom clearfix">
-            <el-table-column label="操作" width="500">
+            <el-table-column label="操作" width="500" fixed="right">
               <template slot-scope="scope">
                 <el-button
                   @click="adjust(scope.row)"
@@ -104,7 +97,7 @@
                   v-else
                   >关闭</el-button
                 >
-                <el-dropdown>
+                <el-dropdown placement="bottom">
                   <el-button
                     type="text"
                     icon="el-icon-more"
@@ -118,7 +111,7 @@
                         class="button"
                         @click="edit(scope.row)"
                         icon="el-icon-edit-outline"
-                        >编辑</el-button
+                        >编辑问卷</el-button
                       >
                     </el-dropdown-item>
                     <el-dropdown-item
@@ -127,7 +120,7 @@
                         class="button"
                         @click="remove(scope.row)"
                         icon="el-icon-delete"
-                        >删除</el-button
+                        >删除问卷</el-button
                       ></el-dropdown-item
                     >
                     <el-dropdown-item
@@ -136,7 +129,7 @@
                         class="button"
                         @click="clone(scope.row)"
                         icon="el-icon-document-copy"
-                        >复制</el-button
+                        >复制问卷</el-button
                       ></el-dropdown-item
                     >
                     <el-dropdown-item
@@ -145,7 +138,7 @@
                         class="button"
                         @click="preview(scope.row)"
                         icon="el-icon-view"
-                        >预览</el-button
+                        >预览问卷</el-button
                       ></el-dropdown-item
                     >
                     <el-dropdown-item
@@ -163,45 +156,8 @@
                         class="button"
                         @click="qr(scope.row)"
                         icon="el-icon-share"
-                        >分享
+                        >分享问卷
                       </el-button>
-                      <el-dialog
-                        :append-to-body="true"
-                        title="分享问卷"
-                        :visible.sync="dialogVisible"
-                        width="30%"
-                        :before-close="handleClose"
-                        center
-                      >
-                        <div class="share">
-                          <div>
-                            <vue-qr
-                              ref="Qrcode"
-                              :text="qrData.text"
-                              :logoSrc="qrData.logo"
-                            >
-                            </vue-qr>
-                          </div>
-                          <div>
-                            <el-button
-                              style="margin: 10px"
-                              class="tag-copy"
-                              @click="copyShareLink"
-                              :data-clipboard-text="qrData.text"
-                            >
-                              复制链接
-                            </el-button>
-                            <a
-                              style="margin: 10px"
-                              :href="exportLink"
-                              @click="downloadImg"
-                              :download="downloadFilename"
-                            >
-                              <el-button>下载二维码</el-button>
-                            </a>
-                          </div>
-                        </div>
-                      </el-dialog>
                     </el-dropdown-item>
                   </el-dropdown-menu>
                 </el-dropdown>
@@ -209,6 +165,43 @@
             </el-table-column>
           </div>
         </el-table>
+        <el-dialog
+          :append-to-body="true"
+          title="分享问卷"
+          :visible.sync="dialogVisible"
+          width="30%"
+          :before-close="handleClose"
+          center
+        >
+          <div class="share">
+            <div>
+              <vue-qr
+                ref="Qrcode"
+                :text="qrData.text"
+                :logoSrc="qrData.logo"
+              >
+              </vue-qr>
+            </div>
+            <div>
+              <el-button
+                style="margin: 10px"
+                class="tag-copy"
+                @click="copyShareLink"
+                :data-clipboard-text="qrData.text"
+              >
+                复制链接
+              </el-button>
+              <a
+                style="margin: 10px"
+                :href="exportLink"
+                @click="downloadImg"
+                :download="downloadFilename"
+              >
+                <el-button>下载二维码</el-button>
+              </a>
+            </div>
+          </div>
+        </el-dialog>
       </div>
     </div>
   </div>
@@ -229,7 +222,9 @@ export default {
       total: 0,
       searchQue: [],
       templateId: 0,
-      allQuest: [],
+      allQuest: [
+        {},{},{},{},{}
+      ],
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
@@ -608,6 +603,9 @@ export default {
 </script>
 
 <style scoped>
+.history {
+  margin-left: 60px;
+}
 .top {
   display: flex;
   justify-content: space-between;
