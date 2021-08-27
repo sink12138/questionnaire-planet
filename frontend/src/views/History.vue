@@ -43,10 +43,12 @@
             <el-table-column fixed prop="title" label="标题" width="150">
             </el-table-column>
             <el-table-column
-              prop="released"
               label="状态"
               width="100"
             >
+              <template slot-scope="scope">
+                  <p>{{ scope.row.released == true ? '正在回收':'未发布' }}</p>
+              </template>
             </el-table-column>
             <el-table-column
               prop="answerCount"
@@ -223,7 +225,7 @@ export default {
       searchQue: [],
       templateId: 0,
       allQuest: [
-        {},{},{},{},{}
+        {released: false},{released: true},{released: false},
       ],
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
