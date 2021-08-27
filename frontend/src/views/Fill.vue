@@ -510,6 +510,12 @@ export default {
               this.questions = response.data.questions;
               this.deadlline = response.data.endTime;
               this.settime();
+              var i = 0;
+              for (i in this.questions) {
+                if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                  this.answers[i] = [];
+                }
+              }
             } else {
               console.log(response.data.message);
               this.$message({
@@ -541,6 +547,12 @@ export default {
             this.deadlline = response.data.endTime;
             this.settime();
             this.dialogFormVisible2 = false;
+            var i = 0;
+            for (i in this.questions) {
+              if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                this.answers[i] = [];
+              }
+            }
           } else {
             if (response.data.message === "密码错误") {
               alert("问卷密码错误！");
