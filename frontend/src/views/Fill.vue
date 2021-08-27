@@ -480,7 +480,7 @@ export default {
             this.questions = response.data.questions;
             this.dialogFormVisible2 = false;
           } else {
-            if (response.data.message === "问卷密码错误") {
+            if (response.data.message === "密码错误") {
               alert("问卷密码错误！");
             }
             else {
