@@ -84,6 +84,12 @@
         {{ description }}
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
+
+      <div class="timer" style="position: absolute;float: right;right: 10px;">
+        <p>截止时间：{{ deadlline }}</p>
+        <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+      </div>
+
     </div>
     <div class="question" v-if="submitted == false">
       <el-form
@@ -313,6 +319,13 @@ export default {
       showIndex: true,
       remain: "∞",
       password: "",
+      deadlline: "",
+      nowtime: "",
+      lefttime: 0,
+      day: 0,
+      hour: 0,
+      minute: 0,
+      second: 0,
       formData: {
         email: "",
         password: "",
@@ -344,6 +357,7 @@ export default {
           this.fillRight = true;
           this.login = response.data.login;
           this.locked = response.data.locked;
+          this.deadlline = response.data.endTime;
           if (this.login == true) {
             this.dialogFormVisible1 = true;
           } else {
@@ -392,6 +406,44 @@ export default {
         }
       })
       .catch((err) => console.log(err));
+
+    /*获取服务器时间*/
+    this.$axios({
+      method: "get",
+      url: "http://139.224.50.146/apis/time",
+    }).then((res) => {
+      if (res.data.success == true) {
+        this.nowtime = new Date(res.data.time).getTime() / 1000;
+        this.lefttime = Math.floor(
+          new Date(this.deadlline).getTime() / 1000 - this.nowtime
+        );
+
+        this.lefttime++;
+        this.timer = setInterval(() => {
+          this.lefttime--;
+
+          this.day = Math.floor(this.lefttime / (60 * 60 * 24));
+          this.hour = Math.floor(this.lefttime / (60 * 60)) - 24 * this.day;
+          this.minute =
+            Math.floor(this.lefttime / 60) -
+            24 * 60 * this.day -
+            60 * this.hour;
+          this.second =
+            Math.floor(this.lefttime) -
+            24 * 60 * 60 * this.day -
+            60 * 60 * this.hour -
+            60 * this.minute;
+
+          if (this.lefttime == 0) {
+            this.submit();
+            clearInterval(this.timer);
+          }
+        }, 1000);
+      } else {
+        this.$message.error(res.data.message);
+      }
+      console.log(res);
+    });
   },
   watch: {
     canvas: function () {
