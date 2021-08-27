@@ -261,11 +261,11 @@ public class TemplateController {
                         choices = parser.toStringList(questionMap.get("choices"));
                         if (isExam) {
                             answerChoice = (Integer) questionMap.get("answer");
-                            if (questionMap.containsKey("points")) {
+                            if (questionMap.get("points") != null) {
                                 questionPoints = Double.parseDouble(questionMap.get("points").toString());
                                 if (questionPoints <= 0) questionPoints = null;
                             }
-                            if (questionMap.containsKey("shuffle"))
+                            if (questionMap.get("shuffle") != null)
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
                     }
@@ -308,10 +308,11 @@ public class TemplateController {
                         min = (Integer) questionMap.get("min");
                         if (isExam) {
                             answerChoices = parser.toIntegerList(questionMap.get("answer"));
-                            if (questionMap.containsKey("points")) {
+                            if (questionMap.get("points") != null) {
                                 questionPoints = Double.parseDouble(questionMap.get("points").toString());
                                 if (questionPoints <= 0) questionPoints = null;
-                            }                            if (questionMap.containsKey("shuffle"))
+                            }
+                            if (questionMap.get("shuffle") != null)
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
                     }
@@ -355,7 +356,7 @@ public class TemplateController {
                         if (isExam) {
                             answerText = (String) questionMap.get("answer");
                             if ("".equals(answerText)) answerText = null;
-                            if (questionMap.containsKey("shuffle"))
+                            if (questionMap.get("shuffle") != null)
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
                     }
