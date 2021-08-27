@@ -212,15 +212,19 @@ public class DataController {
                 ArrayList<Integer> counts = new ArrayList<>();
                 if (!question.getType().equals("filling")) {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
-                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                    ArrayList<String> choices = new ArrayList<>();
+                    if (question.getType().equals("grade")) {
+                        choices = (ArrayList<String>) JSON.parseArray(argsMap.get("grades").toString(), String.class);
+                    } else {
+                        choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                    }
                     for (int j = 0; j < choices.size(); j++) {
                         if (question.getType().equals("choice") || question.getType().equals("multi-choice")) {
                             choicesInFormat.add((char) ((int) 'A' + j) + "." + choices.get(j));
                         } else if (question.getType().equals("dropdown") || question.getType().equals("vote") || question.getType().equals("sign-up")) {
                             choicesInFormat.add(choices.get(j));
                         } else {
-                            ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
-                            choicesInFormat.add(choices.get(j) + "(" + scores.get(j) + ")");
+                            choicesInFormat.add(choices.get(j) + "(" + (j + 1) + ")");
                         }
                         counts.add(0);
                     }
@@ -228,7 +232,7 @@ public class DataController {
                 result.put("answers", choicesInFormat);
                 result.put("counts", counts);
                 if (question.getType().equals("grade")) {
-                    result.put("avg", 0.0);
+                    result.put("avg", "0.0");
                 }
                 results.add(result);
             }
@@ -282,13 +286,11 @@ public class DataController {
                             } else {
                                 sumNum = 1;
                             }
-                            Map<String, Object> argsMap = JSON.parseObject(questions.get(i).getArgs());
-                            ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
                             Integer chIndex = (Integer) JSONArray.parseArray(answers.get(t - 1).getContent(), Object.class).get(i);
                             sumMap.put(i, sumNum);
-                            Double originalAvg = (Double) results.get(i).get("avg");
-                            Double newAvg = ((originalAvg * (sumNum - 1)) + Double.parseDouble(scores.get(chIndex))) / sumNum;
-                            results.get(i).put("avg", newAvg);
+                            double originalAvg = Double.parseDouble((String) results.get(i).get("avg"));
+                            double newAvg = ((originalAvg * (sumNum - 1)) + (chIndex + 1) ) / sumNum;
+                            results.get(i).put("avg", String.format("%.1f", newAvg));
                             if (!answerInFormat.get(i + 1).equals("")) {
                                 @SuppressWarnings("unchecked")
                                 ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
@@ -464,9 +466,8 @@ public class DataController {
                             if (chIndex < 0) {
                                 answerInFormat.add("");
                             } else {
-                                ArrayList<String> scores = (ArrayList<String>) JSON.parseArray(argsMap.get("scores").toString(), String.class);
-                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
-                                answerInFormat.add(choices.get(chIndex) + "(" + scores.get(chIndex) + ")");
+                                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("grades").toString(), String.class);
+                                answerInFormat.add(choices.get(chIndex) + "(" + (chIndex + 1) + ")");
                             }
                             break;
                         }
