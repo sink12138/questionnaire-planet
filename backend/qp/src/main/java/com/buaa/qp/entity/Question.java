@@ -31,6 +31,8 @@ public class Question {
 
     private String points;
 
+    private Boolean shuffle = false;
+
     public Question() {
 
     }
@@ -52,7 +54,7 @@ public class Question {
         this.args = args;
     }
 
-    public Question(Integer templateId, String type, String stem, String description, Boolean required, String args, String answer, String points) {
+    public Question(Integer templateId, String type, String stem, String description, Boolean required, String args, String answer, String points, Boolean shuffle) {
         this.templateId = templateId;
         this.type = type;
         this.stem = stem;
@@ -61,9 +63,10 @@ public class Question {
         this.args = args;
         this.answer = answer;
         this.points = points;
+        this.shuffle = shuffle;
     }
 
-    public Question(Integer templateId, String type, String stem, String description, Boolean required, String args, String answer) {
+    public Question(Integer templateId, String type, String stem, String description, Boolean required, String args, String answer, Boolean shuffle) {
         this.templateId = templateId;
         this.type = type;
         this.stem = stem;
@@ -71,5 +74,6 @@ public class Question {
         this.required = required;
         this.args = args;
         this.answer = answer;
+        this.shuffle = shuffle;
     }
 }
