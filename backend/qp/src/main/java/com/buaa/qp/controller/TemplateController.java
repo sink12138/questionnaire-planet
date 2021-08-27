@@ -237,7 +237,7 @@ public class TemplateController {
             String questionDescription;
             Boolean questionRequired;
             String questionAnswer = null;
-            Float questionPoints = null;
+            Double questionPoints = null;
             boolean questionShuffle = false;
             try {
                 questionType = (String) questionMap.get("type");
@@ -261,13 +261,15 @@ public class TemplateController {
                         choices = parser.toStringList(questionMap.get("choices"));
                         if (isExam) {
                             answerChoice = (Integer) questionMap.get("answer");
-                            questionPoints = (Float) questionMap.get("points");
-                            if (questionPoints != null && questionPoints <= 0) questionPoints = null;
+                            if (questionMap.containsKey("points")) {
+                                questionPoints = Double.parseDouble(questionMap.get("points").toString());
+                                if (questionPoints <= 0) questionPoints = null;
+                            }
                             if (questionMap.containsKey("shuffle"))
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
                     }
-                    catch (ClassCastException cce) {
+                    catch (ClassCastException | NumberFormatException e) {
                         throw new ParameterFormatException();
                     }
                     if (choices == null || choices.size() < 2)
@@ -306,13 +308,14 @@ public class TemplateController {
                         min = (Integer) questionMap.get("min");
                         if (isExam) {
                             answerChoices = parser.toIntegerList(questionMap.get("answer"));
-                            questionPoints = (Float) questionMap.get("points");
-                            if (questionPoints != null && questionPoints <= 0) questionPoints = null;
-                            if (questionMap.containsKey("shuffle"))
+                            if (questionMap.containsKey("points")) {
+                                questionPoints = Double.parseDouble(questionMap.get("points").toString());
+                                if (questionPoints <= 0) questionPoints = null;
+                            }                            if (questionMap.containsKey("shuffle"))
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
                     }
-                    catch (ClassCastException cce) {
+                    catch (ClassCastException | NumberFormatException e) {
                         throw new ParameterFormatException();
                     }
                     if (choices == null || choices.size() < 2)
@@ -359,12 +362,10 @@ public class TemplateController {
                     catch (ClassCastException cce) {
                         throw new ParameterFormatException();
                     }
-                    if (height == null || height <= 0)
-                        throw new ParameterFormatException();
-                    if (width == null || width <= 0)
-                        throw new ParameterFormatException();
-                    if (height > 10) height = 10;
-                    if (width < 300) width = 300;
+                    if (height == null || height <= 0) height = 1;
+                    else if (height > 10) height = 10;
+                    if (width == null) width = 500;
+                    else if (width < 300) width = 300;
                     else if (width > 800) width = 800;
                     argsMap.put("height", height);
                     argsMap.put("width", width + "px");
