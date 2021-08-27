@@ -528,7 +528,7 @@ export default {
         questions: [],
       },
       qrData: {
-        text: window.location.host + "/fill?templateId=" + this.templateId,
+        text: window.location.host + "/fill?code=" + this.code,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
@@ -598,7 +598,7 @@ export default {
               case "choice":
                 question.type = "0";
                 for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j], scores: 0 });
+                  question.answers.push({ value: item.choices[j]});
                 }
                 break;
               case "multi-choice":
@@ -606,15 +606,15 @@ export default {
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j], scores: 0 });
+                  question.answers.push({ value: item.choices[j]});
                 }
                 break;
               case "filling":
                 question.type = "2";
                 question.height = parseInt(item.height);
                 question.width = parseInt(item.width);
-                question.answers.push({ value: "", scores: 0 });
-                question.answers.push({ value: "", scores: 0 });
+                question.answers.push({ value: ""});
+                question.answers.push({ value: ""});
                 break;
               case "grade":
                 question.type = "3";
@@ -625,7 +625,7 @@ export default {
               case "dropdown":
                 question.type = "4";
                 for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j], scores: 0 });
+                  question.answers.push({ value: item.choices[j]});
                 }
                 break;
             }

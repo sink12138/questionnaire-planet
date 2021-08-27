@@ -15,6 +15,7 @@ const EditVote = () => import("../views/EditVote.vue")
 const Apply = () => import("../views/Apply.vue")
 const EditApply = () => import("../views/EditApply.vue")
 const Exam = () => import("../views/Exam.vue")
+const EditExam = () => import("../views/EditExam.vue")
 const Preview = () => import("../views/Preview.vue")
 const Fill = () => import("../views/Fill.vue")
 const Statistics = () => import("../views/Statistics.vue")
@@ -89,6 +90,11 @@ const routes = [
     path: '/exam/new',
     name: 'Exam',
     component: Exam
+  },
+  {
+    path: '/exam/edit',
+    name: 'EditExam',
+    component: EditExam
   },
   {
     path: '/preview',

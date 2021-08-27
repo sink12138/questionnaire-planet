@@ -532,7 +532,7 @@ export default {
         questions: [],
       },
       qrData: {
-        text: window.location.host + "/fill?templateId=" + this.templateId,
+        text: window.location.host + "/fill?code=" + this.code,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",

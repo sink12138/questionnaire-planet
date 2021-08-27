@@ -673,7 +673,7 @@ export default {
         ],
       },
       qrData: {
-        text: window.location.host + "/fill?templateId=" + this.templateId,
+        text: window.location.host + "/fill?code=" + this.code,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
@@ -886,6 +886,9 @@ export default {
             } else {
               quest.points = null;
             }
+            if (quest.answer == [] || quest.answer == undefined || quest.answer == "") {
+              quest.answer = null;
+            }
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -1012,6 +1015,9 @@ export default {
                 }
             } else {
               quest.points = null;
+            }
+            if (quest.answer == [] || quest.answer == undefined || quest.answer == "") {
+              quest.answer = null;
             }
             quest.choices = [];
             switch (question.type) {
@@ -1141,6 +1147,9 @@ export default {
                 }
             } else {
               quest.points = null;
+            }
+            if (quest.answer == [] || quest.answer == undefined || quest.answer == "") {
+              quest.answer = null;
             }
             quest.choices = [];
             switch (question.type) {

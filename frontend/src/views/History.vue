@@ -378,6 +378,19 @@ export default {
             message: "问卷已发布！",
           });
         }
+      } else if (row.type == "exam") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/exam/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$message({
+            message: "问卷已发布！",
+          });
+        }
       }
     },
     release(row) {
