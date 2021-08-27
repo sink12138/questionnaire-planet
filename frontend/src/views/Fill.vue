@@ -488,7 +488,7 @@ export default {
               this.questions = response.data.questions;
               this.dialogFormVisible2 = false;
             } else {
-              
+              alert("问卷密码错误！");
             }
           } else {
             alert("问卷密码错误！");
