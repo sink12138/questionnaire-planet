@@ -613,6 +613,7 @@ export default {
         answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
+      this.$router.push("/normal/new#question" + (this.modelForm.questions.length - 1))
     },
     resetForm(formName) {
       // 重置
