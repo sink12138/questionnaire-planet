@@ -180,16 +180,91 @@
                 :name="index"
                 class="questions"
               >
-                <template slot="title">
-                  <div class="question-index" v-show="modelForm.showIndex">
-                    第{{ index + 1 }}题
-                  </div>
-                  <div class="question-title">
-                    题目:{{ item.questionName }}
-                  </div>
-                </template>
-                <div class="question_name">
-                  <!-- 问题题目 -->
+              </el-switch>
+            </el-form-item>
+            <!-- 结束语 -->
+            <el-form-item label="结束语">
+              <el-input
+                v-model="modelForm.conclusion"
+                style="width: 258px"
+                clearable
+                placeholder="答卷后展示"
+              />
+            </el-form-item>
+            <!-- 问卷密码 -->
+            <el-form-item label="问卷密码">
+              <el-input
+                v-model="modelForm.password"
+                style="width: 258px"
+                clearable
+                placeholder="设置后需要密码才可回答"
+              />
+            </el-form-item>
+            <!-- 问卷限额 -->
+            <el-form-item
+              label="问卷限额"
+              :rules="{
+                type: 'number',
+                message: '请输入数字',
+                trigger: 'blur',
+              }"
+            >
+              <el-input
+                v-model="modelForm.quota"
+                style="width: 258px"
+                clearable
+                placeholder="收集指定数量后停止回收"
+              />
+            </el-form-item>
+            <!-- 发布时间 -->
+            <el-form-item label="自动发布时间">
+              <el-date-picker
+                v-model="modelForm.startTime"
+                value-format="yyyy-MM-dd HH:mm:00"
+                format="yyyy-MM-dd HH:mm"
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions"
+              >
+              </el-date-picker>
+            </el-form-item>
+            <!-- 回收时间 -->
+            <el-form-item label="自动回收时间">
+              <el-date-picker
+                v-model="modelForm.endTime"
+                value-format="yyyy-MM-dd HH:mm:00"
+                format="yyyy-MM-dd HH:mm"
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions"
+              >
+              </el-date-picker>
+            </el-form-item>
+          </div>
+          <div>
+            <el-collapse v-model="activeNames">
+              <vuedraggable
+                v-model="modelForm.questions"
+                class="wrapper"
+                @end="end"
+              >
+                <el-collapse-item
+                  v-for="(item, index) in modelForm.questions"
+                  :key="index"
+                  :name="index"
+                  class="questions"
+                >
+                  <template slot="title">
+                    <div class="question-index" v-show="modelForm.showIndex">
+                      第{{ index + 1 }}题
+                    </div>
+                    <div class="question-title">
+                      题目:{{ item.questionName }}
+                    </div>
+                  </template>
+                  <!-- 问题类型 -->
                   <el-form-item
                     :prop="`questions.${index}.questionName`"
                     label="问题"

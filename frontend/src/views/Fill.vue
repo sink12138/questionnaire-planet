@@ -334,8 +334,6 @@ export default {
   },
   created: function () {
     this.code = this.$route.query.code;
-    if (this.templateId == undefined) this.templateId = 0;
-    console.log(this.templateId);
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/attempt",
@@ -351,12 +349,9 @@ export default {
             this.dialogFormVisible1 = true;
           } else {
             if (this.locked == true) {
-              console.log(22);
               this.fillRight = true;
               this.dialogFormVisible2 = true;
             } else {
-              console.log(33);
-
               this.$axios({
                 method: "get",
                 url: "http://139.224.50.146:80/apis/details",
@@ -440,14 +435,12 @@ export default {
     },
     isLogin() {
       if (this.locked == true) {
-        console.log(22);
         this.dialogFormVisible2 = true;
       } else {
-        console.log(33);
         this.$axios({
           method: "get",
           url: "http://139.224.50.146:80/apis/details",
-          params: { templateId: this.templateId, visitor: true },
+          params: { code: this.code, visitor: true },
         })
           .then((response) => {
             console.log(response);
@@ -473,31 +466,28 @@ export default {
         method: "get",
         url: "http://139.224.50.146:80/apis/details",
         params: {
-          templateId: this.templateId,
+          code: this.code,
           password: this.password,
           visitor: true,
         },
       })
         .then((response) => {
+          console.log(this.password);
           console.log(response);
           if (response.data.success == true) {
-            if (response.data.password == this.password) {
-              this.title = response.data.title;
-              this.type = response.data.type;
-              this.description = response.data.description;
-              this.questions = response.data.questions;
-              this.dialogFormVisible2 = false;
-            } else {
+            this.title = response.data.title;
+            this.type = response.data.type;
+            this.description = response.data.description;
+            this.questions = response.data.questions;
+            this.dialogFormVisible2 = false;
+          } else {
+            if (response.data.message === "密码错误") {
               alert("问卷密码错误！");
             }
-          } else {
-            console.log(response.data.message);
-            this.$message({
-              message: response.data.message,
-              type: "warning",
-              showClose: true,
-            });
-            this.dialogFormVisible2 = false;
+            else {
+              this.$message.error(response.data.message);
+            }
+            
           }
         })
         .catch((err) => console.log(err));
@@ -521,6 +511,12 @@ export default {
         .then(() => {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
+              var i = 0;
+              for (i in this.questions){
+                if(this.questions[i].type == 'grade' && this.answers[i] == 0){
+                  this.answers[i] = null;
+                }
+              }
               let submitData = JSON.stringify({
                 code: this.code,
                 password: this.password,

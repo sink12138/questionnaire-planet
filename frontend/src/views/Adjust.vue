@@ -116,7 +116,7 @@
                       v-model="modelForm.password"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="设置后需要密码才可回答"
                     />
                   </el-form-item>
                   <!-- 问卷限额 -->
@@ -132,7 +132,7 @@
                       v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="收集指定数量后停止回收"
                     />
                   </el-form-item>
                   <!-- 发布时间 -->
@@ -408,9 +408,6 @@ export default {
       if (this.modelForm.conclusion == undefined) {
         this.modelForm.conclusion = "";
       }
-      if (this.modelForm.quota == undefined) {
-        this.modelForm.quota = 0;
-      }
       console.log(this.modelForm.password);
       this.$axios({
         method: "post",
@@ -424,10 +421,7 @@ export default {
           password: this.modelForm.password,
           startTime: this.modelForm.startTime,
           endTime: this.modelForm.endTime,
-          quota:
-            this.modelForm.quota == undefined
-              ? 0
-              : parseInt(this.modelForm.quota),
+          quota: this.modelForm.quota,
         }),
       }).then(
         (response) => {
@@ -449,23 +443,64 @@ export default {
       );
     },
     publishQuestion() {
+      if (this.modelForm.password == undefined) {
+        this.modelForm.password = "";
+      }
+      if (this.modelForm.conclusion == undefined) {
+        this.modelForm.conclusion = "";
+      }
+      console.log(this.modelForm.password);
       this.$axios({
         method: "post",
-        url: "http://139.224.50.146:80/apis/release",
+        url: "http://139.224.50.146:80/apis/adjust",
         data: JSON.stringify({
-          templateId: this.templateId,
+          templateId: parseInt(this.templateId),
+          title: this.modelForm.title,
+          description: this.modelForm.description,
+          conclusion: this.modelForm.conclusion,
+          showIndex: this.modelForm.showIndex,
+          password: this.modelForm.password,
+          startTime: this.modelForm.startTime,
+          endTime: this.modelForm.endTime,
+          quota: this.modelForm.quota,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
             this.$message({
-              message: "问卷发布成功！",
+              message: "问卷修改成功！",
               type: "success",
             });
-            this.code = response.data.code;
-            this.qrData.text = window.location.host + "/fill?code=" + this.code;
-            this.dialogVisible = true;
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146:80/apis/release",
+              data: JSON.stringify({
+                templateId: parseInt(this.templateId),
+              }),
+            }).then(
+              (response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.$message({
+                    message: "问卷发布成功！",
+                    type: "success",
+                  });
+                  this.code = response.data.code;
+                  this.qrData.text =
+                    window.location.host + "/fill?code=" + this.code;
+                  this.dialogVisible = true;
+                } else {
+                  this.$message({
+                    message: response.data.message,
+                  });
+                }
+              },
+              (err) => {
+                alert(err);
+              }
+            );
+            console.log("发布成功!");
           } else {
             this.$message({
               message: response.data.message,
@@ -476,7 +511,6 @@ export default {
           alert(err);
         }
       );
-      console.log("发布成功!");
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");
