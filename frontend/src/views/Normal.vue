@@ -188,39 +188,40 @@
                     题目:{{ item.questionName }}
                   </div>
                 </template>
-                <div>
-                <el-form-item
-                  :prop="`questions.${index}.questionName`"
-                  label="问题"
-                  :rules="{
-                    required: true,
-                    message: '请填写问题',
-                    trigger: 'change',
-                  }"
-                >
-                  <el-input
-                    v-model="item.questionName"
-                    style="width: 258px"
-                    clearable
-                    placeholder="请填写问题"
-                  />
-                </el-form-item>
-                <!-- 是否必填 -->
-                <el-form-item
-                  :prop="`questions.${index}.required`"
-                  :label="`是否必填`"
-                  :rules="{
-                    required: true,
-                    message: '请选择是否必填',
-                    trigger: 'change',
-                  }"
-                >
-                  <el-switch
-                    v-model="item.required"
+                <div class="question_name">
+                  <!-- 问题 -->
+                  <el-form-item
+                    :prop="`questions.${index}.questionName`"
+                    label="问题"
+                    :rules="{
+                      required: true,
+                      message: '请填写问题',
+                      trigger: 'change',
+                    }"
                   >
-                  </el-switch>
-                </el-form-item>
-              </div>
+                    <el-input
+                      v-model="item.questionName"
+                      style="width: 258px"
+                      clearable
+                      placeholder="请填写问题"
+                    />
+                  </el-form-item>
+                  <!-- 是否必填 -->
+                  <el-form-item
+                    :prop="`questions.${index}.required`"
+                    :label="`是否必填`"
+                    :rules="{
+                      required: true,
+                      message: '请选择是否必填',
+                      trigger: 'change',
+                    }"
+                  >
+                    <el-switch
+                      v-model="item.required"
+                    >
+                    </el-switch>
+                  </el-form-item>
+                </div>
               <!-- 问题描述 -->
               <el-form-item
                 :prop="`questions.${index}.questionSummary`"
@@ -1046,11 +1047,11 @@ export default {
   font-size: 15px;
 }
 .basic {
-  width: 1000px;
+  width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: baseline;
   text-align: left;
 }
 .editor .el-button {
