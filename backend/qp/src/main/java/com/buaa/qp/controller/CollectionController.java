@@ -117,10 +117,10 @@ public class CollectionController {
             boolean allowed = false;
             boolean isOwner = false;
             if (template.getOwner().equals(accountId)) {
-                allowed = true;
-                isOwner = true;
+                allowed = !visitor;
+                isOwner = !visitor;
             }
-            else if (template.getReleased()) {
+            if (!isOwner && template.getReleased()) {
                 String pwd = template.getPassword();
                 if (pwd == null || pwd.equals(password))
                     allowed = true;
@@ -129,11 +129,13 @@ public class CollectionController {
             }
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
+
             Integer quota = template.getQuota();
+            String conclusion = template.getConclusion();
             if (isOwner) {
-                if (template.getConclusion() != null)
-                    map.put("conclusion", template.getConclusion());
-                if (template.getQuota() != null)
+                if (conclusion != null)
+                    map.put("conclusion", conclusion);
+                if (quota != null)
                     map.put("quota", quota);
             }
             if (!template.getType().equals("normal") && (visitor || !isOwner)) {
@@ -184,7 +186,6 @@ public class CollectionController {
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {
-            map.clear();
             map.put("success", false);
             map.put("message", exc.toString());
         }
@@ -310,7 +311,11 @@ public class CollectionController {
             }
 
             // Submit the answer
-            Answer answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
+            Answer answer;
+            if (template.getType().equals("normal"))
+                answer = new Answer(templateId, JSON.toJSONString(answers));
+            else
+                answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
             Integer quota = template.getQuota();
             if (quota == null && !template.getType().equals("sign-up"))
                 answerService.submitAnswer(answer);

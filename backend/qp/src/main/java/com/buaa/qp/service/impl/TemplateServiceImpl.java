@@ -43,7 +43,8 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public Integer submitTemplate(Template template, ArrayList<Question> questions) {
         templateDao.insert(template);
-        templateDao.createEvents(template);
+        if (template.getStartTime() != null || template.getEndTime() != null)
+            templateDao.createEvents(template);
         Integer templateId = template.getTemplateId();
         String code = generateCode();
         while (templateDao.selectByCode(code) != null) {

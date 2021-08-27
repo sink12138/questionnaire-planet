@@ -2,6 +2,7 @@ package com.buaa.qp.dao;
 
 import com.buaa.qp.entity.Template;
 import org.apache.ibatis.annotations.Mapper;
+
 import java.util.ArrayList;
 
 @Mapper

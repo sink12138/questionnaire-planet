@@ -1,13 +1,13 @@
 package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.buaa.qp.dao.AnswerDao;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
+import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class TemplateController {
@@ -28,7 +31,7 @@ public class TemplateController {
     private TemplateService templateService;
 
     @Autowired
-    AnswerDao answerDao;
+    AnswerService answerService;
 
     @PostMapping("/submit")
     public Map<String, Object> submit(@RequestBody Map<String, Object> requestMap) {
@@ -70,8 +73,8 @@ public class TemplateController {
                 if (quota != null && quota <= 0) quota = null;
                 String startStr = (String) requestMap.get("startTime");
                 String endStr = (String) requestMap.get("endTime");
-                if (startStr != null) startTime = sdf.parse(startStr);
-                if (endStr != null) endTime = sdf.parse(endStr);
+                if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
+                if (endStr != null && !endStr.isEmpty()) endTime = sdf.parse(endStr);
                 questionMaps = parser.toMapList(requestMap.get("questions"));
             }
             catch (ClassCastException | ParseException cce) {
@@ -190,7 +193,7 @@ public class TemplateController {
                         try {
                             grades = parser.toStringList(questionMap.get("grades"));
                         }
-                        catch (ClassCastException | NumberFormatException e) {
+                        catch (ClassCastException e) {
                             throw new ParameterFormatException();
                         }
                         if (grades == null)
@@ -339,8 +342,8 @@ public class TemplateController {
                 showIndex = (Boolean) requestMap.get("showIndex");
                 String startStr = (String) requestMap.get("startTime");
                 String endStr = (String) requestMap.get("endTime");
-                if (startStr != null) startTime = sdf.parse(startStr);
-                if (endStr != null) endTime = sdf.parse(endStr);
+                if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
+                if (endStr != null && !endStr.isEmpty()) endTime = sdf.parse(endStr);
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
@@ -372,7 +375,7 @@ public class TemplateController {
                 throw new ExtraMessageException("已删除的问卷不能编辑");
             if (template.getReleased())
                 throw new ExtraMessageException("已发布的问卷不能编辑");
-            if (quota != null && quota < answerDao.selectCountByTid(templateId))
+            if (quota != null && quota < answerService.countAnswers(templateId))
                 throw new ExtraMessageException("限额不得少于已收集份数");
 
             template.setTitle(title);

@@ -398,7 +398,7 @@ public class DataController {
     private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
         ArrayList<String> firstRow = new ArrayList<>();
-        firstRow.add(null);
+        firstRow.add("序号");
         int indexOfStem = 1;
         for (Question question : questions) {
             firstRow.add(indexOfStem + "." + question.getStem());
@@ -429,10 +429,8 @@ public class DataController {
                             }
                             break;
                         }
-                        case "vote":{
-                        }
-                        case "sign-up": {
-                        }
+                        case "vote":
+                        case "sign-up":
                         case "multi-choice": {
                             ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                             String choiceStr = answerContents.get(i).toString();
@@ -485,9 +483,8 @@ public class DataController {
                     }
                 }
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-            answerInFormat.add(sdf.format(answer.getSubmitTime()));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            answerInFormat.add(sdf.format(new Date(answer.getSubmitTime().getTime() - 28800000)));
             Integer accountId = answer.getSubmitter();
             if (accountId != null) {
                 Account account = accountService.getAccountById(accountId);
