@@ -2,6 +2,7 @@ package com.buaa.qp.service.impl;
 
 import com.buaa.qp.dao.AnswerDao;
 import com.buaa.qp.dao.QuestionDao;
+import com.buaa.qp.dao.ShuffleDao;
 import com.buaa.qp.dao.TemplateDao;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
@@ -22,6 +23,9 @@ public class TemplateServiceImpl implements TemplateService {
     @Autowired
     private AnswerDao answerDao;
 
+    @Autowired
+    private ShuffleDao shuffleDao;
+
     @Override
     public Template getTemplate(Integer templateId) {
         Template template = templateDao.selectById(templateId);
@@ -29,6 +33,11 @@ public class TemplateServiceImpl implements TemplateService {
             return null;
         template.setDuration(templateDao.selectDuration(templateId));
         return template;
+    }
+
+    @Override
+    public Template getTemplate(String code) {
+        return templateDao.selectByCode(code);
     }
 
     @Override
@@ -66,6 +75,7 @@ public class TemplateServiceImpl implements TemplateService {
         Integer templateId = template.getTemplateId();
         answerDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
+        shuffleDao.deleteByTid(templateId);
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
@@ -95,6 +105,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void deleteTemplate(Integer templateId) {
+        shuffleDao.deleteByTid(templateId);
         answerDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
         templateDao.deleteByTid(templateId);
@@ -108,20 +119,15 @@ public class TemplateServiceImpl implements TemplateService {
     @Override
     public String updateCode(Integer templateId) {
         Template template = templateDao.selectById(templateId);
-        String code = generateCode();
         if (template == null)
             return null;
+        String code = generateCode();
         while (templateDao.selectByCode(code) != null) {
             code = generateCode();
         }
         template.setCode(code);
         templateDao.updateCode(template);
         return code;
-    }
-
-    @Override
-    public Template getTemplateByCode(String code) {
-        return templateDao.selectByCode(code);
     }
 
     private String generateCode() {

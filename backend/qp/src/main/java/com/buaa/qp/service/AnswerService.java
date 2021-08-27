@@ -21,5 +21,5 @@ public interface AnswerService {
 
     ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer shuffleId);
 
-    ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId);
+    ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer accountId, Integer templateId);
 }

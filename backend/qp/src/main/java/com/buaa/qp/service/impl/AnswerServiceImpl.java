@@ -38,10 +38,14 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public void clearAllAnswers(Integer templateId) {
         answerDao.deleteByTid(templateId);
+        shuffleDao.deleteByTid(templateId);
     }
 
     @Override
     public void deleteById(Integer answerId) {
+        Answer answer = answerDao.selectById(answerId);
+        if (answer.getSubmitter() != null)
+            shuffleDao.deleteByAccountTemplateId(answer.getSubmitter(), answer.getTemplateId());
         answerDao.deleteById(answerId);
     }
 
@@ -105,7 +109,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId) {
+    public ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer accountId, Integer templateId) {
         Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
         return reorderAnswer(answers, shuffleId);
     }

@@ -44,7 +44,7 @@ public class CollectionController {
                 throw new ParameterFormatException();
 
             // Authority checks
-            Template template = templateService.getTemplateByCode(code);
+            Template template = templateService.getTemplate(code);
             if (template == null || template.getDeleted())
                 throw new ObjectNotFoundException();
             else if (!template.getReleased())
@@ -103,7 +103,7 @@ public class CollectionController {
             if (password != null && password.isEmpty()) password = null;
 
             // Existence checks
-            Template template = templateService.getTemplateByCode(code);
+            Template template = templateService.getTemplate(code);
             if (template == null)
                 throw new ObjectNotFoundException();
             int templateId = template.getTemplateId();
@@ -243,7 +243,7 @@ public class CollectionController {
             if (password != null && password.isEmpty()) password = null;
 
             // Existence checks
-            Template template = templateService.getTemplateByCode(code);
+            Template template = templateService.getTemplate(code);
             if (template == null)
                 throw new ObjectNotFoundException();
             int templateId = template.getTemplateId();
@@ -348,20 +348,18 @@ public class CollectionController {
                 }
             }
 
-            // Submit the answer
+            // Create answer entity
             Answer answer;
             if (template.getType().equals("normal"))
                 answer = new Answer(templateId, JSON.toJSONString(answers));
             else if (template.getType().equals("exam")) {
-                answer = new Answer(templateId, JSON.toJSONString(answerService.reorderAnswer(answers, shuffleId)));
+                answer = new Answer(templateId, JSON.toJSONString(answerService.reorderAnswer(answers, shuffleId)), accountId);
             }
             else
                 answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
 
-            Integer quota = template.getQuota();
-            if (quota == null && !template.getType().equals("sign-up") && !template.getType().equals("exam"))
-                answerService.submitAnswer(answer);
-            else if (template.getType().equals("exam")) {
+            // Calculate the score if this is an exam
+            if (template.getType().equals("exam")) {
                 ArrayList<Map<String, Object>> results = new ArrayList<>();
                 double fullMarks = 0;
                 double totalMarks = 0;
@@ -424,11 +422,15 @@ public class CollectionController {
                     i ++;
                 }
                 map.put("results", results);
-                String points = String.format("%.1f/%.1f", totalMarks, fullMarks);
+                String points = String.format("%.2f/%.2f", totalMarks, fullMarks);
                 map.put("points", points);
                 answer.setPoints(points);
-                answerService.submitAnswer(answer);
             }
+
+            // Submit the answer
+            Integer quota = template.getQuota();
+            if (quota == null && !template.getType().equals("sign-up"))
+                answerService.submitAnswer(answer);
             else synchronized (quotaLock) {
                 int answerCount = answerService.countAnswers(templateId);
                 if (quota != null && answerCount >= quota)

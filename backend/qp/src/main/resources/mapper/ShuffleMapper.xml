@@ -7,10 +7,18 @@
     </select>
     <select id="selectIdByAccountTemplateId" resultType="Integer">
         select shuffle_id from shuffle
-        where account_id = #{0} and template_id = #{0};
+        where account_id = #{accountId} and template_id = #{templateId};
     </select>
     <insert id="insert" parameterType="Shuffle" useGeneratedKeys="true" keyProperty="shuffleId">
         insert into shuffle(account_id, template_id, numbers, choices)
         values (#{accountId}, #{templateId}, #{numbers}, #{choices});
     </insert>
+    <delete id="deleteByTid" parameterType="Integer">
+        delete from shuffle
+        where template_id = #{templateId};
+    </delete>
+    <delete id="deleteByAccountTemplateId" parameterType="Integer">
+        delete from shuffle
+        where account_id = #{accountId} and template_id = #{templateId};
+    </delete>
 </mapper>

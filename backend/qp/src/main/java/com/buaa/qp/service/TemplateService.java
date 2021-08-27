@@ -26,5 +26,5 @@ public interface TemplateService {
 
     String updateCode(Integer templateId);
 
-    Template getTemplateByCode(String code);
+    Template getTemplate(String code);
 }
