@@ -47,6 +47,7 @@ export default {
         this.nowtime = new Date(res.data.time).getTime() / 1000;
         this.lefttime = Math.floor((new Date(this.deadlline).getTime() / 1000) - this.nowtime);
 
+        this.lefttime++;
         this.timer = setInterval(()=>{
           this.lefttime--;
 
