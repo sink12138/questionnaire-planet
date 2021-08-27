@@ -32,6 +32,10 @@
         />
         <el-button icon="el-icon-search" @click="searchQuest"></el-button>
       </div>
+      <el-button-group>
+        <el-button icon="el-icon-s-unfold"></el-button>
+        <el-button icon="el-icon-menu"></el-button>
+      </el-button-group>
     </div>
     <div class="questionnaire">
       <div class="list" style="margin-left: 1%; margin-right: 1%">
@@ -517,10 +521,10 @@ export default {
 <style scoped>
 .top {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  margin: 15px;
 }
 .list {
   display: flex;

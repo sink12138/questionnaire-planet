@@ -34,11 +34,6 @@ const routes = [
     component: Main,
     children: [
       {
-        path: '/questionnaire',
-        name: 'Questionnaire',
-        component: Questionnaire,
-      },
-      {
         path: '/history',
         name: 'History',
         component: History
@@ -49,6 +44,11 @@ const routes = [
         component: Recycle
       }
     ]
+  },
+  {
+    path: '/questionnaire',
+    name: 'Questionnaire',
+    component: Questionnaire,
   },
   {
     path: '/adjust',
@@ -119,7 +119,7 @@ const router = new VueRouter({
 })
 router.beforeEach((to, from, next) => {
   var regx = /^\/fill.*?$/;
-  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx)) {
+  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx) || to.path != "/") {
     next();
   }
   else {

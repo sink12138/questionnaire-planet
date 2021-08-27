@@ -5,12 +5,15 @@
         <Header></Header>
       </el-header>
       <el-container>
-        <el-aside style="width: 200px">
+        <el-aside v-bind:class="aside" style="width: 121px">
           <el-menu
             default-active="this.$route.path"
             class="el-menu-vertical-demo"
             style="margin: 0"
+            :collapse="isCollapse"
             router>
+            <el-button v-if="this.isCollapse == true" icon="el-icon-caret-right" type="text" @click="changeCollapse()"></el-button>
+            <el-button v-else icon="el-icon-caret-left" type="text" @click="changeCollapse()">收起菜单</el-button>
             <el-menu-item index="/questionnaire">
               <i class="el-icon-circle-plus"></i>
               <span slot="title">新建问卷</span>
@@ -38,6 +41,23 @@ import Header from "../components/Header.vue"
 export default {
   components: {
     'Header': Header,
+  },
+  data() {
+    return {
+      isCollapse: false,
+    }
+  },
+  computed: {
+    aside:function() {
+      return {
+        aside_collapse:this.isCollapse
+      }
+    }
+  },
+  methods: {
+    changeCollapse() {
+      this.isCollapse = !this.isCollapse
+    }
   }
 }
 </script>
@@ -49,11 +69,17 @@ export default {
   align-items: center;
   padding: 0;
 }
-.el-menu {
-  margin-top: 20px;
-  width: 195px;
-}
 .el-main {
   padding: 0;
+}
+.el-menu {
+  margin-top: 20px;
+}
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 120px;
+  min-height: 400px;
+}
+.aside_collapse {
+  width: 65px;
 }
 </style>
