@@ -116,7 +116,7 @@
                       v-model="modelForm.password"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="设置后需要密码才可回答"
                     />
                   </el-form-item>
                   <!-- 问卷限额 -->
@@ -132,7 +132,7 @@
                       v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="收集指定数量后停止回收"
                     />
                   </el-form-item>
                   <!-- 发布时间 -->

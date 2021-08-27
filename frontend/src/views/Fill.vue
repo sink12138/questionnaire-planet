@@ -521,6 +521,12 @@ export default {
         .then(() => {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
+              var i = 0;
+              for (i in this.questions){
+                if(this.questions[i].type == 'grade' && this.answers[i] == 0){
+                  this.answers[i] = null;
+                }
+              }
               let submitData = JSON.stringify({
                 code: this.code,
                 password: this.password,
