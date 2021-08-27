@@ -159,6 +159,18 @@ public class CollectionController {
                 map.put("endTime", sdf.format(new Date(endTime.getTime() - 28800000)));
 
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            if (template.getType().equals("exam")) {
+                int shuffleId;
+                if (!isOwner) {
+                    if (accountId == null) {
+                        shuffleId = questionService.shuffleQuestions(questions, null);
+                    } else {
+                        shuffleId = questionService.shuffleQuestions(questions, accountId, templateId);
+                    }
+                    map.put("shuffleId", shuffleId);
+                }
+            }
+
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
             for (Question question : questions) {
                 Map<String, Object> questionMap = new HashMap<>();
@@ -167,6 +179,13 @@ public class CollectionController {
                 String dsc = question.getDescription();
                 if (dsc != null)
                     questionMap.put("description", dsc);
+                if (template.getType().equals("exam")) {
+                    if (isOwner) {
+                        questionMap.put("answer", question.getAnswer());
+                        questionMap.put("shuffle", question.getShuffle());
+                    }
+                    questionMap.put("points", question.getPoints());
+                }
                 questionMap.put("required", question.getRequired());
                 Map<String, Object> argsMap = JSONObject.parseObject(question.getArgs());
                 questionMap.putAll(argsMap);
@@ -205,6 +224,7 @@ public class CollectionController {
             // General parameter checks
             String code;
             String password;
+            Integer shuffleId = null;
             ArrayList<Object> answers;
             ClassParser parser = new ClassParser();
             try {
@@ -228,6 +248,15 @@ public class CollectionController {
                 throw new ObjectNotFoundException();
             int templateId = template.getTemplateId();
 
+            if (template.getType().equals("exam")) {
+                try {
+                    shuffleId = (Integer) requestMap.get("shuffleId");
+                }
+                catch (ClassCastException cce) {
+                    throw new ParameterFormatException();
+                }
+            }
+
             // Login checks
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (!template.getType().equals("normal") && accountId == null)
@@ -249,6 +278,9 @@ public class CollectionController {
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             if (answers.size() < questions.size())
                 throw new ParameterFormatException();
+            if (template.getType().equals("exam")) {
+                questionService.shuffleQuestions(questions, shuffleId);
+            }
             for (int i = 0; i < answers.size(); ++i) {
                 Object answerObject = answers.get(i);
                 Question question = questions.get(i);
@@ -320,11 +352,83 @@ public class CollectionController {
             Answer answer;
             if (template.getType().equals("normal"))
                 answer = new Answer(templateId, JSON.toJSONString(answers));
+            else if (template.getType().equals("exam")) {
+                answer = new Answer(templateId, JSON.toJSONString(answerService.reorderAnswer(answers, shuffleId)));
+            }
             else
                 answer = new Answer(templateId, JSON.toJSONString(answers), accountId);
+
             Integer quota = template.getQuota();
-            if (quota == null && !template.getType().equals("sign-up"))
+            if (quota == null && !template.getType().equals("sign-up") && !template.getType().equals("exam"))
                 answerService.submitAnswer(answer);
+            else if (template.getType().equals("exam")) {
+                ArrayList<Map<String, Object>> results = new ArrayList<>();
+                double fullMarks = 0;
+                double totalMarks = 0;
+                for (int i = 0; i < questions.size(); i++) {
+                    Question current_q = questions.get(i);
+                    Map<String, Object> result = new HashMap<>();
+                    if (current_q.getAnswer() != null){
+                        result.put("stem", current_q.getStem());
+                        String type = current_q.getType();
+                        result.put("type", type);
+                        if (type.equals("filling")) {
+                            result.put("yourAnswer", answers.get(i));
+                            result.put("correctAnswer", current_q.getAnswer());
+                        } else if (type.equals("choice") || type.equals("multi-choice")){
+                            Map<String, Object> argsMap = JSON.parseObject(current_q.getArgs());
+                            ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                            result.put("choices", choices);
+                            double getPoints = 0;
+                            fullMarks += Double.parseDouble(current_q.getPoints());
+                            if (type.equals("multi-choice")) {
+                                ArrayList<Integer> correctChoices = (ArrayList<Integer>) JSON.parseArray(current_q.getAnswer(), Integer.class);
+                                result.put("correctAnswer", correctChoices);
+                                ArrayList<Integer> yourChoice = parser.toIntegerList(answers.get(i));
+                                if (yourChoice.isEmpty())
+                                    result.put("yourAnswer", "");
+                                if (yourChoice.size() <= correctChoices.size()) {
+                                    int correctNum = 0;
+                                    for (int index : correctChoices) {
+                                        if (yourChoice.contains(index)) {
+                                            correctNum ++;
+                                        }
+                                    }
+                                    if (correctNum == yourChoice.size()) {
+                                        getPoints = Double.parseDouble(current_q.getPoints()) * ((double) correctNum / (double) correctChoices.size());
+                                    }
+                                }
+                                totalMarks += getPoints;
+                                result.put("points", String.format("%.1f/%.1f", getPoints, Double.parseDouble(current_q.getPoints())));
+                            } else {
+                                int correctChoice = Integer.parseInt(current_q.getAnswer());
+                                int yourChoice = (Integer) answers.get(i);
+                                if (yourChoice < 0) {
+                                    result.put("yourAnswer", "");
+                                }
+                                result.put("correctAnswer", correctChoice);
+                                if (yourChoice == correctChoice) {
+                                    totalMarks += Double.parseDouble(current_q.getPoints());
+                                }
+                            }
+                        }
+                    }
+                    results.add(result);
+                }
+                int i = 1;
+                for (Map<String, Object> result : results) {
+                    if (template.getShowIndex()) {
+                        String stem = (String) (result.get("stem"));
+                        result.put("stem", i + "." + stem);
+                    }
+                    i ++;
+                }
+                map.put("results", results);
+                String points = String.format("%.1f/%.1f", totalMarks, fullMarks);
+                map.put("points", points);
+                answer.setPoints(points);
+                answerService.submitAnswer(answer);
+            }
             else synchronized (quotaLock) {
                 int answerCount = answerService.countAnswers(templateId);
                 if (quota != null && answerCount >= quota)

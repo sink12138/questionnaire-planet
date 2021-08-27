@@ -63,20 +63,20 @@ public class DataController {
             // get data
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"));
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
             ArrayList<Map<String, Object>> answerMaps = new ArrayList<>();
-            boolean hasUsername = !template.getType().equals("normal");
             for (int i = 0; i < answers.size(); i++) {
                 Map<String, Object> answerMap = new HashMap<>();
                 answerMap.put("answerId", answers.get(i).getAnswerId());
                 answerMap.put("answerTime", answersInFormat.get(i + 1).get(questions.size() + 1));
-                if (hasUsername)
-                    answerMap.put("username", answersInFormat.get(i + 1).get(questions.size() + 2));
+                answerMap.put("username", answersInFormat.get(i + 1).get(questions.size() + 2));
                 for (int j = 0; j < questions.size(); j ++) {
                     answerMap.put(answersInFormat.get(0).get(j + 1), answersInFormat.get(i + 1).get(j + 1));
                 }
+                if (template.getType().equals("exam"))
+                    answerMap.put("points", answersInFormat.get(i + 1).get(questions.size() + 3));
                 answerMaps.add(answerMap);
             }
             map.put("answers", answerMaps);
@@ -133,7 +133,7 @@ public class DataController {
 
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            ArrayList<ArrayList<String>> formContent = getData(answers, questions);
+            ArrayList<ArrayList<String>> formContent = getData(answers, questions, template.getType().equals("exam"));
             if (file.exists() && !file.delete())
                 throw new ExtraMessageException("File already exists");
             if(!file.createNewFile())
@@ -212,7 +212,7 @@ public class DataController {
                 ArrayList<Integer> counts = new ArrayList<>();
                 if (!question.getType().equals("filling")) {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
-                    ArrayList<String> choices = new ArrayList<>();
+                    ArrayList<String> choices;
                     if (question.getType().equals("grade")) {
                         choices = (ArrayList<String>) JSON.parseArray(argsMap.get("grades").toString(), String.class);
                     } else {
@@ -237,7 +237,7 @@ public class DataController {
                 results.add(result);
             }
             Map<Integer, Integer> sumMap = new HashMap<>(); // for calculate avg of grade question
-            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions);
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"));
             for (int t = 1; t < answersInFormat.size(); t++) {
                 ArrayList<String> answerInFormat = answersInFormat.get(t);
                 for (int i = 0; i < questions.size(); i++) {
@@ -322,6 +322,33 @@ public class DataController {
                 }
             }
             map.put("results", results);
+            if (template.getType().equals("exam")) {
+                String totalPoints = null;
+                double sumDouble = 0.0;
+                ArrayList<Integer> counts = new ArrayList<>();
+                ArrayList<String> pointsStr = new ArrayList<>();
+                for (int i = 1; i < answersInFormat.size(); i++) {
+                    ArrayList<String> answerInFormat = answersInFormat.get(i);
+                    String[] p_array = answerInFormat.get(questions.size() + 3).split("/");
+                    if (totalPoints == null) {
+                        totalPoints = p_array[1];
+                    }
+                    sumDouble += Double.parseDouble(p_array[0]);
+                    if (pointsStr.contains(p_array[0])) {
+                        int index = pointsStr.indexOf(p_array[0]);
+                        int number = counts.get(index);
+                        number ++;
+                        counts.set(index, number);
+                    } else {
+                        pointsStr.add(p_array[0]);
+                        counts.add(1);
+                    }
+                }
+                map.put("totalPoints", totalPoints);
+                map.put("allPoints", pointsStr);
+                map.put("counts", counts);
+                map.put("avgPoints", String.format("%.1f", sumDouble / answers.size()));
+            }
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
@@ -397,7 +424,7 @@ public class DataController {
     @Autowired
     AccountService accountService;
 
-    private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions) {
+    private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions, Boolean isExam) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
         ArrayList<String> firstRow = new ArrayList<>();
         firstRow.add("序号");
@@ -408,6 +435,9 @@ public class DataController {
         }
         firstRow.add("提交时间");
         firstRow.add("用户名");
+        if (isExam) {
+            firstRow.add("得分情况");
+        }
         answersInFormat.add(firstRow);
         for (Answer answer : answers) {
             ArrayList<String> answerInFormat = new ArrayList<>();
@@ -490,6 +520,11 @@ public class DataController {
             if (accountId != null) {
                 Account account = accountService.getAccountById(accountId);
                 answerInFormat.add(account.getUsername());
+            } else {
+                answerInFormat.add(null);
+            }
+            if (isExam) {
+                answerInFormat.add(answer.getPoints());
             }
             answersInFormat.add(answerInFormat);
         }

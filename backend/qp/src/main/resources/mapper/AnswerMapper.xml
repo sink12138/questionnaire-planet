@@ -8,11 +8,11 @@
         delete from answer where answer_id = #{answerId}
     </delete>
     <insert id="insert" parameterType="Answer" keyProperty="answerId" useGeneratedKeys="true">
-        insert into answer(template_id, content, submit_time, submitter)
-        values (#{templateId}, #{content}, now(), #{submitter})
+        insert into answer(template_id, content, submit_time, submitter, points)
+        values (#{templateId}, #{content}, now(), #{submitter}, #{points})
     </insert>
     <select id="selectByTid" parameterType="Integer" resultType="Answer">
-        select answer_id, template_id, content, submit_time, submitter, (
+        select answer_id, template_id, content, submit_time, submitter, points, (
             select username from account
             where account_id = answer.submitter
             limit 1

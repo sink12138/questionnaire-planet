@@ -109,6 +109,7 @@ public class TemplateController {
             ArrayList<Question> questions = makeQuestions(type, quota, questionMaps);
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
                     quota, showIndex, startTime, endTime);
+
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);
             }

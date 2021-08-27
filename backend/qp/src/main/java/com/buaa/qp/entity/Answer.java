@@ -25,6 +25,8 @@ public class Answer {
 
     private Integer submitter;
 
+    private String points;
+
     /**
      * This attribute does not exist in the database!
      * Therefore, it shall not be used in any "insert" expressions.
