@@ -55,6 +55,16 @@ public class ClassParser {
         return noNullList;
     }
 
+    public ArrayList<Object> toObjectListWithNulls(Object object) throws ClassCastException {
+        if (object == null)
+            return null;
+        if (!(object instanceof List))
+            throw new ClassCastException();
+        @SuppressWarnings("unchecked")
+        List<Object> objectList = (List<Object>) object;
+        return new ArrayList<>(objectList);
+    }
+
     public Map<String, Object> toMap(Object object) throws ClassCastException {
         if (object == null)
             return null;

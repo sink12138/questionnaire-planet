@@ -210,7 +210,7 @@ public class CollectionController {
             try {
                 code = (String) requestMap.get("code");
                 password = (String) requestMap.get("password");
-                answers = parser.toObjectList(requestMap.get("answers"));
+                answers = parser.toObjectListWithNulls(requestMap.get("answers"));
             }
             catch (ClassCastException cce) {
                 throw new ParameterFormatException();
@@ -252,50 +252,56 @@ public class CollectionController {
             for (int i = 0; i < answers.size(); ++i) {
                 Object answerObject = answers.get(i);
                 Question question = questions.get(i);
+                if (answerObject == null && question.getRequired())
+                    throw new ParameterFormatException();
                 try {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
                     switch (question.getType()) {
                         case "choice":
-                        case "dropdown":
+                        case "dropdown": {
+                            Integer choice = (Integer) answerObject;
+                            if (choice == null) {
+                                answers.set(i, -1);
+                            }
+                            else if (choice < 0 || choice > parser.toStringList(argsMap.get("choices")).size() - 1)
+                                throw new ParameterFormatException();
+                            break;
+                        }
                         case "grade": {
                             Integer choice = (Integer) answerObject;
-                            if (choice < 0) {
-                                if (question.getRequired()) {
-                                    throw new ParameterFormatException();
-                                }
-                                else
-                                    answers.set(i, -1);
+                            if (choice == null) {
+                                answers.set(i, -1);
                             }
-                            else if (choice > parser.toStringList(argsMap.get("choices")).size() - 1)
+                            else if (choice < 0 || choice > 4)
                                 throw new ParameterFormatException();
                             break;
                         }
                         case "sign-up":
                         case "multi-choice":
                         case "vote": {
-                            int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
                             ArrayList<Integer> choices = parser.toIntegerList(answerObject);
-                            Set<Integer> choiceSet = new HashSet<>(choices);
-                            int size = choiceSet.size();
-                            if (size == 0) {
-                                if (question.getRequired())
+                            if (choices == null)
+                                answers.set(i, new ArrayList<>());
+                            else {
+                                int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
+                                Set<Integer> choiceSet = new HashSet<>(choices);
+                                int size = choiceSet.size();
+                                if (size < (int) argsMap.get("min") || size > (int) argsMap.get("max"))
                                     throw new ParameterFormatException();
+                                for (Integer choice : choiceSet) {
+                                    if (choice < 0 || choice > maxIndex)
+                                        throw new ParameterFormatException();
+                                }
+                                choices = new ArrayList<>(choiceSet);
+                                Collections.sort(choices);
+                                answers.set(i, choices);
                             }
-                            else if (size < (int) argsMap.get("min") || size > (int) argsMap.get("max"))
-                                throw new ParameterFormatException();
-                            for (Integer choice : choiceSet) {
-                                if (choice < 0 || choice > maxIndex)
-                                    throw new ParameterFormatException();
-                            }
-                            choices = new ArrayList<>(choiceSet);
-                            Collections.sort(choices);
-                            answers.set(i, choices);
                             break;
                         }
                         case "filling": {
                             String text = (String) answerObject;
-                            if (text.isEmpty() && question.getRequired())
-                                throw new ParameterFormatException();
+                            if (text == null || text.isEmpty())
+                                answers.set(i, "");
                             break;
                         }
                         default: {
