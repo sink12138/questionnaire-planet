@@ -28,6 +28,11 @@ public class Shuffle {
 
     }
 
+    public Shuffle(String numbers, String choices) {
+        this.numbers = numbers;
+        this.choices = choices;
+    }
+
     public Shuffle(Integer accountId, Integer templateId, String numbers, String choices) {
         this.accountId = accountId;
         this.templateId = templateId;
