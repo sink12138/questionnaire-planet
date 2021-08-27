@@ -9,6 +9,17 @@
               <div class="web-title">问卷星球</div>
             </div>
           </router-link>
+
+          <Anchor show-ink
+            v-for="(item, index) in modelForm.questions"
+            :key="index"
+          >
+            <AnchorLink 
+              :href="'#question' + index "
+              :title="'题目' + (index + 1)"
+            />
+          </Anchor>
+
           <div class="info">拖拽题目以改变顺序</div>
           <el-menu @open="handleOpen" @close="handleClose">
             <el-submenu index="1">
@@ -219,6 +230,7 @@
                   v-for="(item, index) in modelForm.questions"
                   :key="index"
                   :name="index"
+                  :id="setid(index)"
                   class="questions"
                 >
                   <template slot="title">
@@ -547,6 +559,9 @@ export default {
     };
   },
   methods: {
+    setid(i) {
+      return "question" + i;
+    },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {

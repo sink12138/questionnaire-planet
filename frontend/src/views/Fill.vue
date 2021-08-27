@@ -472,8 +472,6 @@ export default {
         },
       })
         .then((response) => {
-          console.log(this.password);
-          console.log(response);
           if (response.data.success == true) {
             this.title = response.data.title;
             this.type = response.data.type;
