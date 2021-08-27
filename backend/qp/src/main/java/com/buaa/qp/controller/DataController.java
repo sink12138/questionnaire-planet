@@ -232,7 +232,7 @@ public class DataController {
                 result.put("answers", choicesInFormat);
                 result.put("counts", counts);
                 if (question.getType().equals("grade")) {
-                    result.put("avg", "0.0");
+                    result.put("avg", "0.00");
                 }
                 results.add(result);
             }
@@ -290,7 +290,7 @@ public class DataController {
                             sumMap.put(i, sumNum);
                             double originalAvg = Double.parseDouble((String) results.get(i).get("avg"));
                             double newAvg = ((originalAvg * (sumNum - 1)) + (chIndex + 1) ) / sumNum;
-                            results.get(i).put("avg", String.format("%.1f", newAvg));
+                            results.get(i).put("avg", String.format("%.2f", newAvg));
                             if (!answerInFormat.get(i + 1).equals("")) {
                                 @SuppressWarnings("unchecked")
                                 ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(i).get("counts");
@@ -347,7 +347,7 @@ public class DataController {
                 map.put("totalPoints", totalPoints);
                 map.put("allPoints", pointsStr);
                 map.put("counts", counts);
-                map.put("avgPoints", String.format("%.1f", sumDouble / answers.size()));
+                map.put("avgPoints", String.format("%.2f", sumDouble / answers.size()));
             }
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {

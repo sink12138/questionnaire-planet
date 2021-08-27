@@ -83,6 +83,8 @@ public class TemplateController {
                 throw new ParameterFormatException();
             if (questionMaps.isEmpty())
                 throw new ParameterFormatException();
+            if (type == null)
+                throw new ParameterFormatException();
             if (!type.equals("normal") && !type.equals("vote") && !type.equals("sign-up") && !type.equals("exam"))
                 throw new ParameterFormatException();
             Date now = sdf.parse(sdf.format(new Date()));

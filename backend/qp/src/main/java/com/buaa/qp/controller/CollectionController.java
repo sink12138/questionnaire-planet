@@ -252,6 +252,8 @@ public class CollectionController {
                 catch (ClassCastException cce) {
                     throw new ParameterFormatException();
                 }
+                if (shuffleId == null)
+                    throw new ParameterFormatException();
             }
 
             // Login checks
@@ -382,6 +384,8 @@ public class CollectionController {
                                 ArrayList<Integer> yourChoice = parser.toIntegerList(answers.get(i));
                                 if (yourChoice.isEmpty())
                                     result.put("yourAnswer", "");
+                                else
+                                    result.put("yourAnswer", yourChoice);
                                 if (yourChoice.size() <= correctChoices.size()) {
                                     int correctNum = 0;
                                     for (int index : correctChoices) {
@@ -394,12 +398,14 @@ public class CollectionController {
                                     }
                                 }
                                 totalMarks += getPoints;
-                                result.put("points", String.format("%.1f/%.1f", getPoints, Double.parseDouble(current_q.getPoints())));
+                                result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
                             } else {
                                 int correctChoice = Integer.parseInt(current_q.getAnswer());
                                 int yourChoice = (Integer) answers.get(i);
                                 if (yourChoice < 0) {
                                     result.put("yourAnswer", "");
+                                } else {
+                                    result.put("yourAnswer", yourChoice);
                                 }
                                 result.put("correctAnswer", correctChoice);
                                 if (yourChoice == correctChoice) {
