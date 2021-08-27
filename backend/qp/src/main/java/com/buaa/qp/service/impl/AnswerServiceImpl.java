@@ -51,4 +51,15 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setSubmitter(submitter);
         return answerDao.selectByTidAndSubmitter(answer);
     }
+
+    @Override
+    public ArrayList<Object> shuffleAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId) {
+        return null;
+    }
+
+    @Override
+    public ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId) {
+        return null;
+    }
+
 }

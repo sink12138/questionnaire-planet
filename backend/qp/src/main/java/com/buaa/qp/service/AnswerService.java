@@ -18,4 +18,8 @@ public interface AnswerService {
     int countAnswers(Integer templateId);
 
     Answer getOldAnswer(Integer templateId, Integer submitter);
+
+    ArrayList<Object> shuffleAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId);
+
+    ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId);
 }
