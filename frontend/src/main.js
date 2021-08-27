@@ -7,12 +7,17 @@ import router from './router'
 import store from './store'
 import vuedraggable from 'vuedraggable'
 import vueToPdf from 'vue-to-pdf';
+import VueRouter from 'vue-router';
+import iView from 'iview';
+import 'iview/dist/styles/iview.css';
 
 Vue.prototype.$axios = axios
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(vueToPdf);
+Vue.use(VueRouter);
+Vue.use(iView);
 
 new Vue({
   router,
