@@ -357,7 +357,6 @@ export default {
           this.fillRight = true;
           this.login = response.data.login;
           this.locked = response.data.locked;
-          this.deadlline = response.data.endTime;
           if (this.login == true) {
             this.dialogFormVisible1 = true;
           } else {
@@ -378,6 +377,7 @@ export default {
                     this.description = response.data.description;
                     this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
+                    this.deadlline = response.data.endTime;
                     var i = 0;
                     for (i in this.questions) {
                       if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
@@ -506,6 +506,7 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
+              this.deadlline = response.data.endTime;
             } else {
               console.log(response.data.message);
               this.$message({
@@ -534,6 +535,7 @@ export default {
             this.type = response.data.type;
             this.description = response.data.description;
             this.questions = response.data.questions;
+            this.deadlline = response.data.endTime;
             this.dialogFormVisible2 = false;
           } else {
             if (response.data.message === "密码错误") {
