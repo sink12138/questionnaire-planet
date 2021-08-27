@@ -14,5 +14,7 @@ public interface ShuffleDao {
 
     void deleteByTid(Integer templateId);
 
+    void deleteAnsweredByTid(Integer templateId);
+
     void deleteByAccountTemplateId(@Param("accountId") Integer accountId, @Param("templateId") Integer templateId);
 }
