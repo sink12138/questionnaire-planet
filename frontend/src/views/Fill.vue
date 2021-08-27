@@ -85,7 +85,7 @@
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
 
-      <div class="timer" style="position: absolute;float: right;right: 10px;">
+      <div v-if="type==='exam'" class="timer" style="position: absolute;float: right;right: 10px;">
         <p>截止时间：{{ deadlline }}</p>
         <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
       </div>
