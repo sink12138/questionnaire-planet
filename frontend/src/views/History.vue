@@ -148,6 +148,15 @@
                         >预览</el-button
                       ></el-dropdown-item
                     >
+                    <el-dropdown-item
+                      ><el-button
+                        type="text"
+                        class="button"
+                        @click="updateCode(scope.row)"
+                        icon="el-icon-refresh"
+                        >更新链接</el-button
+                      ></el-dropdown-item
+                    >
                     <el-dropdown-item>
                       <el-button
                         type="text"
@@ -372,9 +381,77 @@ export default {
       }
     },
     release(row) {
+      if (row.scheduled == true) {
+        this.$confirm("此操作将取消该问卷自动发布, 是否继续?", "提示", {
+          confirmButtonText: "发布",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146:80/apis/release",
+              data: JSON.stringify({
+                templateId: row.templateId,
+              }),
+            }).then(
+              (response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.$message({
+                    message: "问卷发布成功！",
+                    type: "success",
+                  });
+                  this.code = response.data.code;
+                  this.qrData.text =
+                    window.location.host + "/fill?code=" + this.code;
+                  this.dialogVisible = true;
+                  row.released = true;
+                }
+              },
+              (err) => {
+                alert(err);
+              }
+            );
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消发布",
+            });
+          });
+      } else {
+        this.$axios({
+          method: "post",
+          url: "http://139.224.50.146:80/apis/release",
+          data: JSON.stringify({
+            templateId: row.templateId,
+          }),
+        }).then(
+          (response) => {
+            console.log(response);
+            if (response.data.success == true) {
+              this.$message({
+                message: "问卷发布成功！",
+                type: "success",
+              });
+              this.code = response.data.code;
+              this.qrData.text =
+                window.location.host + "/fill?code=" + this.code;
+              this.dialogVisible = true;
+              row.released = true;
+            }
+          },
+          (err) => {
+            alert(err);
+          }
+        );
+      }
+    },
+    updateCode(row) {
       this.$axios({
         method: "post",
-        url: "http://139.224.50.146:80/apis/release",
+        url: "http://139.224.50.146:80/apis/code",
         data: JSON.stringify({
           templateId: row.templateId,
         }),
@@ -383,13 +460,12 @@ export default {
           console.log(response);
           if (response.data.success == true) {
             this.$message({
-              message: "问卷发布成功！",
+              message: "更新链接成功！",
               type: "success",
             });
-            this.code = response.data.code;
-            this.qrData.text = window.location.host + "/fill?code=" + this.code;
+            row.code = response.data.code;
+            this.qrData.text = window.location.host + "/fill?code=" + row.code;
             this.dialogVisible = true;
-            row.released = true;
           }
         },
         (err) => {
