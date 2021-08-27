@@ -1,18 +1,29 @@
 package com.buaa.qp.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.buaa.qp.dao.AnswerDao;
+import com.buaa.qp.dao.ShuffleDao;
 import com.buaa.qp.entity.Answer;
+import com.buaa.qp.entity.Shuffle;
 import com.buaa.qp.service.AnswerService;
+import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
 
     @Autowired
     private AnswerDao answerDao;
+
+    @Autowired
+    private ShuffleDao shuffleDao;
 
     @Override
     public ArrayList<Answer> getAnswersByTid(Integer templateId) {
@@ -53,13 +64,49 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public ArrayList<Object> shuffleAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId) {
-        return null;
+    public ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer shuffleId) {
+        Shuffle shuffle = shuffleDao.selectById(shuffleId);
+        ArrayList<Integer> numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
+        ArrayList<Object> reorderedAns = new ArrayList<>();
+        Map<Integer, ArrayList<Integer>> choicesMap = new HashMap<>();
+        JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
+        ClassParser parser = new ClassParser();
+        for (int i = 0; i < numbersList.size(); ++i) {
+            reorderedAns.add(null);
+        }
+        for (String keyStr : choicesJSON.keySet()) {
+            choicesMap.put(Integer.parseInt(keyStr), parser.toIntegerList(choicesJSON.get(keyStr)));
+        }
+        for (int i = 0; i < numbersList.size(); ++i) {
+            int index = numbersList.get(i);
+            reorderedAns.set(index, answers.get(i));
+        }
+        for (int index : choicesMap.keySet()) {
+            ArrayList<Integer> choicesList = choicesMap.get(index);
+            Object answerObject = reorderedAns.get(index);
+            if (answerObject != null) {
+                if (answerObject instanceof Integer) {
+                    int choice = (int) answerObject;
+                    if (choice >= 0)
+                        reorderedAns.set(index, choicesList.get(choice));
+                }
+                else {
+                    ArrayList<Integer> choices = parser.toIntegerList(answerObject);
+                    for (int i = 0; i < choices.size(); ++i) {
+                        int choice = choices.get(i);
+                        choices.set(i, choicesList.get(choice));
+                    }
+                    Collections.sort(choices);
+                    reorderedAns.set(index, choices);
+                }
+            }
+        }
+        return reorderedAns;
     }
 
     @Override
     public ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId) {
-        return null;
+        Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
+        return reorderAnswer(answers, shuffleId);
     }
-
 }

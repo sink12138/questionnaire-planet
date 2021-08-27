@@ -43,44 +43,34 @@
             </if>
         </set>
         where template_id = #{templateId};
-        <choose>
-            <when test="startTime == null">
-                drop event if exists ${"start"+templateId};
-            </when>
-            <otherwise>
-                drop event if exists ${"start"+templateId};
-                create event ${"start"+templateId}
-                on schedule at addtime(#{startTime}, '08:00:00') do
-                update template
-                set start_time = null, release_time = if(released, release_time, now()), released = true
-                where template_id = #{templateId};
-            </otherwise>
-        </choose>
-        <choose>
-            <when test="endTime == null">
-                drop event if exists ${"end"+templateId};
-            </when>
-            <otherwise>
-                drop event if exists ${"end"+templateId};
-                create event ${"end"+templateId}
-                on schedule at addtime(#{endTime}, '08:00:00') do
-                update template
-                set end_time = null, duration = if(released, addtime(duration, timediff(now(), release_time)), duration), released = false
-                where template_id = #{templateId}
-            </otherwise>
-        </choose>
-    </update>
-    <update id="createEvents" parameterType="Template">
+        drop event if exists ${"start"+templateId};
+        drop event if exists ${"end"+templateId};
         <if test="startTime != null">
             create event ${"start"+templateId}
-            on schedule at addtime(#{startTime}, '08:00:00') do
+            on schedule at addtime(#{startTime}, '08:00:20') do
             update template
             set start_time = null, release_time = if(released, release_time, now()), released = true
             where template_id = #{templateId};
         </if>
         <if test="endTime != null">
             create event ${"end"+templateId}
-            on schedule at addtime(#{endTime}, '08:00:00') do
+            on schedule at addtime(#{endTime}, '08:00:20') do
+            update template
+            set end_time = null, duration = if(released, addtime(duration, timediff(now(), release_time)), duration), released = false
+            where template_id = #{templateId}
+        </if>
+    </update>
+    <update id="createEvents" parameterType="Template">
+        <if test="startTime != null">
+            create event ${"start"+templateId}
+            on schedule at addtime(#{startTime}, '08:00:20') do
+            update template
+            set start_time = null, release_time = if(released, release_time, now()), released = true
+            where template_id = #{templateId};
+        </if>
+        <if test="endTime != null">
+            create event ${"end"+templateId}
+            on schedule at addtime(#{endTime}, '08:00:20') do
             update template
             set end_time = null, duration = if(released, addtime(duration, timediff(now(), release_time)), duration), released = false
             where template_id = #{templateId}

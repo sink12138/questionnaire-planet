@@ -19,7 +19,7 @@ public interface AnswerService {
 
     Answer getOldAnswer(Integer templateId, Integer submitter);
 
-    ArrayList<Object> shuffleAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId);
+    ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer shuffleId);
 
     ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer templateId, Integer accountId);
 }
