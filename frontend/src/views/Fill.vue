@@ -488,16 +488,10 @@ export default {
               this.questions = response.data.questions;
               this.dialogFormVisible2 = false;
             } else {
-              alert("问卷密码错误！");
+              
             }
           } else {
-            console.log(response.data.message);
-            this.$message({
-              message: response.data.message,
-              type: "warning",
-              showClose: true,
-            });
-            this.dialogFormVisible2 = false;
+            alert("问卷密码错误！");
           }
         })
         .catch((err) => console.log(err));
