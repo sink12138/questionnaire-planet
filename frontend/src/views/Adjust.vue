@@ -408,9 +408,6 @@ export default {
       if (this.modelForm.conclusion == undefined) {
         this.modelForm.conclusion = "";
       }
-      if (this.modelForm.quota == undefined) {
-        this.modelForm.quota = 0;
-      }
       console.log(this.modelForm.password);
       this.$axios({
         method: "post",
@@ -451,9 +448,6 @@ export default {
       }
       if (this.modelForm.conclusion == undefined) {
         this.modelForm.conclusion = "";
-      }
-      if (this.modelForm.quota == undefined) {
-        this.modelForm.quota = 0;
       }
       console.log(this.modelForm.password);
       this.$axios({
