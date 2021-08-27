@@ -54,6 +54,17 @@ public class Question {
         this.args = args;
     }
 
+    public Question(String type, String stem, String description, Boolean required, String args, String answer, String points, Boolean shuffle) {
+        this.type = type;
+        this.stem = stem;
+        this.description = description;
+        this.required = required;
+        this.args = args;
+        this.answer = answer;
+        this.points = points;
+        this.shuffle = shuffle;
+    }
+
     public Question(Integer templateId, String type, String stem, String description, Boolean required, String args, String answer, String points, Boolean shuffle) {
         this.templateId = templateId;
         this.type = type;

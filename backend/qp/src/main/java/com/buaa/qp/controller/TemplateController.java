@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class TemplateController {
@@ -109,182 +106,7 @@ public class TemplateController {
             }
 
             // Parameter checks of questions
-            ArrayList<Question> questions = new ArrayList<>();
-            boolean hasSpecialQuestion = !type.equals("vote") && !(type.equals("sign-up") && quota == null);
-            for (Map<String, Object> questionMap : questionMaps) {
-                String questionType;
-                String questionStem;
-                String questionDescription;
-                Boolean questionRequired;
-                try {
-                    questionType = (String) questionMap.get("type");
-                    questionStem = (String) questionMap.get("stem");
-                    questionDescription = (String) questionMap.get("description");
-                    if (questionDescription != null && questionDescription.isEmpty()) questionDescription = null;
-                    questionRequired = (Boolean) questionMap.get("required");
-                }
-                catch (ClassCastException cce) {
-                    throw new ParameterFormatException();
-                }
-                if (questionType == null || questionStem == null || questionRequired == null)
-                    throw new ParameterFormatException();
-                Map<String, Object> argsMap = new HashMap<>();
-                switch (questionType) {
-                    case "choice":
-                    case "dropdown": {
-                        ArrayList<String> choices;
-                        try {
-                            choices = parser.toStringList(questionMap.get("choices"));
-                        }
-                        catch (ClassCastException cce) {
-                            throw new ParameterFormatException();
-                        }
-                        if (choices == null || choices.size() < 2)
-                            throw new ParameterFormatException();
-                        argsMap.put("choices", choices);
-                        break;
-                    }
-                    case "multi-choice": {
-                        ArrayList<String> choices;
-                        Integer max;
-                        Integer min;
-                        try {
-                            choices = parser.toStringList(questionMap.get("choices"));
-                            max = (Integer) questionMap.get("max");
-                            min = (Integer) questionMap.get("min");
-                        }
-                        catch (ClassCastException cce) {
-                            throw new ParameterFormatException();
-                        }
-                        if (choices == null || choices.size() < 2)
-                            throw new ParameterFormatException();
-                        if (max == null || max > choices.size()) max = choices.size();
-                        if (min == null || min < 1) min = 1;
-                        if (max < 2 || max < min || max.equals(min) && min == choices.size())
-                            throw new ParameterFormatException();
-                        argsMap.put("choices", choices);
-                        argsMap.put("max", max);
-                        argsMap.put("min", min);
-                        break;
-                    }
-                    case "filling": {
-                        Integer height;
-                        Integer width;
-                        try {
-                            height = (Integer) questionMap.get("height");
-                            width = (Integer) questionMap.get("width");
-                        }
-                        catch (ClassCastException cce) {
-                            throw new ParameterFormatException();
-                        }
-                        if (height == null || height <= 0)
-                            throw new ParameterFormatException();
-                        if (width == null || width <= 0)
-                            throw new ParameterFormatException();
-                        if (height > 10) height = 10;
-                        if (width < 300) width = 300;
-                        else if (width > 800) width = 800;
-                        argsMap.put("height", height);
-                        argsMap.put("width", width + "px");
-                        break;
-                    }
-                    case "grade": {
-                        ArrayList<String> grades;
-                        try {
-                            grades = parser.toStringList(questionMap.get("grades"));
-                        }
-                        catch (ClassCastException e) {
-                            throw new ParameterFormatException();
-                        }
-                        if (grades == null)
-                            throw new ParameterFormatException();
-                        if (grades.size() != 5)
-                            throw new ParameterFormatException();
-                        argsMap.put("grades", grades);
-                        break;
-                    }
-                    case "vote": {
-                        if (!type.equals("vote"))
-                            throw new ParameterFormatException();
-                        hasSpecialQuestion = true;
-                        ArrayList<String> choices;
-                        Integer max;
-                        Integer min;
-                        try {
-                            choices = parser.toStringList(questionMap.get("choices"));
-                            max = (Integer) questionMap.get("max");
-                            min = (Integer) questionMap.get("min");
-                        }
-                        catch (ClassCastException cce) {
-                            throw new ParameterFormatException();
-                        }
-                        if (choices == null || choices.size() < 2)
-                            throw new ParameterFormatException();
-                        if (max == null || max > choices.size()) max = choices.size();
-                        if (min == null || min < 1) min = 1;
-                        if (min.equals(max) && min == choices.size()) {
-                            throw new ParameterFormatException();
-                        }
-                        else if (min > max) {
-                            throw new ParameterFormatException();
-                        }
-                        argsMap.put("choices", choices);
-                        argsMap.put("max", max);
-                        argsMap.put("min", min);
-                        break;
-                    }
-                    case "sign-up": {
-                        if (!type.equals("sign-up"))
-                            throw new ParameterFormatException();
-                        hasSpecialQuestion = true;
-                        ArrayList<String> choices;
-                        ArrayList<Integer> quotas;
-                        Integer max;
-                        Integer min;
-                        try {
-                            choices = parser.toStringList(questionMap.get("choices"));
-                            quotas = parser.toIntegerList(questionMap.get("quotas"));
-                            max = (Integer) questionMap.get("max");
-                            min = (Integer) questionMap.get("min");
-                        }
-                        catch (ClassCastException cce) {
-                            throw new ParameterFormatException();
-                        }
-                        if (choices == null || choices.size() < 2)
-                            throw new ParameterFormatException();
-                        if (quotas == null || quotas.size() != choices.size()) {
-                            throw new ParameterFormatException();
-                        }
-                        for (Integer q : quotas) {
-                            if (q < 1) {
-                                throw new ParameterFormatException();
-                            }
-                        }
-                        if (max == null || max > choices.size()) max = choices.size();
-                        if (min == null || min < 1) min = 1;
-                        if (min.equals(max) && min == choices.size()) {
-                            throw new ParameterFormatException();
-                        }
-                        else if (min > max) {
-                            throw new ParameterFormatException();
-                        }
-                        argsMap.put("choices", choices);
-                        argsMap.put("quotas", quotas);
-                        ArrayList<Integer> remains = new ArrayList<>(quotas);
-                        argsMap.put("remains", remains);
-                        argsMap.put("max", max);
-                        argsMap.put("min", min);
-                        break;
-                    }
-                    default:
-                        throw new ParameterFormatException();
-                }
-                String args = JSON.toJSONString(argsMap);
-                questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
-            }
-            if (!hasSpecialQuestion) {
-                throw new ExtraMessageException("特殊问卷未设置特殊题目");
-            }
+            ArrayList<Question> questions = makeQuestions(type, quota, questionMaps);
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
                     quota, showIndex, startTime, endTime);
             if (templateId == 0) {
@@ -400,5 +222,273 @@ public class TemplateController {
             map.put("message", "操作失败");
         }
         return map;
+    }
+
+    private ArrayList<Question> makeQuestions(String templateType,Integer templateQuota,
+                                              ArrayList<Map<String, Object>> questionMaps)
+            throws ParameterFormatException, ExtraMessageException {
+        ArrayList<Question> questions = new ArrayList<>();
+        ClassParser parser = new ClassParser();
+        boolean hasSpecialQuestion = !templateType.equals("vote") && !(templateType.equals("sign-up") && templateQuota == null);
+        boolean isExam = templateType.equals("exam");
+        for (Map<String, Object> questionMap : questionMaps) {
+            String questionType;
+            String questionStem;
+            String questionDescription;
+            Boolean questionRequired;
+            String questionAnswer = null;
+            Float questionPoints = null;
+            boolean questionShuffle = false;
+            try {
+                questionType = (String) questionMap.get("type");
+                questionStem = (String) questionMap.get("stem");
+                questionDescription = (String) questionMap.get("description");
+                if (questionDescription != null && questionDescription.isEmpty()) questionDescription = null;
+                questionRequired = (Boolean) questionMap.get("required");
+                if (questionRequired == null) questionRequired = true;
+            }
+            catch (ClassCastException cce) {
+                throw new ParameterFormatException();
+            }
+            if (questionType == null || questionStem == null)
+                throw new ParameterFormatException();
+            Map<String, Object> argsMap = new HashMap<>();
+            switch (questionType) {
+                case "choice": {
+                    ArrayList<String> choices;
+                    Integer answerChoice = null;
+                    try {
+                        choices = parser.toStringList(questionMap.get("choices"));
+                        if (isExam) {
+                            answerChoice = (Integer) questionMap.get("answer");
+                            questionPoints = (Float) questionMap.get("points");
+                            if (questionPoints != null && questionPoints <= 0) questionPoints = null;
+                            if (questionMap.containsKey("shuffle"))
+                                questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
+                        }
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (choices == null || choices.size() < 2)
+                        throw new ParameterFormatException();
+                    if (questionPoints != null && answerChoice == null)
+                        throw new ExtraMessageException("带有分值的题目必须预设正确答案");
+                    if (answerChoice != null) {
+                        if (answerChoice < 0 || answerChoice > choices.size() - 1)
+                            throw new ParameterFormatException();
+                        questionAnswer = answerChoice.toString();
+                    }
+                    argsMap.put("choices", choices);
+                    break;
+                }
+                case "dropdown": {
+                    ArrayList<String> choices;
+                    try {
+                        choices = parser.toStringList(questionMap.get("choices"));
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (choices == null || choices.size() < 2)
+                        throw new ParameterFormatException();
+                    argsMap.put("choices", choices);
+                    break;
+                }
+                case "multi-choice": {
+                    ArrayList<String> choices;
+                    ArrayList<Integer> answerChoices = null;
+                    Integer max;
+                    Integer min;
+                    try {
+                        choices = parser.toStringList(questionMap.get("choices"));
+                        max = (Integer) questionMap.get("max");
+                        min = (Integer) questionMap.get("min");
+                        if (isExam) {
+                            answerChoices = parser.toIntegerList(questionMap.get("answer"));
+                            questionPoints = (Float) questionMap.get("points");
+                            if (questionPoints != null && questionPoints <= 0) questionPoints = null;
+                            if (questionMap.containsKey("shuffle"))
+                                questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
+                        }
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (choices == null || choices.size() < 2)
+                        throw new ParameterFormatException();
+                    if (max == null || max > choices.size()) max = choices.size();
+                    if (min == null || min < 1) min = 1;
+                    if (max < 2 || max < min || max.equals(min) && min == choices.size())
+                        throw new ParameterFormatException();
+                    if (questionPoints != null && answerChoices == null)
+                        throw new ExtraMessageException("带有分值的题目必须预设正确答案");
+                    if (answerChoices != null) {
+                        int maxIndex = choices.size() - 1;
+                        Set<Integer> answerSet = new HashSet<>(answerChoices);
+                        int size = answerSet.size();
+                        if (size < min || size > max)
+                            throw new ParameterFormatException();
+                        for (Integer answerIndex : answerSet) {
+                            if (answerIndex < 0 || answerIndex > maxIndex)
+                                throw new ParameterFormatException();
+                        }
+                        answerChoices = new ArrayList<>(answerSet);
+                        Collections.sort(answerChoices);
+                        questionAnswer = JSON.toJSONString(answerChoices);
+                    }
+                    argsMap.put("choices", choices);
+                    argsMap.put("max", max);
+                    argsMap.put("min", min);
+                    break;
+                }
+                case "filling": {
+                    Integer height;
+                    Integer width;
+                    String answerText = null;
+                    try {
+                        height = (Integer) questionMap.get("height");
+                        width = (Integer) questionMap.get("width");
+                        if (isExam) {
+                            answerText = (String) questionMap.get("answer");
+                            if ("".equals(answerText)) answerText = null;
+                            if (questionMap.containsKey("shuffle"))
+                                questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
+                        }
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (height == null || height <= 0)
+                        throw new ParameterFormatException();
+                    if (width == null || width <= 0)
+                        throw new ParameterFormatException();
+                    if (height > 10) height = 10;
+                    if (width < 300) width = 300;
+                    else if (width > 800) width = 800;
+                    argsMap.put("height", height);
+                    argsMap.put("width", width + "px");
+                    if (answerText != null) {
+                        questionAnswer = answerText;
+                    }
+                    break;
+                }
+                case "grade": {
+                    ArrayList<String> grades;
+                    try {
+                        grades = parser.toStringList(questionMap.get("grades"));
+                    }
+                    catch (ClassCastException e) {
+                        throw new ParameterFormatException();
+                    }
+                    if (grades == null)
+                        throw new ParameterFormatException();
+                    if (grades.size() != 5)
+                        throw new ParameterFormatException();
+                    argsMap.put("grades", grades);
+                    break;
+                }
+                case "vote": {
+                    if (!templateType.equals("vote"))
+                        throw new ParameterFormatException();
+                    hasSpecialQuestion = true;
+                    ArrayList<String> choices;
+                    Integer max;
+                    Integer min;
+                    try {
+                        choices = parser.toStringList(questionMap.get("choices"));
+                        max = (Integer) questionMap.get("max");
+                        min = (Integer) questionMap.get("min");
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (choices == null || choices.size() < 2)
+                        throw new ParameterFormatException();
+                    if (max == null || max > choices.size()) max = choices.size();
+                    if (min == null || min < 1) min = 1;
+                    if (min.equals(max) && min == choices.size()) {
+                        throw new ParameterFormatException();
+                    }
+                    else if (min > max) {
+                        throw new ParameterFormatException();
+                    }
+                    argsMap.put("choices", choices);
+                    argsMap.put("max", max);
+                    argsMap.put("min", min);
+                    break;
+                }
+                case "sign-up": {
+                    if (!templateType.equals("sign-up"))
+                        throw new ParameterFormatException();
+                    hasSpecialQuestion = true;
+                    ArrayList<String> choices;
+                    ArrayList<Integer> quotas;
+                    Integer max;
+                    Integer min;
+                    try {
+                        choices = parser.toStringList(questionMap.get("choices"));
+                        quotas = parser.toIntegerList(questionMap.get("quotas"));
+                        max = (Integer) questionMap.get("max");
+                        min = (Integer) questionMap.get("min");
+                    }
+                    catch (ClassCastException cce) {
+                        throw new ParameterFormatException();
+                    }
+                    if (choices == null || choices.size() < 2)
+                        throw new ParameterFormatException();
+                    if (quotas == null || quotas.size() != choices.size()) {
+                        throw new ParameterFormatException();
+                    }
+                    for (Integer q : quotas) {
+                        if (q < 1) {
+                            throw new ParameterFormatException();
+                        }
+                    }
+                    if (max == null || max > choices.size()) max = choices.size();
+                    if (min == null || min < 1) min = 1;
+                    if (min.equals(max) && min == choices.size()) {
+                        throw new ParameterFormatException();
+                    }
+                    else if (min > max) {
+                        throw new ParameterFormatException();
+                    }
+                    argsMap.put("choices", choices);
+                    argsMap.put("quotas", quotas);
+                    ArrayList<Integer> remains = new ArrayList<>(quotas);
+                    argsMap.put("remains", remains);
+                    argsMap.put("max", max);
+                    argsMap.put("min", min);
+                    break;
+                }
+                default:
+                    throw new ParameterFormatException();
+            }
+            String args = JSON.toJSONString(argsMap);
+            if (isExam) {
+                String pointsFormat = null;
+                if (questionPoints != null) {
+                    double rounded = Math.round(questionPoints * 2) / 2.0;
+                    if (rounded >= 100.25)
+                        throw new ExtraMessageException("分值过大");
+                    if (rounded < 0.25)
+                        throw new ExtraMessageException("分值过小");
+                    pointsFormat = String.format("%.1f", rounded);
+                }
+                questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args,
+                        questionAnswer, pointsFormat, questionShuffle));
+            }
+            else {
+                questions.add(new Question(questionType, questionStem, questionDescription, questionRequired, args));
+            }
+        }
+        if (!hasSpecialQuestion) {
+            switch (templateType) {
+                case "vote": throw new ExtraMessageException("投票问卷必须包含投票题");
+                case "sign-up": throw new ExtraMessageException("报名问卷必须包含报名题或设置限额");
+            }
+            throw new ExtraMessageException("特殊问卷未设置特殊题目");
+        }
+        return questions;
     }
 }

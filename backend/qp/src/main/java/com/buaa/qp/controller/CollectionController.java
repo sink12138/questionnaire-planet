@@ -253,7 +253,7 @@ public class CollectionController {
                 Object answerObject = answers.get(i);
                 Question question = questions.get(i);
                 if (answerObject == null && question.getRequired())
-                    throw new ParameterFormatException();
+                    throw new ExtraMessageException("有必答题未作答");
                 try {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
                     switch (question.getType()) {
