@@ -131,7 +131,7 @@
                 }"
               >
                 <el-checkbox-group
-                  v-model="multi"
+                  v-model="answers[index_question]"
                   v-for="(i, index) in item.choices"
                   :min="0"
                   :max="item.max"
@@ -203,7 +203,7 @@
                 }"
               >
                 <el-checkbox-group
-                  v-model="multi"
+                  v-model="answers[index_question]"
                   v-for="(i, index) in item.choices"
                   :min="0"
                   :max="item.max"
@@ -225,7 +225,7 @@
                 }"
               >
                 <el-checkbox-group
-                  v-model="multi"
+                  v-model="answers[index_question]"
                   v-for="(i, index) in item.choices"
                   :min="0"
                   :max="item.max"
@@ -326,7 +326,6 @@ export default {
       formLabelWidth: "100px",
       results: [],
       questions: [],
-      multi: [],
       answers: [],
       myChart: null,
       canvas: null,
@@ -365,6 +364,12 @@ export default {
                     this.description = response.data.description;
                     this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
+                    var i = 0;
+                    for (i in this.questions) {
+                      if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                        this.answers[i] = [];
+                      }
+                    }
                   } else {
                     console.log(response.data.message);
                     this.$message({
@@ -499,8 +504,7 @@ export default {
       console.log(this.answers);
     },
     multiChangeValue(index) {
-      this.answers[index] = this.multi;
-      console.log(this.multi);
+      console.log(this.answers[index]);
     },
     submit() {
       this.$confirm("是否提交问卷?", "提示", {
@@ -511,9 +515,12 @@ export default {
         .then(() => {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
+              while(this.answers.length < this.questions.length){
+                this.answers.push(null);
+              }
               var i = 0;
               for (i in this.questions){
-                if(this.questions[i].type == 'grade' && this.answers[i] == 0){
+                if((this.questions[i].type == 'grade' && this.answers[i] == 0)||(this.questions[i].type == 'multi-choice' && this.answers[i] == [])){
                   this.answers[i] = null;
                 }
               }
