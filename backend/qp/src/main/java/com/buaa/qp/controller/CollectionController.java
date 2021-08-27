@@ -162,11 +162,7 @@ public class CollectionController {
             if (template.getType().equals("exam")) {
                 int shuffleId;
                 if (!isOwner) {
-                    if (accountId == null) {
-                        shuffleId = questionService.shuffleQuestions(questions, null);
-                    } else {
-                        shuffleId = questionService.shuffleQuestions(questions, accountId, templateId);
-                    }
+                    shuffleId = questionService.shuffleQuestions(questions, null, accountId);
                     map.put("shuffleId", shuffleId);
                 }
             }
@@ -184,7 +180,8 @@ public class CollectionController {
                         questionMap.put("answer", question.getAnswer());
                         questionMap.put("shuffle", question.getShuffle());
                     }
-                    questionMap.put("points", question.getPoints());
+                    if (question.getPoints() != null)
+                        questionMap.put("points", question.getPoints());
                 }
                 questionMap.put("required", question.getRequired());
                 Map<String, Object> argsMap = JSONObject.parseObject(question.getArgs());
@@ -279,7 +276,7 @@ public class CollectionController {
             if (answers.size() < questions.size())
                 throw new ParameterFormatException();
             if (template.getType().equals("exam")) {
-                questionService.shuffleQuestions(questions, shuffleId);
+                questionService.shuffleQuestions(questions, shuffleId, null);
             }
             for (int i = 0; i < answers.size(); ++i) {
                 Object answerObject = answers.get(i);

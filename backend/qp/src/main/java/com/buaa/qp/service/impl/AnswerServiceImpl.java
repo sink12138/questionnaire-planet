@@ -72,21 +72,22 @@ public class AnswerServiceImpl implements AnswerService {
         Shuffle shuffle = shuffleDao.selectById(shuffleId);
         ArrayList<Integer> numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
         ArrayList<Object> reorderedAns = new ArrayList<>();
-        Map<Integer, ArrayList<Integer>> choicesMap = new HashMap<>();
+        Map<String, ArrayList<Integer>> choicesMap = new HashMap<>();
         JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
         ClassParser parser = new ClassParser();
         for (int i = 0; i < numbersList.size(); ++i) {
             reorderedAns.add(null);
         }
-        for (String keyStr : choicesJSON.keySet()) {
-            choicesMap.put(Integer.parseInt(keyStr), parser.toIntegerList(choicesJSON.get(keyStr)));
+        for (String key : choicesJSON.keySet()) {
+            choicesMap.put(key, parser.toIntegerList(choicesJSON.get(key)));
         }
         for (int i = 0; i < numbersList.size(); ++i) {
             int index = numbersList.get(i);
             reorderedAns.set(index, answers.get(i));
         }
-        for (int index : choicesMap.keySet()) {
-            ArrayList<Integer> choicesList = choicesMap.get(index);
+        for (String indexStr : choicesMap.keySet()) {
+            int index = Integer.parseInt(indexStr);
+            ArrayList<Integer> choicesList = choicesMap.get(indexStr);
             Object answerObject = reorderedAns.get(index);
             if (answerObject != null) {
                 if (answerObject instanceof Integer) {

@@ -28,7 +28,8 @@ public class Shuffle {
 
     }
 
-    public Shuffle(String numbers, String choices) {
+    public Shuffle(Integer templateId, String numbers, String choices) {
+        this.templateId = templateId;
         this.numbers = numbers;
         this.choices = choices;
     }

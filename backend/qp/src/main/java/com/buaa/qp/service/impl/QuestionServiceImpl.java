@@ -30,12 +30,15 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Integer shuffleQuestions(ArrayList<Question> questions, Integer shuffleId) {
+    public Integer shuffleQuestions(ArrayList<Question> questions, Integer shuffleId, Integer accountId) {
         Shuffle shuffle;
         ArrayList<Integer> numbersList;
-        Map<Integer, ArrayList<Integer>> choicesMap;
+        Map<String, ArrayList<Integer>> choicesMap;
         ArrayList<Map<String, Object>> argMaps = new ArrayList<>();
         ClassParser parser = new ClassParser();
+        Integer templateId = questions.get(0).getTemplateId();
+        if (shuffleId == null)
+            shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
         if (shuffleId == null) {
             numbersList = new ArrayList<>();
             choicesMap = new HashMap<>();
@@ -58,7 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
                             shuffleChs.add(j);
                         }
                         Collections.shuffle(shuffleChs);
-                        choicesMap.put(i, shuffleChs);
+                        choicesMap.put(String.valueOf(i), shuffleChs);
                     }
                 }
             }
@@ -68,7 +71,7 @@ public class QuestionServiceImpl implements QuestionService {
                 if (numbersList.get(i) == null)
                     numbersList.set(i, shuffleNums.get(index++));
             }
-            shuffle = new Shuffle(JSON.toJSONString(numbersList), JSON.toJSONString(choicesMap));
+            shuffle = new Shuffle(accountId, templateId, JSON.toJSONString(numbersList), JSON.toJSONString(choicesMap));
             shuffleDao.insert(shuffle);
             shuffleId = shuffle.getShuffleId();
         }
@@ -77,17 +80,18 @@ public class QuestionServiceImpl implements QuestionService {
             numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
             choicesMap = new HashMap<>();
             JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
-            for (String keyStr : choicesJSON.keySet()) {
-                choicesMap.put(Integer.parseInt(keyStr), parser.toIntegerList(choicesJSON.get(keyStr)));
+            for (String key : choicesJSON.keySet()) {
+                choicesMap.put(key, parser.toIntegerList(choicesJSON.get(key)));
             }
             for (Question question : questions) {
                 argMaps.add(JSON.parseObject(question.getArgs()));
             }
         }
-        for (int index : choicesMap.keySet()) {
+        for (String indexStr : choicesMap.keySet()) {
+            int index = Integer.parseInt(indexStr);
             ArrayList<String> choices = parser.toStringList(argMaps.get(index).get("choices"));
             ArrayList<String> shuffleChs = new ArrayList<>();
-            for (int num : choicesMap.get(index)) {
+            for (int num : choicesMap.get(indexStr)) {
                 shuffleChs.add(choices.get(num));
             }
             argMaps.get(index).put("choices", shuffleChs);
@@ -100,12 +104,6 @@ public class QuestionServiceImpl implements QuestionService {
         questions.clear();
         questions.addAll(shuffledQues);
         return shuffleId;
-    }
-
-    @Override
-    public Integer shuffleQuestions(ArrayList<Question> questions, Integer accountId, Integer templateId) {
-        Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
-        return shuffleQuestions(questions, shuffleId);
     }
 
 }
