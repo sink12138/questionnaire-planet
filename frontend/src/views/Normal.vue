@@ -178,6 +178,7 @@
                 v-for="(item, index) in modelForm.questions"
                 :key="index"
                 :name="index"
+                :id="setid(index)"
                 class="questions"
               >
                 <template slot="title">
@@ -423,7 +424,18 @@
     </div>
     <div class="anchor">
       <h1>目录</h1>
-      这里准备写个目录
+      <Anchor
+        show-ink
+        container=".main" 
+        :affix="false"
+        v-for="(item, index) in modelForm.questions"
+        :key="index"
+      >
+        <AnchorLink 
+          :href="'#question' + index"
+          :title="'题目' + (index + 1)"
+        />
+      </Anchor>
     </div>
   </div>
 </template>
@@ -510,6 +522,9 @@ export default {
     };
   },
   methods: {
+    setid(i) {
+      return "question" + i;
+    },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
