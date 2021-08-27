@@ -540,6 +540,7 @@ export default {
       })
         .then((response) => {
           if (response.data.success == true) {
+            console.log(response)
             this.title = response.data.title;
             this.type = response.data.type;
             this.description = response.data.description;
