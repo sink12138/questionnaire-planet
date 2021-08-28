@@ -112,7 +112,6 @@
             <div class="stem">{{ item.stem }}</div>
             <div class="description">{{ item.description }}</div>
           </div>
-
           <div class="question-content">
             <div v-if="item.type == 'choice'">
               <el-form-item

@@ -9,7 +9,7 @@
           <el-menu
             :default-active="this.$route.path"
             class="el-menu-vertical-demo"
-            style="margin: 0;text-align: left"
+            style="margin: 0;text-align: left;"
             :collapse="isCollapse"
             router>
             <Button v-if="this.isCollapse" icon="ios-arrow-dropright-circle" @click="changeCollapse()"></Button>
@@ -18,11 +18,11 @@
               <Button class="new" icon="md-add-circle" v-if="this.isCollapse"></Button>
               <Button class="new" icon="md-add-circle" v-if="this.isCollapse == false">创建问卷</Button>
             </router-link>
-            <el-menu-item index="/history">
+            <el-menu-item index="/history" style="padding-left: 15px;">
               <i class="el-icon-s-order"></i>
               <span slot="title">我的问卷</span>
             </el-menu-item>
-            <el-menu-item index="/recycle">
+            <el-menu-item index="/recycle" style="padding-left: 15px;">
               <i class="el-icon-delete-solid"></i>
               <span slot="title">回收站</span>
             </el-menu-item>
@@ -81,6 +81,10 @@ export default {
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 120px;
   min-height: 400px;
+}
+.el-menu-vertical-demo .el-menu-item{
+  font-size: 15px;
+  padding-left: 0;
 }
 .ivu-btn {
   height: 56px;

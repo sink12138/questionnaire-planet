@@ -3,10 +3,29 @@
     <Header class="header"></Header>
     <div class="editor">
       <Button class="new" icon="md-arrow-round-back">所有问卷</Button>
-      <el-button icon="el-icon-s-order" @click="changeShow('data')">查看数据</el-button>
-      <el-button icon="el-icon-s-data" @click="changeShow('sum')">选项分析</el-button>
-      <el-button icon="el-icon-s-data" @click="changeShow('xy')">交叉分析</el-button>
-      <el-button icon="el-icon-download" @click="handleDownload()">下载数据</el-button>
+      <el-button 
+      :style="{'background-color': setColor('data')}" 
+      icon="el-icon-tickets" 
+      @click="changeShow('data')">
+        查看数据
+      </el-button>
+      <el-button 
+      :style="{'background-color': setColor('sum')}" 
+      icon="el-icon-s-data" 
+      @click="changeShow('sum')">
+        选项分析
+      </el-button>
+      <el-button 
+      :style="{'background-color': setColor('xy')}" 
+      icon="el-icon-rank" 
+      @click="changeShow('xy')">
+        交叉分析
+      </el-button>
+      <el-button 
+      icon="el-icon-download" 
+      @click="handleDownload()">
+        下载数据
+      </el-button>
     </div>
     <div class="fill">
       <div class="main">
@@ -41,40 +60,69 @@
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
+          <div>{{this.sum(countList)}}</div>
+          <RadioGroup v-model="chartShow" type="button">
+              <Radio label="pie">Pie</Radio>
+              <Radio label="bar">Bar</Radio>
+              <Radio label="line">Line</Radio>
+          </RadioGroup>
           <div class="chart">
-            <canvas id="myChart"></canvas>
+            <canvas v-show="this.chartShow === 'pie'" id="myPieChart"></canvas>
+            <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 300px"></canvas>
+            <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 300px"></canvas>
           </div>
-          <el-table
-          :data="sumData"
-          border
-          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}"
-          max-height="650px">
-            <el-table-column
-            label="题目序号"
-            fixed
-            type="index"
-            width="80">
-            </el-table-column>
-            <el-table-column
-            prop="stem"
-            label="题目题干">
-            </el-table-column>
-            <el-table-column>
-              <template slot-scope="scope">
-                <el-button @click="loadData(scope.row)">查看分析</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="sum-table" style="width: 480px">
+            <el-table
+            :data="sumData"
+            border
+            :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}"
+            max-height="650px">
+              <el-table-column
+              label="题目序号"
+              fixed
+              type="index"
+              width="80">
+              </el-table-column>
+              <el-table-column
+              prop="stem"
+              label="题目题干">
+              </el-table-column>
+              <el-table-column width="120">
+                <template slot-scope="scope">
+                  <el-button @click="loadData(scope.row)">查看分析</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
         </div>
         <div class="cross-over" v-show="this.show === 'xy'">
+          <el-select v-model="x" placeholder="x">
+            <el-option
+            v-for="(item, index) in questionList"
+            :key="index"
+            :label="item"
+            :value="index">
+            </el-option>
+          </el-select>
+          <el-select v-model="y" placeholder="y">
+            <el-option
+            v-for="(item, index) in questionList"
+            :key="index"
+            :label="item"
+            :value="index">
+            </el-option>
+          </el-select>
+          <el-button @click="cross()">开始分析</el-button>
           <el-table
-          :data="xyData">
+          :data="xyData"
+          border
+          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}">
             <el-table-column
-            prop="choicex"
-            label="x">
+            prop="choiceX"
+            label="选项">
             </el-table-column>
             <el-table-column
-            v-for="(item, index) in choicey"
+            v-for="(item, index) in choicesy"
             :key="index"
             :label="item">
               <template slot-scope="scope">
@@ -99,6 +147,7 @@ export default {
   data() {
     return {
       show: "data",
+      chartShow: "pie",
       questionList: ['q1','q2','q3'],
       answerData: [
       {
@@ -126,60 +175,26 @@ export default {
           stem: 'q2',
           answers: ['a1','a2','A3'],
           counts: [6,9,9]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q1',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
+        }
       ],
-      choicey:['y1','y2','y3'],
+      x: 0,
+      y: 0,
+      choicesy:['y1','y2','y3'],
       xyData: [
         {
-          choicex: 'x1',
+          choiceX: 'x1',
           "xy": ['n11','n12','n13']
         },
         {
-          choicex: 'x2',
+          choiceX: 'x2',
           "xy": ['n21','n22','n23']
         }
       ],
       answerList: [],
-      countList: [],
+      countList: [1,2,3],
       stem: '',
       type: '',
       avg: '',
-      myChart: null,
       canvas: null,
     }
   },
@@ -236,13 +251,48 @@ export default {
     }
   },
   mounted() {
-    var el = document.getElementById('myChart');
+    var el = document.getElementById('myPieChart');
     this.canvas = el
+    this.loadData(this.sumData[0])
   },
   methods: {
     changeShow(key) {
       this.show = key
-      this.loadData(this.sumData[0])
+    },
+    setColor(key) {
+      if (key == this.show) return '#ddd'
+      else return '#fff'
+    },
+    sum(list) {
+      var s = 0;
+      var i = 0;
+      for (i in list) {
+        s += list[i]
+      }
+      console.log(s)
+      return s
+    },
+    cross() {
+      console.log(this.x,this.y)
+      this.$axios({
+        method: "get",
+        url: "http://139.224.50.146:80/apis/cross",
+        data: JSON.stringify({
+          templateId: parseInt(this.templateId),
+          indexX: parseInt(this.x),
+          indexY: parseInt(this.y),
+        }),
+      }).then((response) => {
+        console.log(response);
+        if (response.data.success == true) {
+          this.choicesy = response.data.choicesY;
+          this.xyData = response.data.xyData;
+        } else {
+          console.log(response.data.message);
+        }
+      }).catch((error) => {
+        console.log(error)
+      });
     },
     loadData(item) {
       this.stem = item['stem']
@@ -254,10 +304,10 @@ export default {
       }
       this.updateChart()
     },
-    loadChart: function() {
+    loadChart() {
       console.log(this.sumData)
-      var ctx1 = document.getElementById('myChart');
-      this.myChart = new Chart(ctx1, {
+      var ctx1 = document.getElementById('myPieChart');
+      this.myPieChart = new Chart(ctx1,{
         type: 'pie',
         data: {
           labels: [],
@@ -281,16 +331,41 @@ export default {
           }]
         }
       })
+      var ctx2 = document.getElementById('myBarChart');
+      this.myBarChart = new Chart(ctx2,{
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+              label: "柱状图",
+              backgroundColor: "rgb(0, 150, 199)",
+              data: []
+            }]
+        }
+      })
+      var ctx3 = document.getElementById('myLineChart');
+      this.myLineChart = new Chart(ctx3,{
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+              label: "折线图",
+              data: []
+            }]
+        }
+      })
     },
-    updateChart: function() {
-      if (this.type == 'grade') {
-        this.myChart.data.type = 'bar'
-      } else {
-        this.myChart.data.type = 'bar'
-      }
-      this.myChart.data.labels = this.answerList
-      this.myChart.data.datasets[0].data = this.countList
-      this.myChart.update()
+    updateChart() {
+      console.log('uuuppp')
+      this.myPieChart.data.labels = this.answerList
+      this.myPieChart.data.datasets[0].data = this.countList
+      this.myPieChart.update()
+      this.myBarChart.data.labels = this.answerList
+      this.myBarChart.data.datasets[0].data = this.countList
+      this.myBarChart.update()
+      this.myLineChart.data.labels = this.answerList
+      this.myLineChart.data.datasets[0].data = this.countList
+      this.myLineChart.update()
     },
     handleDownload:function() {
       this.$axios({
@@ -364,12 +439,17 @@ export default {
   opacity: 0.94;
 }
 .all-data {
-  margin-left: 60px;
+  padding: 36px;
 }
 .data-sum {
+  padding: 36px;
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+}
+.cross-over {
+  padding: 36px;
 }
 .chart {
   height: 400px;
@@ -377,13 +457,14 @@ export default {
 }
 .editor .el-button {
   border: #fff;
+  color: #3f3f3f;
   font-size: 16px;
   margin: 0;
-  padding-top: 20px;
+  padding-top: 21px;
   padding-bottom: 20px;
 }
 .ivu-btn {
-  height: 50px;
+  height: 56px;
   width: 100%;
   background: rgb(0, 183, 255);
   color: #ffffff;
