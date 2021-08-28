@@ -285,6 +285,9 @@
       </el-form>
     </div>
     <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+    <div class="conclusion" v-if="submitted == true && type == 'exam'">
+      您的分数是{{ points }}
+    </div>
     <div class="voted" v-if="submitted == true && isVote == true">
       <div class="result">
         <div class="chart">
@@ -300,6 +303,125 @@
           </el-table-column>
         </el-table>
       </div>
+    </div>
+    <div class="question" v-if="submitted == true && type == 'exam'">
+      <el-form
+        :model="results"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="ruleForm"
+      >
+        <div v-for="(item, index_question) in results" :key="index_question">
+          <el-divider content-position="left" style="margin-top: 15px">
+            <div v-show="showIndex">第{{ index_question + 1 }}题</div>
+          </el-divider>
+          <div class="question-title">
+            <div class="stem">{{ item.stem }}</div>
+          </div>
+
+          <div class="question-content">
+            <div v-if="item.type == 'choice'">
+              <el-form-item label="你的答案">
+                <el-radio-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-radio-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="multi" v-if="item.type == 'multi-choice'">
+              <el-form-item label="你的答案">
+                <el-checkbox-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-checkbox-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div v-if="item.type == 'filling'">
+              <el-form-item label="你的答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的答案"
+                  v-model="item.yourAnswer"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item label="参考答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="无参考答案"
+                  v-model="item.correctAnswer"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+          </div>
+        </div>
+      </el-form>
     </div>
     <div class="submit" v-if="fillRight == true">
       <el-button @click="submit()" v-if="submitted == false"
@@ -374,6 +496,7 @@ export default {
       answers: [],
       myChart: null,
       canvas: null,
+      points: "",
     };
   },
   created: function () {
@@ -412,6 +535,11 @@ export default {
                     this.deadlline = response.data.endTime;
                     this.shuffleId = response.data.shuffleId;
                     this.settime();
+                    if (this.type == "vote") {
+                      this.isVote = true;
+                    } else {
+                      this.isVote = false;
+                    }
                     var i = 0;
                     for (i in this.questions) {
                       if (
@@ -750,12 +878,10 @@ export default {
                     } else {
                       this.conclusion = response.data.conclusion;
                     }
-                    if (response.data.results == undefined) {
-                      this.isVote = false;
-                    } else {
-                      this.isVote = true;
+                    if (response.data.results != undefined) {
                       this.results = response.data.results;
                       console.log(this.results);
+                      this.points = response.data.points;
                     }
                   } else {
                     this.$notify({

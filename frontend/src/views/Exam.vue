@@ -1220,6 +1220,7 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.code = response.data.code;
                 this.templateId = response.data.templateId;
                 this.$notify({
                   title: "提示",
@@ -1230,7 +1231,7 @@ export default {
                   method: "post",
                   url: "http://139.224.50.146:80/apis/release",
                   data: JSON.stringify({
-                    code: this.code,
+                    templateId: parseInt(this.templateId),
                   }),
                 }).then(
                   (response) => {
