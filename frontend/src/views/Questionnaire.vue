@@ -50,6 +50,18 @@
                         </router-link>
                 </div>
             </div>
+            <div class="type create_by_epide">
+                <div class="inner">
+                        <div class="type_show">
+                            <question-pic></question-pic>
+                        </div>
+                        <h2 class="title">创建疫情打卡问卷</h2>
+                        <h3 class="subtitle">创建包含预设题目的疫情打卡问卷</h3>
+                        <router-link to="/epidemic/new">
+                            <el-button>开始</el-button>
+                        </router-link>
+                </div>
+            </div>
         </div>
         <!--
         <vue-seamless-scroll
@@ -99,14 +111,14 @@ export default {
 }
 .banner {
     position: relative;
-    height: 400px;
+    height: 420px;
     overflow: hidden;
     zoom: 1;
 }
 .type {
     float: left;
     height: 100%;
-    width: 25%;
+    width: 20%;
     position: relative;
     text-align: center;
     display: flex;
@@ -137,16 +149,19 @@ export default {
     color: #ffffff;
 }
 .create_by_normal {
-    background-color: rgba(46, 140, 219, 0.66);
+    background-color: rgba(46, 140, 219, 0.75);
 }
 .create_by_vote {
-    background-color: rgba(71, 157, 230, 0.66);
+    background-color: rgba(71, 157, 230, 0.75);
 }
 .create_by_apply {
-    background-color: rgba(144, 214, 126, 0.66);
+    background-color: rgba(144, 214, 126, 0.75);
 }
 .create_by_exam {
-    background-color: rgba(46, 219, 161, 0.66);
+    background-color: rgba(46, 219, 161, 0.75);
+}
+.create_by_epide {
+    background-color: rgba(212, 212, 212, 0.75);
 }
 </style>
 
