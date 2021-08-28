@@ -60,8 +60,9 @@ public class TemplateController {
                 title = (String) requestMap.get("title");
                 type = (String) requestMap.get("type");
                 showIndex = (Boolean) requestMap.get("showIndex");
-                limited = (Boolean) requestMap.get("limited");
                 if (showIndex == null) showIndex = true;
+                limited = (Boolean) requestMap.get("limited");
+                if (limited == null) limited = false;
                 description = (String) requestMap.get("description");
                 if (description != null && description.isEmpty()) description = null;
                 password = (String) requestMap.get("password");
@@ -96,8 +97,6 @@ public class TemplateController {
                 throw new ExtraMessageException("自动关闭时间不得早于当前时间");
             if (startTime != null && endTime != null && !startTime.before(endTime))
                 throw new ExtraMessageException("开始时间不得晚于结束时间");
-            if (limited == null)
-                throw new ParameterFormatException();
 
             if (templateId > 0) {
                 Template template = templateService.getTemplate(templateId);
@@ -156,6 +155,7 @@ public class TemplateController {
             String conclusion;
             Integer quota;
             Boolean showIndex;
+            Boolean limited;
             Date startTime = null;
             Date endTime = null;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -169,6 +169,7 @@ public class TemplateController {
                 conclusion = (String) requestMap.get("conclusion");
                 quota = (Integer) requestMap.get("quota");
                 showIndex = (Boolean) requestMap.get("showIndex");
+                limited = (Boolean) requestMap.get("limited");
                 String startStr = (String) requestMap.get("startTime");
                 String endStr = (String) requestMap.get("endTime");
                 if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
@@ -181,8 +182,9 @@ public class TemplateController {
             if (password != null && password.isEmpty()) password = null;
             if (conclusion != null && conclusion.isEmpty()) conclusion = null;
             if (quota != null && quota <= 0) quota = null;
-            if (showIndex == null)
-                throw new ParameterFormatException();
+            if (showIndex == null) showIndex = true;
+            if (limited == null) limited = false;
+
             if (templateId == null || templateId < 0)
                 throw new ParameterFormatException();
             if (title == null || title.isEmpty())
@@ -213,6 +215,7 @@ public class TemplateController {
             template.setConclusion(conclusion);
             template.setQuota(quota);
             template.setShowIndex(showIndex);
+            template.setLimited(limited);
             template.setStartTime(startTime);
             template.setEndTime(endTime);
             templateService.adjustTemplate(template);
