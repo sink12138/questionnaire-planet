@@ -51,14 +51,14 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷尚未发布或已关闭");
             Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
-            if (template.getType().equals("vote")) {
+            if (template.getLimited()) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
 
             Boolean locked = template.getPassword() != null;
-            Boolean login = !template.getType().equals("normal") && accountId == null;
+            Boolean login = template.getLimited() && accountId == null;
             map.put("success", true);
             map.put("locked", locked);
             map.put("login", login);
@@ -110,7 +110,7 @@ public class CollectionController {
 
             // Login checks
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
-            if (!template.getType().equals("normal") && accountId == null)
+            if (template.getLimited() && accountId == null)
                 throw new LoginVerificationException();
 
             // Authority checks
@@ -268,7 +268,7 @@ public class CollectionController {
 
             // Login checks
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
-            if (!template.getType().equals("normal") && accountId == null)
+            if (template.getLimited() && accountId == null)
                 throw new LoginVerificationException();
 
             // Authority checks
@@ -396,7 +396,7 @@ public class CollectionController {
                                     result.put("yourAnswer", "");
                                 else
                                     result.put("yourAnswer", yourChoice);
-                                if (yourChoice.size() <= correctChoices.size()) {
+                                if (answer.getPoints() != null && yourChoice.size() <= correctChoices.size()) {
                                     int correctNum = 0;
                                     for (int index : correctChoices) {
                                         if (yourChoice.contains(index)) {
@@ -418,7 +418,7 @@ public class CollectionController {
                                     result.put("yourAnswer", yourChoice);
                                 }
                                 result.put("correctAnswer", correctChoice);
-                                if (yourChoice == correctChoice) {
+                                if (answer.getPoints() != null && yourChoice == correctChoice) {
                                     totalMarks += Double.parseDouble(current_q.getPoints());
                                 }
                             }

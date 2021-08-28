@@ -49,6 +49,7 @@ public class TemplateController {
             Boolean showIndex;
             Date startTime = null;
             Date endTime = null;
+            Boolean limited;
             ArrayList<Map<String, Object>> questionMaps;
             ClassParser parser = new ClassParser();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -59,6 +60,7 @@ public class TemplateController {
                 title = (String) requestMap.get("title");
                 type = (String) requestMap.get("type");
                 showIndex = (Boolean) requestMap.get("showIndex");
+                limited = (Boolean) requestMap.get("limited");
                 if (showIndex == null) showIndex = true;
                 description = (String) requestMap.get("description");
                 if (description != null && description.isEmpty()) description = null;
@@ -94,6 +96,8 @@ public class TemplateController {
                 throw new ExtraMessageException("自动关闭时间不得早于当前时间");
             if (startTime != null && endTime != null && !startTime.before(endTime))
                 throw new ExtraMessageException("开始时间不得晚于结束时间");
+            if (limited == null)
+                throw new ParameterFormatException();
 
             if (templateId > 0) {
                 Template template = templateService.getTemplate(templateId);
@@ -110,7 +114,7 @@ public class TemplateController {
             // Parameter checks of questions
             ArrayList<Question> questions = makeQuestions(type, quota, questionMaps);
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
-                    quota, showIndex, startTime, endTime);
+                    quota, showIndex, startTime, endTime, limited);
 
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);

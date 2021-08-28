@@ -49,6 +49,8 @@ public class Template {
 
     private String code;
 
+    private Boolean limited;
+
     public Template() {
     }
 
@@ -75,7 +77,7 @@ public class Template {
     }
 
     public Template(String type, Integer owner, String title, String description, String password, String conclusion,
-                    Integer quota, Boolean showIndex, Date startTime, Date endTime) {
+                    Integer quota, Boolean showIndex, Date startTime, Date endTime, Boolean limited) {
         this.type = type;
         this.owner = owner;
         this.title = title;
@@ -86,6 +88,7 @@ public class Template {
         this.showIndex = showIndex;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.limited = limited;
     }
 
     public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration) {
