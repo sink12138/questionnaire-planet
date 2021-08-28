@@ -431,7 +431,7 @@ public class DataController {
         return map;
     }
 
-    @GetMapping("/analysis")
+    @GetMapping("/cross")
     public Map<String, Object> analysis(@RequestParam("templateId") Integer templateId, @RequestParam("indexX") Integer indexX, @RequestParam("indexY") Integer indexY) {
         Map<String, Object> map = new HashMap<>();
         try {// check login
@@ -472,7 +472,7 @@ public class DataController {
                 choicesY = (ArrayList<String>) JSON.parseArray(argsMapY.get("choices").toString(), String.class);
             ArrayList<String> choicesXInFormat = choicesFormat(choicesX, questionX.getType());
             ArrayList<String> choicesYInFormat = choicesFormat(choicesY, questionY.getType());
-            map.put("choicey", choicesY);
+            map.put("choiceY", choicesY);
             for (int i = 0; i < choicesX.size(); i++) {
                 ArrayList<Integer> numbers = new ArrayList<>();
                 for (int j = 0; j < choicesY.size(); j ++)
@@ -516,7 +516,7 @@ public class DataController {
             }
             for (int i = 0; i < choicesX.size(); i ++) {
                 Map<String, Object> result = new HashMap<>();
-                result.put("choicex", choicesX.get(i));
+                result.put("choiceX", choicesX.get(i));
                 result.put("xy", strResults.get(i));
                 results.add(result);
             }
