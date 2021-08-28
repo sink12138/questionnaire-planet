@@ -432,16 +432,21 @@ public class CollectionController {
                         result.put("stem", current_q.getStem());
                         String type = current_q.getType();
                         result.put("type", type);
+                        double getPoints = 0;
+                        if (current_q.getPoints() != null)
+                            fullMarks += Double.parseDouble(current_q.getPoints());
                         if (type.equals("filling")) {
                             result.put("yourAnswer", answers.get(i));
-                            result.put("correctAnswer", current_q.getAnswer());
+                            ArrayList<String> correctAnswers = (ArrayList<String>) JSON.parseArray(current_q.getAnswer(), String.class);
+                            result.put("correctAnswer", correctAnswers);
+                            if (correctAnswers.contains((String) answers.get(i))) {
+                                getPoints = Double.parseDouble(current_q.getPoints());
+                            }
+                            result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
                         } else if (type.equals("choice") || type.equals("multi-choice")){
                             Map<String, Object> argsMap = JSON.parseObject(current_q.getArgs());
                             ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
                             result.put("choices", choices);
-                            double getPoints = 0;
-                            if (current_q.getPoints() != null)
-                                fullMarks += Double.parseDouble(current_q.getPoints());
                             if (type.equals("multi-choice")) {
                                 ArrayList<Integer> correctChoices = (ArrayList<Integer>) JSON.parseArray(current_q.getAnswer(), Integer.class);
                                 result.put("correctAnswer", correctChoices);
@@ -462,7 +467,6 @@ public class CollectionController {
                                             getPoints = Double.parseDouble(current_q.getPoints()) * ((double) correctNum / (double) correctChoices.size());
                                         }
                                     }
-                                    totalMarks += getPoints;
                                     result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
                                 }
                             } else {
@@ -475,10 +479,13 @@ public class CollectionController {
                                 }
                                 result.put("correctAnswer", correctChoice);
                                 if (current_q.getPoints() != null && yourChoice == correctChoice) {
-                                    totalMarks += Double.parseDouble(current_q.getPoints());
+                                    getPoints = Double.parseDouble(current_q.getPoints());
                                 }
+                                assert current_q.getPoints() != null;
+                                result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
                             }
                         }
+                        totalMarks += getPoints;
                         String stem = (String) (result.get("stem"));
                         result.put("stem", (i + 1) + "." + stem);
                         results.add(result);
