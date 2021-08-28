@@ -172,6 +172,19 @@
             >
             </el-date-picker>
           </el-form-item>
+
+          <!-- 定位测试 -->
+          <el-form-item label="定位" v-if="isEditing == false">
+            <iframe
+              id="geoPage"
+              width="0"
+              height="0"
+              frameborder="0"
+              style="display: none"
+              scrolling="no"
+              src="https://apis.map.qq.com/tools/geolocation?key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp"
+            ></iframe>
+          </el-form-item>
         </div>
         <div v-if="isEditing">
           <el-collapse v-model="activeNames">
@@ -483,8 +496,7 @@ export default {
           },
         ],
       },
-      quest: 0,
-      activeNames: [],
+      activeNames: [0, 1],
       template: {},
       rules: {},
       templateId: 0,
@@ -495,49 +507,11 @@ export default {
         conclusion: "",
         showIndex: true,
         password: "",
-        quota: 0,
+        quota: undefined,
         startTime: "",
         endTime: "",
-        questions: [],
-      },
-      qrData: {
-        text: window.location.host + "/fill?code=" + this.code,
-        logo: require("../assets/logo.png"),
-      },
-      exportLink: "",
-      downloadFilename: "",
-      isEditing: true,
-      dialogVisible: false,
-      popVisible: false,
-    };
-  },
-  created: function () {
-    this.templateId = this.$route.query.templateId;
-    this.code = this.$route.query.code;
-    if (this.templateId == undefined) this.templateId = 0;
-    console.log(this.templateId);
-    this.$axios({
-      method: "get",
-      url: "http://139.224.50.146:80/apis/details",
-      params: { password: "", code: this.code },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.data.success == true) {
-          this.modelForm.title = response.data.title;
-          this.modelForm.description = response.data.description;
-          this.modelForm.conclusion = response.data.conclusion;
-          this.modelForm.password = response.data.password;
-          response.data.quota == undefined
-            ? (this.modelForm.quota = 0)
-            : (this.modelForm.quota = response.data.quota);
-          if (response.data.startTime != undefined) {
-            this.modelForm.startTime = response.data.startTime;
-          }
-          if (response.data.endTime != undefined) {
-            this.modelForm.endTime = response.data.endTime;
-          }
-          var question = {
+        questions: [
+          {
             type: "0",
             required: true,
             questionName: "",
@@ -546,76 +520,25 @@ export default {
             min: 1,
             height: 1,
             width: 800,
-            grades: [],
-            answers: [],
-          };
-          var item = {};
-          var i = 0;
-          var j = 0;
-          for (i in response.data.questions) {
-            question = {
-              type: "0",
-              required: true,
-              questionName: "",
-              questionSummary: "",
-              max: 2,
-              min: 1,
-              height: 1,
-              width: 800,
-              grades: [],
-              answers: [],
-            };
-            item = response.data.questions[i];
-            question.questionName = item.stem;
-            question.questionSummary = item.description;
-            question.required = item.required;
-            switch (item.type) {
-              case "choice":
-                question.type = "0";
-                for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j] });
-                }
-                break;
-              case "multi-choice":
-                question.type = "1";
-                question.max = item.max;
-                question.min = item.min;
-                for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j] });
-                }
-                break;
-              case "filling":
-                question.type = "2";
-                question.height = parseInt(item.height);
-                question.width = parseInt(item.width);
-                question.answers.push({ value: "" });
-                question.answers.push({ value: "" });
-                break;
-              case "grade":
-                question.type = "3";
-                for (j in item.grades) {
-                  question.grades.push(item.grades[j]);
-                }
-                break;
-              case "dropdown":
-                question.type = "4";
-                for (j in item.choices) {
-                  question.answers.push({ value: item.choices[j] });
-                }
-                break;
-            }
-            console.log(question);
-            this.modelForm.questions.push(question);
-            this.activeNames.push(this.modelForm.questions.length - 1);
-          }
-          console.log(this.modelForm.questions);
-        } else {
-          console.log(response.data.message);
-        }
-      })
-      .catch((err) => console.log(err));
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+        ],
+      },
+      qrData: {
+        text: window.location.host + "/fill?templateId=" + this.templateId,
+        logo: require("../assets/logo.png"),
+      },
+      exportLink: "",
+      downloadFilename: "",
+      isEditing: true,
+      dialogVisible: false,
+      popVisible: false,
+      opp: "",
+    };
   },
-  methods: {    
+  mounted() {},
+  methods: {
     setid(i) {
       return "question" + i;
     },
@@ -693,6 +616,7 @@ export default {
     },
     addQuestion(index) {
       // 新增题目
+      this.popVisible = false;
       this.modelForm.questions.push({
         type: index.toString(),
         required: true,
@@ -706,6 +630,9 @@ export default {
         answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
+      this.$router.push(
+        "/normal/new#question" + (this.modelForm.questions.length - 1)
+      );
     },
     resetForm(formName) {
       // 重置
@@ -780,14 +707,12 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
+          console.log("submit", templateQuestions);
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -795,7 +720,10 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -891,14 +819,11 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -906,7 +831,10 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -915,11 +843,12 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
+                this.code = response.data.code;
                 this.$message({
                   message: "问卷保存成功！",
                   type: "success",
                 });
-                this.$router.push("/preview?templateId=" + this.templateId);
+                this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$message({
                   message: response.data.message,
@@ -1003,14 +932,11 @@ export default {
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1018,7 +944,10 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
               type: "normal",
               questions: templateQuestions,
             }),
@@ -1144,11 +1073,11 @@ export default {
   opacity: 0.9;
 }
 .button_group {
-  position:fixed;
+  position: fixed;
 }
 .button_group .el-button {
   border-radius: 0;
-  border:white;
+  border: white;
   border-bottom: #000000;
   font-size: 15px;
 }
@@ -1167,12 +1096,13 @@ export default {
   background-color: #f0f0f0;
   margin: 0;
 }
-.editor_1,.editor_2 {
+.editor_1,
+.editor_2 {
   display: flex;
   flex-direction: column;
 }
 .question_name {
-  display:flex;
+  display: flex;
 }
 .question-index {
   font-family: 仿宋;
