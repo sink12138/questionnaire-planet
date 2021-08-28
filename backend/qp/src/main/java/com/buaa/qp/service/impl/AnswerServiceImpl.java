@@ -37,8 +37,8 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void clearAllAnswers(Integer templateId) {
+        shuffleDao.deleteAnsweredByTid(templateId);
         answerDao.deleteByTid(templateId);
-        shuffleDao.deleteByTid(templateId);
     }
 
     @Override

@@ -15,10 +15,17 @@
     </insert>
     <delete id="deleteByTid" parameterType="Integer">
         delete from shuffle
-        where template_id = #{templateId};
+        where template_id = #{templateId}
+    </delete>
+    <delete id="deleteAnsweredByTid" parameterType="Integer">
+        delete from shuffle
+        where template_id = #{templateId} and exists(
+            select * from answer
+            where submitter is not null and submitter = shuffle.account_id and template_id = shuffle.template_id
+        )
     </delete>
     <delete id="deleteByAccountTemplateId" parameterType="Integer">
         delete from shuffle
-        where account_id = #{accountId} and template_id = #{templateId};
+        where account_id is not null and account_id = #{accountId} and template_id = #{templateId};
     </delete>
 </mapper>
