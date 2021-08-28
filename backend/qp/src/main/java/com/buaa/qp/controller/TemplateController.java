@@ -356,6 +356,7 @@ public class TemplateController {
                         min = (Integer) questionMap.get("min");
                         if (isExam) {
                             answerChoices = parser.toIntegerList(questionMap.get("answer"));
+                            if (answerChoices != null && answerChoices.isEmpty()) answerChoices = null;
                             if (questionMap.get("points") != null) {
                                 questionPoints = Double.parseDouble(questionMap.get("points").toString());
                                 if (questionPoints <= 0) questionPoints = null;
@@ -397,13 +398,22 @@ public class TemplateController {
                 case "filling": {
                     Integer height;
                     Integer width;
-                    String answerText = null;
+                    ArrayList<String> answerTexts = null;
                     try {
                         height = (Integer) questionMap.get("height");
                         width = (Integer) questionMap.get("width");
                         if (isExam) {
-                            answerText = (String) questionMap.get("answer");
-                            if ("".equals(answerText)) answerText = null;
+                            answerTexts = parser.toStringList(questionMap.get("answer"));
+                            if (answerTexts!= null && answerTexts.isEmpty()) answerTexts = null;
+                            if (answerTexts != null) {
+                                while (answerTexts.contains(""))
+                                    answerTexts.remove("");
+                                if (answerTexts.isEmpty()) answerTexts = null;
+                            }
+                            if (questionMap.get("points") != null) {
+                                questionPoints = Double.parseDouble(questionMap.get("points").toString());
+                                if (questionPoints <= 0) questionPoints = null;
+                            }
                             if (questionMap.get("shuffle") != null)
                                 questionShuffle = Boolean.parseBoolean(questionMap.get("shuffle").toString());
                         }
@@ -418,8 +428,10 @@ public class TemplateController {
                     else if (width > 800) width = 800;
                     argsMap.put("height", height);
                     argsMap.put("width", width + "px");
-                    if (answerText != null) {
-                        questionAnswer = answerText;
+                    if (questionPoints != null && answerTexts == null)
+                        throw new ExtraMessageException("带有分值的题目必须预设正确答案");
+                    if (answerTexts != null) {
+                        questionAnswer = JSON.toJSONString(answerTexts);
                     }
                     break;
                 }

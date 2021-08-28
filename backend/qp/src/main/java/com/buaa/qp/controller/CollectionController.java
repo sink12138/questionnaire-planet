@@ -187,7 +187,7 @@ public class CollectionController {
                     if (isOwner) {
                         switch (question.getType()) {
                             case "filling":
-                                questionMap.put("answer", question.getAnswer());
+                                questionMap.put("answer", JSON.parseArray(question.getAnswer(), String.class));
                                 break;
                             case "choice":
                                 questionMap.put("answer", Integer.parseInt(question.getAnswer()));
