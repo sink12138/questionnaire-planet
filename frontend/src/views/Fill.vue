@@ -843,12 +843,13 @@ export default {
     changeValue(val, index_question) {
       console.log(this.answers);
       for (var j = 0; j < this.logic.length; j++) {
+        this.mark[this.logic[j][2]] = false;
+      }
+
+      for (var j = 0; j < this.logic.length; j++) {
         if (this.logic[j][0] == index_question) {
           if (this.logic[j][1] == val) {
             this.mark[this.logic[j][2]] = true
-          }
-          else {
-            this.mark[this.logic[j][2]] = false
           }
         }
       }
