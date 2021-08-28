@@ -101,7 +101,7 @@
                     </el-col>
                     <el-col :span="10">
                       <!-- 限填一次 -->
-                      <el-form-item label="是否每人限填一次">
+                      <el-form-item label="每人限填一次">
                         <el-switch v-model="modelForm.limited"> </el-switch>
                       </el-form-item>
                     </el-col>
