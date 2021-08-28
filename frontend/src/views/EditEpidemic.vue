@@ -108,10 +108,20 @@
               placeholder="请填写问卷描述"
             />
           </el-form-item>
-          <!-- 显示题号 -->
-          <el-form-item label="是否显示题号" v-if="isEditing == false">
-            <el-switch v-model="modelForm.showIndex"> </el-switch>
-          </el-form-item>
+          <el-row>
+            <el-col :span="10">
+              <!-- 显示题号 -->
+              <el-form-item label="是否显示题号" v-if="isEditing == false">
+                <el-switch v-model="modelForm.showIndex"> </el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <!-- 限填一次 -->
+              <el-form-item label="是否每人限填一次" v-if="isEditing == false">
+                <el-switch v-model="modelForm.limited"> </el-switch>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <!-- 结束语 -->
           <el-form-item label="结束语" v-if="isEditing == false">
             <el-input
@@ -497,6 +507,7 @@ export default {
         description: "",
         conclusion: "",
         showIndex: true,
+        limited: true,
         password: "",
         quota: undefined,
         startTime: "",
@@ -532,6 +543,8 @@ export default {
           this.modelForm.title = response.data.title;
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.showIndex = response.data.showIndex;
+          this.modelForm.limited = response.data.limited;
           this.modelForm.password = response.data.password;
           response.data.quota == undefined
             ? (this.modelForm.quota = 0)
@@ -806,6 +819,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
@@ -920,6 +934,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
@@ -1036,6 +1051,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,

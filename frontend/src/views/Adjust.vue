@@ -92,15 +92,20 @@
                       placeholder="请填写问卷描述"
                     />
                   </el-form-item>
-                  <!-- 显示题号 -->
-                  <el-form-item label="是否显示题号">
-                    <el-switch
-                      v-model="modelForm.showIndex"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949"
-                    >
-                    </el-switch>
-                  </el-form-item>
+                  <el-row>
+                    <el-col :span="10">
+                      <!-- 显示题号 -->
+                      <el-form-item label="是否显示题号">
+                        <el-switch v-model="modelForm.showIndex"> </el-switch>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="10">
+                      <!-- 限填一次 -->
+                      <el-form-item label="是否每人限填一次">
+                        <el-switch v-model="modelForm.limited"> </el-switch>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
                   <!-- 结束语 -->
                   <el-form-item label="结束语">
                     <el-input
@@ -378,6 +383,7 @@ export default {
         description: "",
         conclusion: "",
         showIndex: true,
+        limited: true,
         password: "",
         quota: undefined,
         questions: [],
@@ -410,6 +416,7 @@ export default {
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
           this.modelForm.showIndex = response.data.showIndex;
+          this.modelForm.limited = response.data.limited;
           this.modelForm.password = response.data.password;
           this.modelForm.quota = response.data.quota;
           if (response.data.startTime != undefined) {
@@ -507,6 +514,7 @@ export default {
           description: this.modelForm.description,
           conclusion: this.modelForm.conclusion,
           showIndex: this.modelForm.showIndex,
+          limited: this.modelForm.limited,
           password: this.modelForm.password,
           startTime: this.modelForm.startTime,
           endTime: this.modelForm.endTime,
