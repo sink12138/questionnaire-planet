@@ -298,14 +298,40 @@ public class CollectionController {
 
             // Detailed parameter checks
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            TreeSet<Logic> logics = templateService.getLogicsByTid(templateId);
             if (answers.size() < questions.size())
                 throw new ParameterFormatException();
             if (template.getType().equals("exam")) {
                 questionService.shuffleQuestions(questions, shuffleId, null);
             }
+            boolean[] checkList = new boolean[questions.size()];
+            Arrays.fill(checkList, true);
+            for (Logic logic : logics) {
+                checkList[logic.getN()] = false;
+            }
             for (int i = 0; i < answers.size(); ++i) {
                 Object answerObject = answers.get(i);
                 Question question = questions.get(i);
+                if (!checkList[i]) {
+                    switch (question.getType()) {
+                        case "choice":
+                        case "dropdown":
+                        case "grade": {
+                            answers.set(i, -1);
+                            break;
+                        }
+                        case "multi-choice":
+                        case "vote":
+                        case "sign-up": {
+                            answers.set(i, new ArrayList<>());
+                        }
+                        case "filling":
+                        case "location": {
+                            answers.set(i, "");
+                        }
+                    }
+                    continue;
+                }
                 if (answerObject == null && question.getRequired())
                     throw new ExtraMessageException("有必答题未作答");
                 try {
@@ -319,6 +345,10 @@ public class CollectionController {
                             }
                             else if (choice < 0 || choice > parser.toStringList(argsMap.get("choices")).size() - 1)
                                 throw new ParameterFormatException();
+                            for (Logic logic : logics) {
+                                if (logic.getM().equals(i) && logic.getC().equals(choice))
+                                    checkList[logic.getN()] = true;
+                            }
                             break;
                         }
                         case "grade": {
@@ -349,11 +379,15 @@ public class CollectionController {
                                 choices = new ArrayList<>(choiceSet);
                                 Collections.sort(choices);
                                 answers.set(i, choices);
+                                for (Logic logic : logics) {
+                                    if (logic.getM().equals(i) && choices.contains(logic.getC()))
+                                        checkList[logic.getN()] = true;
+                                }
                             }
                             break;
                         }
-                        case "location":
-                        case "filling": {
+                        case "filling":
+                        case "location": {
                             String text = (String) answerObject;
                             if (text == null || text.isEmpty()) {
                                 if (!question.getRequired())
