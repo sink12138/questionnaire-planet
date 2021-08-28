@@ -85,11 +85,14 @@
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
 
-      <div v-if="type==='exam'" class="timer" style="position: absolute;float: right;right: 10px;">
+      <div
+        v-if="type === 'exam'"
+        class="timer"
+        style="position: absolute; float: right; right: 10px"
+      >
         <p>截止时间：{{ deadlline }}</p>
         <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
       </div>
-
     </div>
     <div class="question" v-if="submitted == false">
       <el-form
@@ -175,7 +178,11 @@
                   required: item.required,
                 }"
               >
-                <el-rate v-model="answers[index_question]" show-text :texts="item.grades">
+                <el-rate
+                  v-model="answers[index_question]"
+                  show-text
+                  :texts="item.grades"
+                >
                 </el-rate>
               </el-form-item>
             </div>
@@ -250,6 +257,29 @@
                 </el-checkbox-group>
               </el-form-item>
             </div>
+            <div v-if="item.type == 'location'">
+              <el-form-item
+                label="定位"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-button
+                  type="primary"
+                  icon="el-icon-location-information"
+                  @click="getLocation(index_question)"
+                  >点击获取定位</el-button
+                >
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="您的位置"
+                  v-model="answers[index_question]"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
         </div>
       </el-form>
@@ -280,6 +310,7 @@
 </template>
 
 <script>
+import AMapJS from "amap-js";
 import Chart from "chart.js/auto";
 Chart.defaults.font.size = 15;
 export default {
@@ -383,7 +414,11 @@ export default {
                     this.settime();
                     var i = 0;
                     for (i in this.questions) {
-                      if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                      if (
+                        this.questions[i].type == "multi-choice" ||
+                        this.questions[i].type == "vote" ||
+                        this.questions[i].type == "sign-up"
+                      ) {
                         this.answers[i] = [];
                       }
                     }
@@ -392,7 +427,7 @@ export default {
                     this.$notify({
                       title: "提示",
                       message: response.data.message,
-                      type: "warning"
+                      type: "warning",
                     });
                   }
                 })
@@ -404,7 +439,7 @@ export default {
           this.$notify({
             title: "提示",
             message: response.data.message,
-            type: "warning"
+            type: "warning",
           });
         }
       })
@@ -425,13 +460,48 @@ export default {
   mounted() {
     var el = document.getElementById("myChart");
     this.canvas = el;
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.Geolocation"], //需要加载的插件
+    });
   },
   methods: {
-    forceSubmit: function () {
-      
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.gaodeMap.load().then(({ AMap }) => {
+            new AMap.Geolocation({
+              enableHighAccuracy: false, //是否使用高精度定位，默认:true
+              timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            }).getCurrentPosition((status, result) => {
+              console.log("状态", status);
+              this.$set(
+                this.answers,
+                index,
+                result.addressComponent.province +
+                  result.addressComponent.city +
+                  result.addressComponent.district
+              );
+              console.log("位置", this.answers[index]);
+            });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
     },
+    forceSubmit: function () {},
     settime: function () {
-      if (this.type==="exam") {
+      if (this.type === "exam") {
         /*获取服务器时间*/
         this.$axios({
           method: "get",
@@ -468,7 +538,7 @@ export default {
             this.$notify({
               title: "提示",
               message: res.data.message,
-              type: "error"
+              type: "error",
             });
           }
           console.log(res);
@@ -494,7 +564,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "登录成功",
-            type: "success"
+            type: "success",
           });
           this.dialogFormVisible1 = false;
           this.isLogin();
@@ -502,7 +572,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "用户名或密码错误",
-            type: "error"
+            type: "error",
           });
         }
         console.log(res);
@@ -529,7 +599,11 @@ export default {
               this.settime();
               var i = 0;
               for (i in this.questions) {
-                if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                if (
+                  this.questions[i].type == "multi-choice" ||
+                  this.questions[i].type == "vote" ||
+                  this.questions[i].type == "sign-up"
+                ) {
                   this.answers[i] = [];
                 }
               }
@@ -538,7 +612,7 @@ export default {
               this.$notify({
                 title: "提示",
                 message: response.data.message,
-                type: "warning"
+                type: "warning",
               });
             }
           })
@@ -557,7 +631,7 @@ export default {
       })
         .then((response) => {
           if (response.data.success == true) {
-            console.log(response)
+            console.log(response);
             this.title = response.data.title;
             this.type = response.data.type;
             this.description = response.data.description;
@@ -568,7 +642,11 @@ export default {
             this.dialogFormVisible2 = false;
             var i = 0;
             for (i in this.questions) {
-              if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+              if (
+                this.questions[i].type == "multi-choice" ||
+                this.questions[i].type == "vote" ||
+                this.questions[i].type == "sign-up"
+              ) {
                 this.answers[i] = [];
               }
             }
@@ -577,17 +655,15 @@ export default {
               this.$notify({
                 title: "提示",
                 message: "问卷密码错误！",
-                type: "error"
+                type: "error",
               });
-            }
-            else {
+            } else {
               this.$notify({
                 title: "提示",
                 message: response.data.message,
-                type: "error"
+                type: "error",
               });
             }
-            
           }
         })
         .catch((err) => console.log(err));
@@ -610,12 +686,16 @@ export default {
         .then(() => {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
-              while(this.answers.length < this.questions.length){
+              while (this.answers.length < this.questions.length) {
                 this.answers.push(null);
               }
               var i = 0;
-              for (i in this.questions){
-                if((this.questions[i].type == 'grade' && this.answers[i] == 0)||(this.questions[i].type == 'multi-choice' && this.answers[i] == [])){
+              for (i in this.questions) {
+                if (
+                  (this.questions[i].type == "grade" && this.answers[i] == 0) ||
+                  (this.questions[i].type == "multi-choice" &&
+                    this.answers[i] == [])
+                ) {
                   this.answers[i] = null;
                 }
               }
@@ -625,17 +705,16 @@ export default {
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
-                  shuffleId: this.shuffleId
+                  shuffleId: this.shuffleId,
                 });
-              }
-              else {
+              } else {
                 submitData = JSON.stringify({
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
                 });
               }
-              
+
               console.log(submitData);
               this.$axios({
                 method: "post",
@@ -662,7 +741,7 @@ export default {
                     this.$notify({
                       title: "提示",
                       message: response.data.message,
-                      type: "info"
+                      type: "info",
                     });
                   }
                 },
@@ -670,7 +749,7 @@ export default {
                   this.$notify({
                     title: "错误",
                     message: err,
-                    type: "error"
+                    type: "error",
                   });
                 }
               );
@@ -684,7 +763,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "已取消提交",
-            type: "info"
+            type: "info",
           });
         });
     },

@@ -116,7 +116,12 @@
                       required: item.required,
                     }"
                   >
-                    <el-rate v-model="answers[index_question]" show-text :texts="item.grades"> </el-rate>
+                    <el-rate
+                      v-model="answers[index_question]"
+                      show-text
+                      :texts="item.grades"
+                    >
+                    </el-rate>
                   </el-form-item>
                 </div>
                 <div v-if="item.type == 'dropdown'">
@@ -186,6 +191,29 @@
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
+                <div v-if="item.type == 'location'">
+                  <el-form-item
+                    label="定位"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-button
+                      type="primary"
+                      icon="el-icon-location-information"
+                      @click="getLocation(index_question)"
+                      >点击获取定位</el-button
+                    >
+                    <el-input
+                      disabled
+                      type="text"
+                      class="input"
+                      placeholder="您的位置"
+                      v-model="answers[index_question]"
+                    >
+                    </el-input>
+                  </el-form-item>
+                </div>
               </div>
             </div>
           </el-form>
@@ -196,6 +224,7 @@
 </template>
 
 <script>
+import AMapJS from "amap-js";
 import logo from "../components/svg_logo.vue";
 export default {
   components: {
@@ -263,6 +292,12 @@ export default {
           required: true,
           choices: ["(C2H5O)n", "Au", "Fe"],
         },
+        {
+          type: "location",
+          stem: "瓜从哪吃?",
+          description: "",
+          required: true,
+        },
       ],
       multi: [],
       answers: [],
@@ -293,7 +328,46 @@ export default {
       })
       .catch((err) => console.log(err));
   },
+  mounted() {
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.Geolocation"], //需要加载的插件
+    });
+  },
   methods: {
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.gaodeMap.load().then(({ AMap }) => {
+            new AMap.Geolocation({
+              enableHighAccuracy: false, //是否使用高精度定位，默认:true
+              timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            }).getCurrentPosition((status, result) => {
+              console.log("状态", status);
+              this.$set(
+                this.answers,
+                index,
+                result.addressComponent.province +
+                  result.addressComponent.city +
+                  result.addressComponent.district
+              );
+              console.log("位置", this.answers[index]);
+            });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
+    },
     exportQuest() {
       this.$PDFSave(this.$refs.quest, this.title);
     },

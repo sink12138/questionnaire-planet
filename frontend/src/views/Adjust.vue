@@ -318,6 +318,29 @@
                           </el-checkbox-group>
                         </el-form-item>
                       </div>
+                      <div v-if="item.type == 'location'">
+                        <el-form-item
+                          label="定位"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-button
+                            type="primary"
+                            icon="el-icon-location-information"
+                            @click="getLocation(index_question)"
+                            >点击获取定位</el-button
+                          >
+                          <el-input
+                            disabled
+                            type="text"
+                            class="input"
+                            placeholder="您的位置"
+                            v-model="answers[index_question]"
+                          >
+                          </el-input>
+                        </el-form-item>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -330,6 +353,7 @@
   </div>
 </template>
 <script>
+import AMapJS from "amap-js";
 import logo from "../components/svg_logo.vue";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";
@@ -365,6 +389,7 @@ export default {
       exportLink: "",
       downloadFilename: "",
       dialogVisible: false,
+      gaodeMap: {},
     };
   },
   created: function () {
@@ -399,8 +424,52 @@ export default {
         }
       })
       .catch((err) => console.log(err));
+    var i = 0;
+    for (i in this.questions) {
+      this.answers[i] = [];
+    }
+    console.log(this.answers);
+  },
+  mounted() {
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.Geolocation"], //需要加载的插件
+    });
   },
   methods: {
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.gaodeMap.load().then(({ AMap }) => {
+            new AMap.Geolocation({
+              enableHighAccuracy: false, //是否使用高精度定位，默认:true
+              timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            }).getCurrentPosition((status, result) => {
+              console.log("状态", status);
+              this.$set(
+                this.answers,
+                index,
+                result.addressComponent.province +
+                  result.addressComponent.city +
+                  result.addressComponent.district
+              );
+              console.log("位置", this.answers[index]);
+            });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
+    },
     save() {
       if (this.modelForm.password == undefined) {
         this.modelForm.password = "";
@@ -430,13 +499,13 @@ export default {
             this.$notify({
               title: "提示",
               message: "问卷修改成功",
-              type: "success"
+              type: "success",
             });
           } else {
             this.$notify({
               title: "提示",
               message: response.data.message,
-              type: "info"
+              type: "info",
             });
           }
         },
@@ -444,7 +513,7 @@ export default {
           this.$notify({
             title: "错误",
             message: err,
-            type: "error"
+            type: "error",
           });
         }
       );
@@ -478,7 +547,7 @@ export default {
             this.$notify({
               title: "提示",
               message: "问卷修改成功",
-              type: "success"
+              type: "success",
             });
             this.$axios({
               method: "post",
@@ -503,7 +572,7 @@ export default {
                   this.$notify({
                     title: "提示",
                     message: response.data.message,
-                    type: "info"
+                    type: "info",
                   });
                 }
               },
@@ -511,7 +580,7 @@ export default {
                 this.$notify({
                   title: "错误",
                   message: err,
-                  type: "error"
+                  type: "error",
                 });
               }
             );
@@ -520,7 +589,7 @@ export default {
             this.$notify({
               title: "提示",
               message: response.data.message,
-              type: "info"
+              type: "info",
             });
           }
         },
@@ -528,7 +597,7 @@ export default {
           this.$notify({
             title: "错误",
             message: err,
-            type: "error"
+            type: "error",
           });
         }
       );
@@ -540,7 +609,7 @@ export default {
         this.$notify({
           title: "提示",
           message: "已复制链接到剪贴板",
-          type: "success"
+          type: "success",
         });
         clipboard.destroy();
       });
@@ -548,7 +617,7 @@ export default {
         this.$notify({
           title: "错误",
           message: "复制出现错误",
-          type: "error"
+          type: "error",
         });
         clipboard.destroy();
       });

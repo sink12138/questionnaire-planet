@@ -501,20 +501,7 @@ export default {
         quota: undefined,
         startTime: "",
         endTime: "",
-        questions: [
-          {
-            type: "0",
-            required: true,
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-            answers: [{ value: "" }, { value: "" }],
-          },
-        ],
+        questions: [],
       },
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
@@ -730,7 +717,7 @@ export default {
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/epidemic/new#question" + (this.modelForm.questions.length - 1)
+        "/epidemic/edit#question" + (this.modelForm.questions.length - 1)
       );
     },
     resetForm(formName) {
