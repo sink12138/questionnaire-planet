@@ -51,6 +51,7 @@ public class TemplateController {
             Date endTime = null;
             Boolean limited;
             ArrayList<Map<String, Object>> questionMaps;
+            ArrayList<Object> logicList;
             ClassParser parser = new ClassParser();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -76,6 +77,8 @@ public class TemplateController {
                 if (startStr != null && !startStr.isEmpty()) startTime = sdf.parse(startStr);
                 if (endStr != null && !endStr.isEmpty()) endTime = sdf.parse(endStr);
                 questionMaps = parser.toMapList(requestMap.get("questions"));
+                logicList = parser.toObjectList(requestMap.get("logic"));
+                if (logicList == null) logicList = new ArrayList<>();
             }
             catch (ClassCastException | ParseException cce) {
                 throw new ParameterFormatException();
@@ -113,8 +116,50 @@ public class TemplateController {
 
             // Parameter checks of questions
             ArrayList<Question> questions = makeQuestions(type, quota, questionMaps);
+
+            // Parameter checks of logics
+            TreeSet<ArrayList<Integer>> logicSet = new TreeSet<>((logic1, logic2) -> {
+                if (!logic1.get(0).equals(logic2.get(0)))
+                    return logic1.get(0) - logic2.get(0);
+                if (!logic1.get(1).equals(logic2.get(1)))
+                    return logic1.get(1) - logic2.get(1);
+                return logic1.get(2) - logic2.get(2);
+            });
+            try {
+                int size = questions.size();
+                for (Object logicObject : logicList) {
+                    ArrayList<Integer> logic = parser.toIntegerList(logicObject);
+                    if (logic == null)
+                        continue;
+                    if (logic.size() < 3)
+                        throw new ParameterFormatException();
+                    if (logic.size() > 3)
+                        logic = new ArrayList<>(logic.subList(0, 3));
+                    if (logic.contains(null))
+                        throw new ParameterFormatException();
+                    // Logic tuple: (m, c, n)
+                    int m = logic.get(0), c = logic.get(1), n = logic.get(2);
+                    if (m < 0 || m >= size || n < 0 || n >= size)
+                        throw new ParameterFormatException();
+                    String questionType = questions.get(logic.get(0)).getType();
+                    if (questionType.equals("filling") || questionType.equals("grade") || questionType.equals("location"))
+                        throw new ExtraMessageException("只有带选项的题目才可作为逻辑条件");
+                    if (c < 0 || c >= parser.toObjectList(questionMaps.get(m).get("choices")).size())
+                        throw new ParameterFormatException();
+                    if (m >= n)
+                        throw new ExtraMessageException("后面题目不能作为前面题目的出现条件");
+                    if (questions.get(m).getShuffle() || questions.get(n).getShuffle())
+                        throw new ExtraMessageException("参与乱序的题目不能设置逻辑关联");
+                    logicSet.add(logic);
+                }
+            }
+            catch (ClassCastException | NumberFormatException e) {
+                throw new ParameterFormatException();
+            }
+
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
                     quota, showIndex, startTime, endTime, limited);
+            newTemplate.setLogic(JSON.toJSONString(logicSet));
 
             if (templateId == 0) {
                 templateId = templateService.submitTemplate(newTemplate, questions);

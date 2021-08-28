@@ -23,9 +23,12 @@
         select * from template where code = #{code}
     </select>
     <insert id="insert" parameterType="Template" useGeneratedKeys="true" keyProperty="templateId">
-        insert into template(type, owner, title, description, password, creation_time, conclusion, quota, show_index, code, start_time, end_time, limited)
-        values (#{type}, #{owner}, #{title}, #{description}, #{password}, now(),
-                #{conclusion}, #{quota}, #{showIndex}, #{code}, addtime(#{startTime}, '08:00:00'), addtime(#{endTime}, '08:00:00'), #{limited});
+        insert into template(type, owner, title, description, password, creation_time, conclusion, quota,
+                             show_index, code, start_time, end_time, limited, logic)
+        values (#{type}, #{owner}, #{title}, #{description}, #{password},
+                now(), #{conclusion}, #{quota}, #{showIndex}, #{code},
+                addtime(#{startTime}, '08:00:00'), addtime(#{endTime}, '08:00:00'),
+                #{limited}, #{logic});
     </insert>
     <update id="update" parameterType="Template">
         update template
@@ -38,6 +41,7 @@
             show_index = #{showIndex},
             start_time = addtime(#{startTime}, '08:00:00'),
             end_time = addtime(#{endTime}, '08:00:00'),
+            logic = #{logic}
             <if test="duration != null">
                 duration = #{duration}
             </if>

@@ -51,6 +51,8 @@ public class Template {
 
     private Boolean limited;
 
+    private String logic = "[]";
+
     public Template() {
     }
 
@@ -106,7 +108,7 @@ public class Template {
         this.duration = duration;
     }
 
-    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration, String conclusion, Integer quota, Date startTime, Date endTime, Boolean showIndex, String code) {
+    public Template(Integer templateId, String type, Integer owner, String title, String description, String password, Boolean released, Boolean deleted, Date creationTime, Date releaseTime, String duration, String conclusion, Integer quota, Date startTime, Date endTime, Boolean showIndex, String code, Boolean limited, String logic) {
         this.templateId = templateId;
         this.type = type;
         this.owner = owner;
@@ -124,5 +126,7 @@ public class Template {
         this.endTime = endTime;
         this.showIndex = showIndex;
         this.code = code;
+        this.limited = limited;
+        this.logic = logic;
     }
 }
