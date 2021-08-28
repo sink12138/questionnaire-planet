@@ -85,11 +85,14 @@
       </h3>
       <h3>问卷剩余{{ remain }}份</h3>
 
-      <div v-if="type==='exam'" class="timer" style="position: absolute;float: right;right: 10px;">
+      <div
+        v-if="type === 'exam'"
+        class="timer"
+        style="position: absolute; float: right; right: 10px"
+      >
         <p>截止时间：{{ deadlline }}</p>
         <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
       </div>
-
     </div>
     <div class="question" v-if="submitted == false">
       <el-form
@@ -252,12 +255,38 @@
                 </el-form-item>
               </div>
             </div>
+            <div v-if="item.type == 'location'">
+              <el-form-item
+                label="定位"
+                :rules="{
+                  required: item.required,
+                }"
+              >
+                <el-button
+                  type="primary"
+                  icon="el-icon-location-information"
+                  @click="getLocation(index_question)"
+                  >点击获取定位</el-button
+                >
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="您的位置"
+                  v-model="answers[index_question]"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
           </div>
           
         </div>
       </el-form>
     </div>
     <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+    <div class="conclusion" v-if="submitted == true && type == 'exam'">
+      您的分数是{{ points }}
+    </div>
     <div class="voted" v-if="submitted == true && isVote == true">
       <div class="result">
         <div class="chart">
@@ -274,6 +303,125 @@
         </el-table>
       </div>
     </div>
+    <div class="question" v-if="submitted == true && type == 'exam'">
+      <el-form
+        :model="results"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="ruleForm"
+      >
+        <div v-for="(item, index_question) in results" :key="index_question">
+          <el-divider content-position="left" style="margin-top: 15px">
+            <div v-show="showIndex">第{{ index_question + 1 }}题</div>
+          </el-divider>
+          <div class="question-title">
+            <div class="stem">{{ item.stem }}</div>
+          </div>
+
+          <div class="question-content">
+            <div v-if="item.type == 'choice'">
+              <el-form-item label="你的答案">
+                <el-radio-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-radio-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div class="multi" v-if="item.type == 'multi-choice'">
+              <el-form-item label="你的答案">
+                <el-checkbox-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-checkbox-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div v-if="item.type == 'filling'">
+              <el-form-item label="你的答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的答案"
+                  v-model="item.yourAnswer"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item label="参考答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="无参考答案"
+                  v-model="item.correctAnswer"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+          </div>
+        </div>
+      </el-form>
+    </div>
     <div class="submit" v-if="fillRight == true">
       <el-button @click="submit()" v-if="submitted == false"
         >提交问卷</el-button
@@ -283,6 +431,7 @@
 </template>
 
 <script>
+import AMapJS from "amap-js";
 import Chart from "chart.js/auto";
 Chart.defaults.font.size = 15;
 export default {
@@ -348,6 +497,7 @@ export default {
       logic: [],
       myChart: null,
       canvas: null,
+      points: "",
     };
   },
   created: function () {
@@ -393,18 +543,30 @@ export default {
                     this.deadlline = response.data.endTime;
                     this.shuffleId = response.data.shuffleId;
                     this.settime();
+                    if (this.type == "vote") {
+                      this.isVote = true;
+                    } else {
+                      this.isVote = false;
+                    }
                     var i = 0;
                     for (i in this.questions) {
-                      if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                      if (
+                        this.questions[i].type == "multi-choice" ||
+                        this.questions[i].type == "vote" ||
+                        this.questions[i].type == "sign-up"
+                      ) {
                         this.answers[i] = [];
                       }
                     }
+                    while (this.answers.length < this.questions.length) {
+                      this.answers.push(null);
+                    }
                   } else {
                     console.log(response.data.message);
-                    this.$message({
+                    this.$notify({
+                      title: "提示",
                       message: response.data.message,
                       type: "warning",
-                      showClose: true,
                     });
                   }
                 })
@@ -413,10 +575,10 @@ export default {
           }
         } else {
           console.log(response.data.message);
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: response.data.message,
             type: "warning",
-            showClose: true,
           });
         }
       })
@@ -437,13 +599,65 @@ export default {
   mounted() {
     var el = document.getElementById("myChart");
     this.canvas = el;
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.CitySearch", "AMap.Geolocation"], //需要加载的插件
+    });
   },
   methods: {
-    forceSubmit: function () {
-      
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          var answertmp = this.answers;
+          var tmp = this;
+          this.gaodeMap.load().then(({ AMap }) => {
+            var citysearch = new AMap.CitySearch();
+            //自动获取用户IP，返回当前城市
+            citysearch.getLocalCity(function (status, result) {
+              if (status === "complete" && result.info === "OK") {
+                if (result && result.city && result.bounds) {
+                  var cityinfo = result.city;
+                  console.log("您当前所在城市：", cityinfo);
+                  tmp.$set(answertmp, index, cityinfo);
+                  console.log("您当前所在城市：", answertmp[index]);
+                  //地图显示当前城市
+                }
+              } else {
+                console.log(result.info);
+              }
+            });
+            // new AMap.Geolocation({
+            //   enableHighAccuracy: false, //是否使用高精度定位，默认:true
+            //   timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            // }).getCurrentPosition((status, result) => {
+            //   console.log("状态", status);
+            //   this.$set(
+            //     this.answers,
+            //     index,
+            //     result.addressComponent.province +
+            //       result.addressComponent.city +
+            //       result.addressComponent.district
+            //   );
+            //   console.log("位置", this.answers[index]);
+            // });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
     },
+    forceSubmit: function () {},
     settime: function () {
-      if (this.type==="exam") {
+      if (this.type === "exam") {
         /*获取服务器时间*/
         this.$axios({
           method: "get",
@@ -477,7 +691,11 @@ export default {
               }
             }, 1000);
           } else {
-            this.$message.error(res.data.message);
+            this.$notify({
+              title: "提示",
+              message: res.data.message,
+              type: "error",
+            });
           }
           console.log(res);
         });
@@ -499,14 +717,19 @@ export default {
         if (res.data.success == true) {
           sessionStorage.setItem("isLogin", true);
           this.$store.commit("login");
-          this.$message({
-            message: "登录成功！",
+          this.$notify({
+            title: "提示",
+            message: "登录成功",
             type: "success",
           });
           this.dialogFormVisible1 = false;
           this.isLogin();
         } else {
-          alert("用户名或密码错误！");
+          this.$notify({
+            title: "提示",
+            message: "用户名或密码错误",
+            type: "error",
+          });
         }
         console.log(res);
       });
@@ -539,16 +762,20 @@ export default {
               this.settime();
               var i = 0;
               for (i in this.questions) {
-                if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+                if (
+                  this.questions[i].type == "multi-choice" ||
+                  this.questions[i].type == "vote" ||
+                  this.questions[i].type == "sign-up"
+                ) {
                   this.answers[i] = [];
                 }
               }
             } else {
               console.log(response.data.message);
-              this.$message({
+              this.$notify({
+                title: "提示",
                 message: response.data.message,
                 type: "warning",
-                showClose: true,
               });
             }
           })
@@ -567,7 +794,7 @@ export default {
       })
         .then((response) => {
           if (response.data.success == true) {
-            console.log(response)
+            console.log(response);
             this.title = response.data.title;
             this.type = response.data.type;
             this.description = response.data.description;
@@ -585,18 +812,28 @@ export default {
             this.dialogFormVisible2 = false;
             var i = 0;
             for (i in this.questions) {
-              if(this.questions[i].type == "multi-choice" || this.questions[i].type == "vote" || this.questions[i].type == "sign-up") {
+              if (
+                this.questions[i].type == "multi-choice" ||
+                this.questions[i].type == "vote" ||
+                this.questions[i].type == "sign-up"
+              ) {
                 this.answers[i] = [];
               }
             }
           } else {
             if (response.data.message === "密码错误") {
-              alert("问卷密码错误！");
+              this.$notify({
+                title: "提示",
+                message: "问卷密码错误！",
+                type: "error",
+              });
+            } else {
+              this.$notify({
+                title: "提示",
+                message: response.data.message,
+                type: "error",
+              });
             }
-            else {
-              this.$message.error(response.data.message);
-            }
-            
           }
         })
         .catch((err) => console.log(err));
@@ -626,12 +863,16 @@ export default {
         .then(() => {
           this.$refs["ruleForm"].validate((valid) => {
             if (valid) {
-              while(this.answers.length < this.questions.length){
+              while (this.answers.length < this.questions.length) {
                 this.answers.push(null);
               }
               var i = 0;
-              for (i in this.questions){
-                if((this.questions[i].type == 'grade' && this.answers[i] == 0)||(this.questions[i].type == 'multi-choice' && this.answers[i] == [])){
+              for (i in this.questions) {
+                if (
+                  (this.questions[i].type == "grade" && this.answers[i] == 0) ||
+                  (this.questions[i].type == "multi-choice" &&
+                    this.answers[i] == [])
+                ) {
                   this.answers[i] = null;
                 }
               }
@@ -641,17 +882,16 @@ export default {
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
-                  shuffleId: this.shuffleId
+                  shuffleId: this.shuffleId,
                 });
-              }
-              else {
+              } else {
                 submitData = JSON.stringify({
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
                 });
               }
-              
+
               console.log(submitData);
               this.$axios({
                 method: "post",
@@ -667,22 +907,25 @@ export default {
                     } else {
                       this.conclusion = response.data.conclusion;
                     }
-                    if (response.data.results == undefined) {
-                      this.isVote = false;
-                    } else {
-                      this.isVote = true;
+                    if (response.data.results != undefined) {
                       this.results = response.data.results;
                       console.log(this.results);
+                      this.points = response.data.points;
                     }
                   } else {
-                    this.$message({
+                    this.$notify({
+                      title: "提示",
                       message: response.data.message,
                       type: "info",
                     });
                   }
                 },
                 (err) => {
-                  alert(err);
+                  this.$notify({
+                    title: "错误",
+                    message: err,
+                    type: "error",
+                  });
                 }
               );
             } else {
@@ -692,9 +935,10 @@ export default {
           });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消提交",
+            type: "info",
           });
         });
     },

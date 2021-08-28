@@ -13,6 +13,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -107,10 +108,20 @@
               placeholder="请填写问卷描述"
             />
           </el-form-item>
-          <!-- 显示题号 -->
-          <el-form-item label="是否显示题号" v-if="isEditing == false">
-            <el-switch v-model="modelForm.showIndex"> </el-switch>
-          </el-form-item>
+          <el-row>
+            <el-col :span="10">
+              <!-- 显示题号 -->
+              <el-form-item label="是否显示题号" v-if="isEditing == false">
+                <el-switch v-model="modelForm.showIndex"> </el-switch>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <!-- 限填一次 -->
+              <el-form-item label="每人限填一次" v-if="isEditing == false">
+                <el-switch v-model="modelForm.limited"> </el-switch>
+              </el-form-item>
+            </el-col>
+          </el-row>
           <!-- 结束语 -->
           <el-form-item label="结束语" v-if="isEditing == false">
             <el-input
@@ -171,19 +182,6 @@
               :picker-options="pickerOptions"
             >
             </el-date-picker>
-          </el-form-item>
-
-          <!-- 定位测试 -->
-          <el-form-item label="定位" v-if="isEditing == false">
-            <iframe
-              id="geoPage"
-              width="0"
-              height="0"
-              frameborder="0"
-              style="display: none"
-              scrolling="no"
-              src="https://apis.map.qq.com/tools/geolocation?key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp"
-            ></iframe>
           </el-form-item>
         </div>
         <div v-if="isEditing">
@@ -346,7 +344,9 @@
                   </el-col>
                 </el-row>
                 <!-- 答案 -->
-                <el-row v-if="item.type != 2 && item.type != 3">
+                <el-row
+                  v-if="item.type != 2 && item.type != 3 && item.type != 5"
+                >
                   <el-form-item
                     v-for="(opt, idx) in item.answers"
                     :key="idx"
@@ -404,7 +404,7 @@
                 <el-form-item label="编辑题目">
                   <el-button
                     icon="el-icon-circle-plus"
-                    v-if="item.type != 2 && item.type != 3"
+                    v-if="item.type != 2 && item.type != 3 && item.type != 5"
                     @click="addDomain(index)"
                     >新增选项</el-button
                   >
@@ -430,6 +430,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </el-button-group>
           <el-button
             id="addButton"
@@ -496,7 +497,7 @@ export default {
           },
         ],
       },
-      activeNames: [0, 1],
+      activeNames: [0,1,2,3,4,5],
       template: {},
       rules: {},
       templateId: 0,
@@ -506,16 +507,77 @@ export default {
         description: "",
         conclusion: "",
         showIndex: true,
+        limited: true,
         password: "",
         quota: undefined,
         startTime: "",
         endTime: "",
         questions: [
           {
+            type: "2",
+            required: true,
+            questionName: "您的学号是",
+            questionSummary: "请输入学号",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+          {
+            type: "2",
+            required: true,
+            questionName: "您的姓名是",
+            questionSummary: "请输入姓名",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+          {
             type: "0",
             required: true,
-            questionName: "",
-            questionSummary: "",
+            questionName: "您的体温是",
+            questionSummary: "请选择体温范围",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "37.5度以下" }, { value: "37.5度至38.5度" }, { value: "38.5度以上" }],
+          },
+          {
+            type: "0",
+            required: true,
+            questionName: "是否去过高风险地区",
+            questionSummary: "请选择近期是否经过高风险地区",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "是" }, { value: "否" }],
+          },
+          {
+            type: "0",
+            required: true,
+            questionName: "是否有新冠症状",
+            questionSummary: "请选择是否有感染新冠肺炎症状",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "是" }, { value: "否" }],
+          },
+          {
+            type: "5",
+            required: true,
+            questionName: "您当前所处的位置",
+            questionSummary: "请定位您当前所处的位置",
             max: 2,
             min: 1,
             height: 1,
@@ -535,23 +597,11 @@ export default {
       dialogVisible: false,
       popVisible: false,
       opp: "",
+      gaodeMap: {},
     };
   },
-  mounted() {
-    this.Tmap();
-  },
+  mounted() {},
   methods: {
-    Tmap() {
-      window.addEventListener(
-        "message",
-        function (event) {
-          var loc = event.data;
-          this.opp = loc;
-          console.log(this.opp); // 显示你当前位置
-        },
-        false
-      );
-    },
     setid(i) {
       return "question" + i;
     },
@@ -577,7 +627,11 @@ export default {
       if (this.modelForm.questions[index].answers.length > 2) {
         this.modelForm.questions[index].answers.splice(idx, 1);
       } else {
-        this.$message("至少需要两个选项");
+        this.$notify({
+          title: "提示",
+          message: "至少需要两个选项",
+          type: "info"
+        });
       }
     },
     removeQuestion(index) {
@@ -644,7 +698,7 @@ export default {
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/normal/new#question" + (this.modelForm.questions.length - 1)
+        "/epidemic/new#question" + (this.modelForm.questions.length - 1)
       );
     },
     resetForm(formName) {
@@ -685,9 +739,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -715,6 +770,9 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "location";
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -730,6 +788,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
@@ -737,7 +796,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -745,18 +804,25 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -797,9 +863,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -827,6 +894,9 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "location";
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -841,6 +911,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
@@ -848,7 +919,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -857,19 +928,26 @@ export default {
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
                 this.code = response.data.code;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
                 this.$router.push("/preview?code=" + this.code);
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -910,9 +988,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -940,6 +1019,9 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "location";
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -954,6 +1036,7 @@ export default {
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
               showIndex: this.modelForm.showIndex,
+              limited: this.modelForm.limited,
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
@@ -961,7 +1044,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -969,9 +1052,10 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
                 this.$axios({
                   method: "post",
@@ -983,33 +1067,46 @@ export default {
                   (response) => {
                     console.log(response);
                     if (response.data.success == true) {
-                      this.$message({
-                        message: "问卷发布成功！",
-                        type: "success",
+                      this.$notify({
+                        title: "提示",
+                        message: "问卷发布成功",
+                        type: "success"
                       });
                       this.code = response.data.code;
                       this.qrData.text =
                         window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
-                      this.$message({
+                      this.$notify({
+                        title: "提示",
                         message: response.data.message,
+                        type: "info"
                       });
                     }
                   },
                   (err) => {
-                    alert(err);
+                    this.$notify({
+                      title: "错误",
+                      message: err,
+                      type: "error"
+                    });
                   }
                 );
                 console.log("发布成功!");
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -1020,11 +1117,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制出现错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },

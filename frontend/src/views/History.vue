@@ -39,133 +39,133 @@
     </div>
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
-        <el-table :data="searchQue" border style="width: 100%">
-            <el-table-column fixed prop="title" label="标题" width="150">
-            </el-table-column>
-            <el-table-column
-              label="状态"
-              width="100"
-            >
-              <template slot-scope="scope">
-                  <p>{{ scope.row.released == true ? '正在回收':'未发布' }}</p>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="answerCount"
-              label="收集数量"
-              width="100"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="creationTime"
-              label="创建时间"
-              width="150"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="releaseTime"
-              label="最后发布"
-              width="150"
-            >
-            </el-table-column>
-            <el-table-column prop="duration" label="收集时长" width="150">
-            </el-table-column>
-          <div class="bottom clearfix">
-            <el-table-column label="操作" width="500" fixed="right">
-              <template slot-scope="scope">
+        <el-table 
+        :data="searchQue" 
+        border 
+        style="width: 100%" 
+        :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266'}"
+        filter-placement="bottom">
+          <el-table-column fixed prop="title" label="标题" width="150">
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="100"
+            :filters="[{text:'回收中',value:true},{text:'未发布',value:false}]"
+            :filter-method="filterHandler"
+          >
+            <template slot-scope="scope">
+                <p>{{ scope.row.released == true ? '正在回收':'未发布' }}</p>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="answerCount"
+            label="收集数量"
+            width="100"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="creationTime"
+            label="创建时间"
+            width="150"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="releaseTime"
+            label="最后发布"
+            width="150"
+          >
+          </el-table-column>
+          <el-table-column prop="duration" label="收集时长" width="150">
+          </el-table-column>
+          <el-table-column label="操作" width="480">
+            <template slot-scope="scope">
+              <el-button
+                @click="release(scope.row)"
+                icon="el-icon-video-play"
+                v-if="scope.row.released == false"
+                >发布</el-button
+              >
+              <el-button
+                @click="close(scope.row)"
+                icon="el-icon-video-pause"
+                v-else
+                >关闭</el-button
+              >
+              <el-button
+                @click="adjust(scope.row)"
+                icon="el-icon-edit"
+                >微调</el-button
+              >
+              <el-button
+                @click="statistics(scope.row)"
+                icon="el-icon-pie-chart"
+                >数据分析</el-button
+              >
+              <el-dropdown placement="bottom" style="margin-left: 10px">
                 <el-button
-                  @click="adjust(scope.row)"
-                  type="text"
-                  icon="el-icon-edit"
-                  >微调</el-button
+                  icon="el-icon-more-outline"
+                  style="color: black"
+                  >更多操作</el-button
                 >
-                <el-button
-                  type="text"
-                  @click="statistics(scope.row)"
-                  icon="el-icon-pie-chart"
-                  >数据分析</el-button
-                >
-                <el-button
-                  type="text"
-                  @click="release(scope.row)"
-                  icon="el-icon-video-play"
-                  v-if="scope.row.released == false"
-                  >发布</el-button
-                >
-                <el-button
-                  type="text"
-                  @click="close(scope.row)"
-                  icon="el-icon-video-pause"
-                  v-else
-                  >关闭</el-button
-                >
-                <el-dropdown placement="bottom">
-                  <el-button
-                    type="text"
-                    icon="el-icon-more"
-                    style="color: black"
-                    >更多操作</el-button
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
+                    <el-button
+                      type="text"
+                      class="btn"
+                      @click="edit(scope.row)"
+                      icon="el-icon-edit-outline"
+                      >编辑问卷</el-button
+                    >
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="remove(scope.row)"
+                      icon="el-icon-delete"
+                      >删除问卷</el-button
+                    ></el-dropdown-item
                   >
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <el-button
-                        type="text"
-                        class="button"
-                        @click="edit(scope.row)"
-                        icon="el-icon-edit-outline"
-                        >编辑问卷</el-button
-                      >
-                    </el-dropdown-item>
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="remove(scope.row)"
-                        icon="el-icon-delete"
-                        >删除问卷</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="clone(scope.row)"
-                        icon="el-icon-document-copy"
-                        >复制问卷</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="preview(scope.row)"
-                        icon="el-icon-view"
-                        >预览问卷</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item
-                      ><el-button
-                        type="text"
-                        class="button"
-                        @click="updateCode(scope.row)"
-                        icon="el-icon-refresh"
-                        >更新链接</el-button
-                      ></el-dropdown-item
-                    >
-                    <el-dropdown-item>
-                      <el-button
-                        type="text"
-                        class="button"
-                        @click="qr(scope.row)"
-                        icon="el-icon-share"
-                        >分享问卷
-                      </el-button>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
-              </template>
-            </el-table-column>
-          </div>
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="clone(scope.row)"
+                      icon="el-icon-document-copy"
+                      >复制问卷</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="preview(scope.row)"
+                      icon="el-icon-view"
+                      >预览问卷</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="updateCode(scope.row)"
+                      icon="el-icon-refresh"
+                      >更新链接</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item>
+                    <el-button
+                      type="text"
+                      class="btn"
+                      @click="qr(scope.row)"
+                      icon="el-icon-share"
+                      >分享问卷
+                    </el-button>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
         </el-table>
         <el-dialog
           :append-to-body="true"
@@ -224,9 +224,7 @@ export default {
       total: 0,
       searchQue: [],
       templateId: 0,
-      allQuest: [
-        {released: false},{released: true},{released: false},
-      ],
+      allQuest: [],
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
@@ -330,8 +328,10 @@ export default {
           "/adjust?templateId=" + this.quest + "&code=" + this.code
         );
       } else {
-        this.$message({
+        this.$notify({
+          title: "提示",
           message: "问卷已发布！",
+          type: "warning"
         });
       }
     },
@@ -345,8 +345,10 @@ export default {
             "/normal/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "vote") {
@@ -358,8 +360,10 @@ export default {
             "/vote/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "sign-up") {
@@ -371,8 +375,10 @@ export default {
             "/apply/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "exam") {
@@ -384,8 +390,25 @@ export default {
             "/exam/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
+          });
+        }
+      } else if (row.type == "epidemic") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/epidemic/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "问卷已发布！",
+            type: "warning"
           });
         }
       }
@@ -408,9 +431,10 @@ export default {
               (response) => {
                 console.log(response);
                 if (response.data.success == true) {
-                  this.$message({
-                    message: "问卷发布成功！",
-                    type: "success",
+                  this.$notify({
+                    title: "提示",
+                    message: "问卷发布成功",
+                    type: "success"
                   });
                   this.code = response.data.code;
                   this.qrData.text =
@@ -420,14 +444,19 @@ export default {
                 }
               },
               (err) => {
-                alert(err);
+                this.$notify({
+                  title: "错误",
+                  message: err,
+                  type: "error"
+                });
               }
             );
           })
           .catch(() => {
-            this.$message({
-              type: "info",
+            this.$notify({
+              title: "提示",
               message: "已取消发布",
+              type: "info"
             });
           });
       } else {
@@ -441,9 +470,10 @@ export default {
           (response) => {
             console.log(response);
             if (response.data.success == true) {
-              this.$message({
-                message: "问卷发布成功！",
-                type: "success",
+              this.$notify({
+                title: "提示",
+                message: "问卷发布成功",
+                type: "success"
               });
               this.code = response.data.code;
               this.qrData.text =
@@ -453,7 +483,11 @@ export default {
             }
           },
           (err) => {
-            alert(err);
+            this.$notify({
+              title: "错误",
+              message: err,
+              type: "error"
+            });
           }
         );
       }
@@ -469,9 +503,10 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "更新链接成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "更新链接成功",
+              type: "success"
             });
             row.code = response.data.code;
             this.qrData.text = window.location.host + "/fill?code=" + row.code;
@@ -479,7 +514,11 @@ export default {
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -499,15 +538,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷关闭成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷关闭成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -522,15 +566,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷复制成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷复制成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -551,22 +600,28 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已删除。",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷删除成功",
+                  type: "success"
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info"
           });
         });
     },
@@ -582,11 +637,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制发生错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },
@@ -600,6 +663,9 @@ export default {
       console.log(this.quest);
       this.$router.push("/statistics?templateId=" + this.quest);
     },
+    filterHandler(value, row) {
+      return row['released'] === value;
+    }
   },
 };
 </script>
@@ -645,14 +711,8 @@ export default {
   margin: 0;
   margin-top: 5px;
 }
-.type_show {
-  margin-top: 0px;
-}
 .title {
   margin-bottom: 10px;
-}
-.button {
-  color: black;
 }
 .share {
   display: flex;
@@ -660,7 +720,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.clearfix .el-button {
-  width: 45px;
+.btn {
+  color: #000;
 }
 </style>

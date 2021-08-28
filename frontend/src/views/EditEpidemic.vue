@@ -13,7 +13,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
-            <el-button @click="addQuestion(5)">报名题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -204,40 +204,37 @@
                   </div>
                   <div class="question-title">题目:{{ item.questionName }}</div>
                 </template>
-                <!-- 是否必填 -->
-                <el-form-item
-                  :prop="`questions.${index}.required`"
-                  :label="`是否必填`"
-                  :rules="{
-                    required: true,
-                    message: '请选择是否必填',
-                    trigger: 'change',
-                  }"
-                >
-                  <el-switch
-                    v-model="item.required"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
+                <div class="question_name">
+                  <!-- 问题 -->
+                  <el-form-item
+                    :prop="`questions.${index}.questionName`"
+                    label="问题"
+                    :rules="{
+                      required: true,
+                      message: '请填写问题',
+                      trigger: 'change',
+                    }"
                   >
-                  </el-switch>
-                </el-form-item>
-                <!-- 问题题目 -->
-                <el-form-item
-                  :prop="`questions.${index}.questionName`"
-                  label="问题"
-                  :rules="{
-                    required: true,
-                    message: '请填写问题',
-                    trigger: 'change',
-                  }"
-                >
-                  <el-input
-                    v-model="item.questionName"
-                    style="width: 258px"
-                    clearable
-                    placeholder="请填写问题"
-                  />
-                </el-form-item>
+                    <el-input
+                      v-model="item.questionName"
+                      style="width: 258px"
+                      clearable
+                      placeholder="请填写问题"
+                    />
+                  </el-form-item>
+                  <!-- 是否必填 -->
+                  <el-form-item
+                    :prop="`questions.${index}.required`"
+                    :label="`是否必填`"
+                    :rules="{
+                      required: true,
+                      message: '请选择是否必填',
+                      trigger: 'change',
+                    }"
+                  >
+                    <el-switch v-model="item.required"> </el-switch>
+                  </el-form-item>
+                </div>
                 <!-- 问题描述 -->
                 <el-form-item
                   :prop="`questions.${index}.questionSummary`"
@@ -254,7 +251,7 @@
                   <!-- 最小选项 -->
                   <el-col :span="10">
                     <el-form-item
-                      v-if="item.type == 1 || item.type == 5"
+                      v-if="item.type == 1"
                       :prop="`questions.${index}.min`"
                       label="最小选项"
                       :rules="[
@@ -267,7 +264,7 @@
                       ]"
                     >
                       <el-input
-                        v-model="item.min"
+                        v-model.trim="item.min"
                         style="width: 125px"
                         clearable
                         placeholder="请填写最小选项个数"
@@ -277,7 +274,7 @@
                   <!-- 最大选项 -->
                   <el-col :span="10">
                     <el-form-item
-                      v-if="item.type == 1 || item.type == 5"
+                      v-if="item.type == 1"
                       :prop="`questions.${index}.max`"
                       label="最大选项"
                       :rules="[
@@ -300,11 +297,11 @@
                 </el-row>
                 <el-row>
                   <!-- 高度 -->
-                  <el-col :span="10">
+                  <el-col :span="9">
                     <el-form-item
                       v-if="item.type == 2"
                       :prop="`questions.${index}.height`"
-                      label="填空框高度（行）"
+                      label="填空框高度(行)"
                       :rules="[
                         {
                           required: true,
@@ -327,7 +324,7 @@
                     <el-form-item
                       v-if="item.type == 2"
                       :prop="`questions.${index}.width`"
-                      label="宽度（px）"
+                      label="宽度(px)"
                       :rules="[
                         {
                           required: true,
@@ -347,7 +344,9 @@
                   </el-col>
                 </el-row>
                 <!-- 答案 -->
-                <el-row v-if="item.type != 2 && item.type != 3">
+                <el-row
+                  v-if="item.type != 2 && item.type != 3 && item.type != 5"
+                >
                   <el-form-item
                     v-for="(opt, idx) in item.answers"
                     :key="idx"
@@ -402,36 +401,10 @@
                     </div>
                   </el-form-item>
                 </el-row>
-                <el-row v-if="item.type == 5">
-                  <el-form-item
-                    v-for="(opt, idx) in item.answers"
-                    :key="idx"
-                    :label="`第${idx + 1}项名额`"
-                    :prop="`questions.${index}.answers.${idx}.number`"
-                    :rules="[
-                      {
-                        required: true,
-                        message: '请输入名额',
-                        trigger: 'blur',
-                      },
-                      {
-                        validator: isNum,
-                        trigger: 'blur',
-                      },
-                    ]"
-                  >
-                    <el-input
-                      v-model="opt.number"
-                      style="width: 120px; margin-left: 10px"
-                      clearable
-                      placeholder="请输入名额"
-                    />
-                  </el-form-item>
-                </el-row>
                 <el-form-item label="编辑题目">
                   <el-button
                     icon="el-icon-circle-plus"
-                    v-show="item.type != 2 && item.type != 3"
+                    v-if="item.type != 2 && item.type != 3 && item.type != 5"
                     @click="addDomain(index)"
                     >新增选项</el-button
                   >
@@ -457,7 +430,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
-            <el-button @click="addQuestion(5)">报名题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </el-button-group>
           <el-button
             id="addButton"
@@ -524,66 +497,22 @@ export default {
           },
         ],
       },
-      activeNames: [0, 1, 2],
+      activeNames: [0, 1],
       template: {},
       rules: {},
       templateId: 0,
       code: "",
       modelForm: {
-        title: "报名问卷",
+        title: "新的问卷",
         description: "",
         conclusion: "",
         showIndex: true,
         limited: true,
         password: "",
         quota: undefined,
-        questions: [
-          {
-            type: "2",
-            required: true,
-            questionName: "你的姓名是",
-            questionSummary: "请输入你的姓名",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-            answers: [
-              { value: "", number: 0 },
-              { value: "", number: 0 },
-            ],
-          },
-          {
-            type: "2",
-            required: true,
-            questionName: "你的手机号是",
-            questionSummary: "请输入你的手机号",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-            answers: [
-              { value: "", number: 0 },
-              { value: "", number: 0 },
-            ],
-          },
-          {
-            type: "5",
-            required: true,
-            questionName: "你要报名的活动是",
-            questionSummary: "请选择要报名的活动",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 800,
-            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-            answers: [
-              { value: "活动1", number: 10 },
-              { value: "活动2", number: 10 },
-            ],
-          },
-        ],
+        startTime: "",
+        endTime: "",
+        questions: [],
       },
       qrData: {
         text: window.location.host + "/fill?templateId=" + this.templateId,
@@ -594,24 +523,128 @@ export default {
       isEditing: true,
       dialogVisible: false,
       popVisible: false,
+      opp: "",
+      gaodeMap: {},
     };
   },
+  created: function () {
+    this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
+    if (this.templateId == undefined) this.templateId = 0;
+    console.log(this.templateId);
+    this.$axios({
+      method: "get",
+      url: "http://139.224.50.146:80/apis/details",
+      params: { password: "", code: this.code },
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.data.success == true) {
+          this.modelForm.title = response.data.title;
+          this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.showIndex = response.data.showIndex;
+          this.modelForm.limited = response.data.limited;
+          this.modelForm.password = response.data.password;
+          response.data.quota == undefined
+            ? (this.modelForm.quota = 0)
+            : (this.modelForm.quota = response.data.quota);
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
+          var question = {
+            type: "0",
+            required: true,
+            questionName: "",
+            questionSummary: "",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: [],
+            answers: [],
+          };
+          var item = {};
+          var i = 0;
+          var j = 0;
+          for (i in response.data.questions) {
+            question = {
+              type: "0",
+              required: true,
+              questionName: "",
+              questionSummary: "",
+              max: 2,
+              min: 1,
+              height: 1,
+              width: 800,
+              grades: [],
+              answers: [],
+            };
+            item = response.data.questions[i];
+            question.questionName = item.stem;
+            question.questionSummary = item.description;
+            question.required = item.required;
+            switch (item.type) {
+              case "choice":
+                question.type = "0";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "multi-choice":
+                question.type = "1";
+                question.max = item.max;
+                question.min = item.min;
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "filling":
+                question.type = "2";
+                question.height = parseInt(item.height);
+                question.width = parseInt(item.width);
+                question.answers.push({ value: "" });
+                question.answers.push({ value: "" });
+                break;
+              case "grade":
+                question.type = "3";
+                for (j in item.grades) {
+                  question.grades.push(item.grades[j]);
+                }
+                break;
+              case "dropdown":
+                question.type = "4";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "location":
+                question.type = "5";
+                break;
+            }
+            console.log(question);
+            this.modelForm.questions.push(question);
+            this.activeNames.push(this.modelForm.questions.length - 1);
+          }
+          console.log(this.modelForm.questions);
+        } else {
+          console.log(response.data.message);
+        }
+      })
+      .catch((err) => console.log(err));
+  },
+  mounted() {},
   methods: {
     setid(i) {
       return "question" + i;
-    },
-    editing() {
-      this.isEditing = true;
-    },
-    notEditing() {
-      this.isEditing = false;
     },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
         callback(new Error("请输入数字"));
-      } else if (parseInt(value) < 1) {
-        callback(new Error("请输入大于等于一的数字"));
       } else {
         callback();
       }
@@ -619,16 +652,18 @@ export default {
     end() {
       this.$refs.modelForm.clearValidate();
     },
+    editing() {
+      this.isEditing = true;
+    },
+    notEditing() {
+      this.isEditing = false;
+    },
     removeDomain(index, idx) {
       // 删除选项
       if (this.modelForm.questions[index].answers.length > 2) {
         this.modelForm.questions[index].answers.splice(idx, 1);
       } else {
-        this.$notify({
-          title: "提示",
-          message: "至少需要两个选项",
-          type: "info"
-        });
+        this.$message("至少需要两个选项");
       }
     },
     removeQuestion(index) {
@@ -676,13 +711,11 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({
-        value: "",
-        number: 0,
-      });
+      this.modelForm.questions[index].answers.push({ value: "" });
     },
     addQuestion(index) {
       // 新增题目
+      this.popVisible = false;
       this.modelForm.questions.push({
         type: index.toString(),
         required: true,
@@ -693,14 +726,11 @@ export default {
         height: 1,
         width: 800,
         grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-        answers: [
-          { value: "", number: 0 },
-          { value: "", number: 0 },
-        ],
+        answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/apply/new#question" + (this.modelForm.questions.length - 1)
+        "/epidemic/edit#question" + (this.modelForm.questions.length - 1)
       );
     },
     resetForm(formName) {
@@ -741,10 +771,9 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
+                  this.$message({
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -773,36 +802,19 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning"
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
+          console.log("submit", templateQuestions);
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -815,7 +827,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -823,25 +835,18 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
-                this.$notify({
-                  title: "提示",
-                  message: "问卷保存成功",
-                  type: "success"
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
                 });
               } else {
-                this.$notify({
-                  title: "提示",
+                this.$message({
                   message: response.data.message,
-                  type: "info"
                 });
               }
             },
             (err) => {
-              this.$notify({
-                title: "错误",
-                message: err,
-                type: "error"
-              });
+              alert(err);
             }
           );
           console.log("保存成功!");
@@ -882,10 +887,9 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
+                  this.$message({
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -914,25 +918,7 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning"
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
@@ -943,7 +929,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -956,35 +942,28 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.code = response.data.code;
                 this.templateId = response.data.templateId;
-                this.$notify({
-                  title: "提示",
-                  message: "问卷保存成功",
-                  type: "success"
+                this.code = response.data.code;
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
                 });
                 this.$router.push("/preview?code=" + this.code);
               } else {
-                this.$notify({
-                  title: "提示",
+                this.$message({
                   message: response.data.message,
-                  type: "info"
                 });
               }
             },
             (err) => {
-              this.$notify({
-                title: "错误",
-                message: err,
-                type: "error"
-              });
+              alert(err);
             }
           );
           console.log("保存成功!");
@@ -1025,10 +1004,9 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
+                  this.$message({
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -1057,25 +1035,7 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning"
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
@@ -1086,7 +1046,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1099,18 +1059,18 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "sign-up",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.code = response.data.code;
                 this.templateId = response.data.templateId;
-                this.$notify({
-                  title: "提示",
-                  message: "问卷保存成功",
-                  type: "success"
+                this.$message({
+                  message: "问卷保存成功！",
+                  type: "success",
                 });
                 this.$axios({
                   method: "post",
@@ -1122,46 +1082,33 @@ export default {
                   (response) => {
                     console.log(response);
                     if (response.data.success == true) {
-                      this.$notify({
-                        title: "提示",
-                        message: "问卷发布成功",
-                        type: "success"
+                      this.$message({
+                        message: "问卷发布成功！",
+                        type: "success",
                       });
                       this.code = response.data.code;
                       this.qrData.text =
                         window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
-                      this.$notify({
-                        title: "提示",
+                      this.$message({
                         message: response.data.message,
-                        type: "info"
                       });
                     }
                   },
                   (err) => {
-                    this.$notify({
-                      title: "错误",
-                      message: err,
-                      type: "error"
-                    });
+                    alert(err);
                   }
                 );
                 console.log("发布成功!");
               } else {
-                this.$notify({
-                  title: "提示",
+                this.$message({
                   message: response.data.message,
-                  type: "info"
                 });
               }
             },
             (err) => {
-              this.$notify({
-                title: "错误",
-                message: err,
-                type: "error"
-              });
+              alert(err);
             }
           );
           console.log("保存成功!");
@@ -1172,19 +1119,11 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        this.$notify({
-          title: "提示",
-          message: "已复制链接到剪贴板",
-          type: "success"
-        });
+        alert("Copy Success");
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        this.$notify({
-          title: "错误",
-          message: "复制出现错误",
-          type: "error"
-        });
+        alert("Copy error");
         clipboard.destroy();
       });
     },
@@ -1196,6 +1135,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 .normal {
