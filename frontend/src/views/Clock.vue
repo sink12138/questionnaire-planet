@@ -537,21 +537,8 @@ export default {
       opp: "",
     };
   },
-  mounted() {
-    this.Tmap();
-  },
+  mounted() {},
   methods: {
-    Tmap() {
-      window.addEventListener(
-        "message",
-        function (event) {
-          var loc = event.data;
-          this.opp = loc;
-          console.log(this.opp); // 显示你当前位置
-        },
-        false
-      );
-    },
     setid(i) {
       return "question" + i;
     },
