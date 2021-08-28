@@ -177,7 +177,17 @@ public class CollectionController {
                     questionMap.put("description", dsc);
                 if (template.getType().equals("exam")) {
                     if (isOwner) {
-                        questionMap.put("answer", question.getAnswer());
+                        switch (question.getType()) {
+                            case "filling":
+                                questionMap.put("answer", question.getAnswer());
+                                break;
+                            case "choice":
+                                questionMap.put("answer", Integer.parseInt(question.getAnswer()));
+                                break;
+                            case "multi-choice":
+                                questionMap.put("answer", JSON.parseArray(question.getAnswer(), Integer.class));
+                                break;
+                        }
                         questionMap.put("shuffle", question.getShuffle());
                     }
                     if (question.getPoints() != null)
