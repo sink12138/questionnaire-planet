@@ -215,7 +215,7 @@ public class DataController {
                 result.put("type", question.getType());
                 ArrayList<String> choicesInFormat = new ArrayList<>();
                 ArrayList<Integer> counts = new ArrayList<>();
-                if (!question.getType().equals("filling") && !question.getType().equals("epidemic")) {
+                if (!question.getType().equals("filling") && !question.getType().equals("location")) {
                     Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
                     ArrayList<String> choices;
                     if (question.getType().equals("grade")) {
@@ -305,7 +305,7 @@ public class DataController {
                             }
                             break;
                         }
-                        case "epidemic":
+                        case "location":
                         case "filling": {
                             if (!answerInFormat.get(i + 1).equals("")) {
                                 @SuppressWarnings("unchecked")
@@ -497,7 +497,7 @@ public class DataController {
                             }
                             break;
                         }
-                        case "epidemic":
+                        case "location":
                         case "filling": {
                             String answerStr = (String) answerContents.get(i);
                             answerInFormat.add(answerStr);

@@ -339,8 +339,7 @@ public class CollectionController {
                             }
                             break;
                         }
-                        case "epidemic":{
-                        }
+                        case "location":
                         case "filling": {
                             String text = (String) answerObject;
                             if (text == null || text.isEmpty()) {
