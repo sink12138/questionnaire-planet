@@ -37,6 +37,7 @@
             conclusion = #{conclusion},
             quota = #{quota},
             show_index = #{showIndex},
+            limited = #{limited}
             start_time = addtime(#{startTime}, '08:00:00'),
             end_time = addtime(#{endTime}, '08:00:00'),
             <if test="duration != null">

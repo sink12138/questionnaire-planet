@@ -6,6 +6,7 @@ import com.buaa.qp.dao.QuestionDao;
 import com.buaa.qp.dao.ShuffleDao;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Shuffle;
+import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.QuestionService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Integer shuffleQuestions(ArrayList<Question> questions, Integer shuffleId, Integer accountId) {
+    public Integer shuffleQuestions(ArrayList<Question> questions, Integer shuffleId, Integer accountId) throws ParameterFormatException {
         Shuffle shuffle;
         ArrayList<Integer> numbersList;
         Map<String, ArrayList<Integer>> choicesMap;
@@ -87,11 +88,15 @@ public class QuestionServiceImpl implements QuestionService {
                 argMaps.add(JSON.parseObject(question.getArgs()));
             }
         }
+        if (numbersList.size() != questions.size())
+            throw new ParameterFormatException();
         for (String indexStr : choicesMap.keySet()) {
             int index = Integer.parseInt(indexStr);
             Question question = questions.get(index);
             ArrayList<Integer> choicesList = choicesMap.get(indexStr);
             ArrayList<String> choices = parser.toStringList(argMaps.get(index).get("choices"));
+            if (choicesList == null || choices == null || choicesList.size() != choices.size())
+                throw new ParameterFormatException();
             ArrayList<String> shuffleChs = new ArrayList<>();
             for (int num : choicesList) {
                 shuffleChs.add(choices.get(num));

@@ -134,13 +134,17 @@ public class CollectionController {
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
 
-            Integer quota = template.getQuota();
+            String pwd = template.getPassword();
             String conclusion = template.getConclusion();
+            Integer quota = template.getQuota();
             if (isOwner) {
+                if (pwd != null)
+                    map.put("password", pwd);
                 if (conclusion != null)
                     map.put("conclusion", conclusion);
                 if (quota != null)
                     map.put("quota", quota);
+                map.put("limited", template.getLimited());
             }
             if (template.getLimited() && (visitor || !isOwner)) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
@@ -214,11 +218,8 @@ public class CollectionController {
             map.put("type", template.getType());
             map.put("title", template.getTitle());
             String dsc = template.getDescription();
-            String pwd = template.getPassword();
             if (dsc != null)
                 map.put("description", dsc);
-            if (pwd != null)
-                map.put("password", pwd);
             map.put("showIndex", template.getShowIndex());
             map.put("questions", questionMaps);
             map.put("logic", logicTriplets);
