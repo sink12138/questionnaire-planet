@@ -63,7 +63,7 @@ public class DataController {
             // get data
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"));
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"), template.getLimited());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
             ArrayList<Map<String, Object>> answerMaps = new ArrayList<>();
@@ -71,12 +71,17 @@ public class DataController {
                 Map<String, Object> answerMap = new HashMap<>();
                 answerMap.put("answerId", answers.get(i).getAnswerId());
                 answerMap.put("answerTime", answersInFormat.get(i + 1).get(questions.size() + 1));
-                answerMap.put("username", answersInFormat.get(i + 1).get(questions.size() + 2));
+                if (template.getLimited())
+                    answerMap.put("username", answersInFormat.get(i + 1).get(questions.size() + 2));
                 for (int j = 0; j < questions.size(); j ++) {
                     answerMap.put(answersInFormat.get(0).get(j + 1), answersInFormat.get(i + 1).get(j + 1));
                 }
-                if (template.getType().equals("exam"))
-                    answerMap.put("points", answersInFormat.get(i + 1).get(questions.size() + 3));
+                if (template.getType().equals("exam")) {
+                    if (template.getLimited())
+                        answerMap.put("points", answersInFormat.get(i + 1).get(questions.size() + 3));
+                    else
+                        answerMap.put("points", answersInFormat.get(i + 1).get(questions.size() + 2));
+                }
                 answerMaps.add(answerMap);
             }
             map.put("answers", answerMaps);
@@ -133,7 +138,7 @@ public class DataController {
 
             ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            ArrayList<ArrayList<String>> formContent = getData(answers, questions, template.getType().equals("exam"));
+            ArrayList<ArrayList<String>> formContent = getData(answers, questions, template.getType().equals("exam"), template.getLimited());
             if (file.exists() && !file.delete())
                 throw new ExtraMessageException("File already exists");
             if(!file.createNewFile())
@@ -237,7 +242,7 @@ public class DataController {
                 results.add(result);
             }
             Map<Integer, Integer> sumMap = new HashMap<>(); // for calculate avg of grade question
-            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"));
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"), template.getLimited());
             for (int t = 1; t < answersInFormat.size(); t++) {
                 ArrayList<String> answerInFormat = answersInFormat.get(t);
                 for (int i = 0; i < questions.size(); i++) {
@@ -329,7 +334,11 @@ public class DataController {
                 ArrayList<String> pointsStr = new ArrayList<>();
                 for (int i = 1; i < answersInFormat.size(); i++) {
                     ArrayList<String> answerInFormat = answersInFormat.get(i);
-                    String[] p_array = answerInFormat.get(questions.size() + 3).split("/");
+                    String[] p_array;
+                    if (template.getLimited())
+                        p_array = answerInFormat.get(questions.size() + 3).split("/");
+                    else
+                        p_array = answerInFormat.get(questions.size() + 2).split("/");
                     if (totalPoints == null) {
                         totalPoints = p_array[1];
                     }
@@ -424,7 +433,7 @@ public class DataController {
     @Autowired
     AccountService accountService;
 
-    private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions, Boolean isExam) {
+    private ArrayList<ArrayList<String>> getData(ArrayList<Answer> answers, ArrayList<Question> questions, Boolean isExam, Boolean showUserName) {
         ArrayList<ArrayList<String>> answersInFormat = new ArrayList<>();
         ArrayList<String> firstRow = new ArrayList<>();
         firstRow.add("序号");
@@ -434,7 +443,8 @@ public class DataController {
             indexOfStem += 1;
         }
         firstRow.add("提交时间");
-        firstRow.add("用户名");
+        if (showUserName)
+            firstRow.add("用户名");
         if (isExam) {
             firstRow.add("得分情况");
         }
@@ -517,11 +527,13 @@ public class DataController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             answerInFormat.add(sdf.format(new Date(answer.getSubmitTime().getTime() - 28800000)));
             Integer accountId = answer.getSubmitter();
-            if (accountId != null) {
-                Account account = accountService.getAccountById(accountId);
-                answerInFormat.add(account.getUsername());
-            } else {
-                answerInFormat.add(null);
+            if (showUserName) {
+                if (accountId != null) {
+                    Account account = accountService.getAccountById(accountId);
+                    answerInFormat.add(account.getUsername());
+                } else {
+                    answerInFormat.add(null);
+                }
             }
             if (isExam) {
                 answerInFormat.add(answer.getPoints());
