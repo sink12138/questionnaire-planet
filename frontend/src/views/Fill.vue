@@ -853,6 +853,7 @@ export default {
           }
         }
       }
+      console.log(this.mark)
     },
     multiChangeValue(index) {
       console.log(this.answers[index]);
