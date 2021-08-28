@@ -108,15 +108,16 @@ export default {
           .then((res) => {
             console.log(res);
             if (res.data.success == false) {
-              this.$message({
-                showClose: true,
+              this.$notify({
+                title: "提示",
                 message: res.data.message,
-               });
+                type: "info"
+              });
             } else {
-              this.$message({
-                showClose: true,
+              this.$notify({
+                title: "提示",
                 message: "信息修改成功",
-                 type: "success",
+                type: "success"
               });
             }
           })

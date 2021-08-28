@@ -1,94 +1,81 @@
 <template>
-  <div class="reviewer">
-    <div class="search">
-      <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <el-button><i class="el-icon-s-operation"></i></el-button>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="creationTime()"
-              >创建时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="releaseTime()"
-              >发布时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="duration()"
-              >持续时间</el-button
-            ></el-dropdown-item
-          >
-        </el-dropdown-menu>
-      </el-dropdown>
-      <el-input
+  <div class="recycle">
+    <div class="top">
+      <div class="search">
+        <el-input
         v-model.trim="search"
-        style="width: 250px"
+        style="width: 320px"
         clearable
-        placeholder="请输入要搜索的问卷"
-      />
-      <el-button icon="el-icon-search" @click="searchQuest"></el-button>
+        placeholder="请输入要搜索的问卷">
+          <el-dropdown trigger="click" slot="prepend" placement="bottom">
+            <span class="el-dropdown-link">
+              <el-button><i class="el-icon-s-operation"></i></el-button>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="creationTime()"
+                  >创建时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="releaseTime()"
+                  >发布时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="duration()"
+                  >持续时间</el-button
+                ></el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+          <el-button slot="append" icon="el-icon-search" @click="searchQuest"></el-button>
+        </el-input>
+      </div>
+      <ButtonGroup size="large">
+        <Button icon="md-menu"></Button>
+        <Button icon="ios-apps"></Button>
+      </ButtonGroup>
     </div>
     <div class="questionnaire">
-      <div class="list" style="margin-left: 1%; margin-right: 1%">
-        <el-table :data="searchQue" border style="width: 100%">
-          <div class="title">
-            <el-table-column fixed prop="title" label="标题" width="150">
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column
-              fixed
-              prop="creationTime"
-              label="创建时间"
-              width="150"
-            >
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column
-              fixed
-              prop="releaseTime"
-              label="最后发布"
-              width="150"
-            >
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column fixed prop="duration" label="收集时长" width="150">
-            </el-table-column>
-          </div>
-          <div class="time">
-            <el-table-column
-              fixed
-              prop="answerCount"
-              label="收集数量"
-              width="100"
-            >
-            </el-table-column>
-          </div>
-          <div class="bottom clearfix">
-            <el-table-column label="操作" width="200">
-              <template slot-scope="scope">
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="deleteQuest(scope.row)"
-                  icon="el-icon-delete-solid"
-                  >彻底删除</el-button
-                >
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="recover(scope.row)"
-                  icon="el-icon-refresh"
-                  >恢复问卷</el-button
-                >
-              </template>
-            </el-table-column>
-          </div>
+      <div class="table" style="margin-left: 1%; margin-right: 1%">
+        <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
+          <el-table-column fixed prop="title" label="标题" width="150">
+          </el-table-column>
+          <el-table-column
+            prop="answerCount"
+            label="收集数量"
+            width="100"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="creationTime"
+            label="创建时间"
+            width="150"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="releaseTime"
+            label="最后发布"
+            width="150"
+          >
+          </el-table-column>
+          <el-table-column prop="duration" label="收集时长" width="150">
+          </el-table-column>
+          <el-table-column label="操作" width="280">
+            <template slot-scope="scope">
+              <el-button
+                @click="deleteQuest(scope.row)"
+                icon="el-icon-delete"
+                >彻底删除</el-button
+              >
+              <el-button
+                @click="recover(scope.row)"
+                icon="el-icon-refresh"
+                >恢复问卷</el-button
+              >
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -159,22 +146,28 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已彻底删除。",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷彻底删除成功",
+                  type: "success"
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info"
           });
         });
     },
@@ -189,15 +182,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷已恢复。",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷恢复成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -260,11 +258,15 @@ export default {
 </script>
 
 <style scoped>
-.list {
+.recycle {
+  margin-left: 60px;
+}
+.top {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  margin: 15px;
 }
 .cards {
   width: 16%;
@@ -301,10 +303,7 @@ export default {
 .title {
   margin-bottom: 10px;
 }
-.button {
-  color: black;
-}
-.clearfix .el-button {
-  width: 45px;
+.el-table__column-filter-trigger {
+  height: 20px;
 }
 </style>

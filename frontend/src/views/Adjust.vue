@@ -427,18 +427,25 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷修改成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷修改成功",
+              type: "success"
             });
           } else {
-            this.$message({
+            this.$notify({
+              title: "提示",
               message: response.data.message,
+              type: "info"
             });
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -468,9 +475,10 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷修改成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷修改成功",
+              type: "success"
             });
             this.$axios({
               method: "post",
@@ -482,8 +490,9 @@ export default {
               (response) => {
                 console.log(response);
                 if (response.data.success == true) {
-                  this.$message({
-                    message: "问卷发布成功！",
+                  this.$$notify({
+                    title: "提示",
+                    message: "问卷发布成功",
                     type: "success",
                   });
                   this.code = response.data.code;
@@ -491,24 +500,36 @@ export default {
                     window.location.host + "/fill?code=" + this.code;
                   this.dialogVisible = true;
                 } else {
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: response.data.message,
+                    type: "info"
                   });
                 }
               },
               (err) => {
-                alert(err);
+                this.$notify({
+                  title: "错误",
+                  message: err,
+                  type: "error"
+                });
               }
             );
             console.log("发布成功!");
           } else {
-            this.$message({
+            this.$notify({
+              title: "提示",
               message: response.data.message,
+              type: "info"
             });
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -516,11 +537,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制出现错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },
