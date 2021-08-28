@@ -56,6 +56,9 @@ public class CollectionController {
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
             }
+            Integer quota = template.getQuota();
+            if (quota != null && quota <= answerService.countAnswers(templateId))
+                throw new ExtraMessageException("问卷名额已满");
 
             Boolean locked = template.getPassword() != null;
             Boolean login = template.getLimited() && accountId == null;
@@ -146,7 +149,7 @@ public class CollectionController {
             if (quota != null) {
                 int remain = quota - answerService.countAnswers(templateId);
                 if (remain == 0 && (visitor || !isOwner))
-                    throw new ExtraMessageException("名额已满");
+                    throw new ExtraMessageException("问卷名额已满");
                 map.put("remain", remain);
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -504,9 +507,6 @@ public class CollectionController {
 
                 // Insert the answer into the database
                 answerService.submitAnswer(answer);
-                // Close the questionnaire if the quota has been reached
-                if (quota != null && answerCount + 1 >= quota)
-                    templateService.releaseTemplate(templateId, false);
             }
 
             // Collect the conclusion and results after the submission

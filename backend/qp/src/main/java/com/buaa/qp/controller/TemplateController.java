@@ -207,8 +207,6 @@ public class TemplateController {
                 throw new ExtraMessageException("已删除的问卷不能编辑");
             if (template.getReleased())
                 throw new ExtraMessageException("已发布的问卷不能编辑");
-            if (quota != null && quota < answerService.countAnswers(templateId))
-                throw new ExtraMessageException("限额不得少于已收集份数");
 
             template.setTitle(title);
             template.setDescription(description);
