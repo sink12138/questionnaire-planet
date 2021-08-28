@@ -12,12 +12,12 @@
             style="margin: 0"
             :collapse="isCollapse"
             router>
-            <el-button v-if="this.isCollapse == true" icon="el-icon-caret-right" type="text" @click="changeCollapse()"></el-button>
-            <el-button v-else icon="el-icon-caret-left" type="text" @click="changeCollapse()">收起菜单</el-button>
-            <el-menu-item index="/questionnaire">
-              <i class="el-icon-circle-plus"></i>
-              <span slot="title">新建问卷</span>
-            </el-menu-item>
+            <Button v-if="this.isCollapse" icon="ios-arrow-dropright-circle" @click="changeCollapse()"></Button>
+            <Button v-if="this.isCollapse == false" icon="ios-arrow-dropleft-circle" @click="changeCollapse()">收起菜单</Button>
+            <router-link to="/questionnaire">
+              <Button icon="md-add-circle" v-if="this.isCollapse"></Button>
+              <Button icon="md-add-circle" v-if="this.isCollapse == false">创建问卷</Button>
+            </router-link>
             <el-menu-item index="/history">
               <i class="el-icon-s-order"></i>
               <span slot="title">我的问卷</span>
@@ -78,6 +78,13 @@ export default {
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 120px;
   min-height: 400px;
+}
+.ivu-btn {
+  height: 56px;
+  width: 100%;
+  font-size: 15px;
+  margin: 0;
+  border: #ffffff;
 }
 .aside_collapse {
   width: 65px;
