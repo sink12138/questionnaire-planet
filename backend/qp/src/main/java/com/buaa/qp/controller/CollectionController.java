@@ -138,7 +138,7 @@ public class CollectionController {
                 if (quota != null)
                     map.put("quota", quota);
             }
-            if (!template.getType().equals("normal") && (visitor || !isOwner)) {
+            if (template.getLimited() && (visitor || !isOwner)) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
@@ -277,7 +277,7 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷可能已经关闭");
             if (pwd != null && !pwd.equals(password))
                 throw new ExtraMessageException("密码错误");
-            if (!template.getType().equals("normal")) {
+            if (template.getLimited()) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
                     throw new ExtraMessageException("已填过问卷");
@@ -437,9 +437,12 @@ public class CollectionController {
                     }
                     i ++;
                 }
+
+                // Add results to the returned map
                 map.put("results", results);
                 String points = String.format("%.2f/%.2f", totalMarks, fullMarks);
                 map.put("points", points);
+                // Set the points of the answer for database storage
                 answer.setPoints(points);
             }
 
