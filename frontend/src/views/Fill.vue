@@ -126,7 +126,7 @@
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :key="index"
-                    @change="(val)=>changeValue(val, index_question)"
+                    @change="((val)=>{changeValue(val, index_question)})"
                   >
                     <el-radio class="option" :label="index">{{ i }}</el-radio>
                   </el-radio-group></el-form-item
@@ -843,14 +843,12 @@ export default {
     changeValue(val, index_question) {
       console.log(this.answers);
       for (var j = 0; j < this.logic.length; j++) {
-        console.log(this.logic[j][0]);
-        console.log(this.logic[j][1]);
-        console.log(this.logic[j][2]);
-        console.log(index_question);
-        console.log(val);
         if (this.logic[j][0] == index_question) {
           if (this.logic[j][1] == val) {
-            this.logic[j][2] = true
+            this.mark[this.logic[j][2]] = true
+          }
+          else {
+            this.mark[this.logic[j][2]] = false
           }
         }
       }
