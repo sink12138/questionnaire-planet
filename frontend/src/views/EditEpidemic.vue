@@ -813,7 +813,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -927,7 +927,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(
@@ -1043,7 +1043,7 @@ export default {
                 this.modelForm.quota == undefined
                   ? 0
                   : parseInt(this.modelForm.quota),
-              type: "normal",
+              type: "epidemic",
               questions: templateQuestions,
             }),
           }).then(

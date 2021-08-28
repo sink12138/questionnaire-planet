@@ -396,6 +396,21 @@ export default {
             type: "warning"
           });
         }
+      } else if (row.type == "epidemic") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/epidemic/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "问卷已发布！",
+            type: "warning"
+          });
+        }
       }
     },
     release(row) {
