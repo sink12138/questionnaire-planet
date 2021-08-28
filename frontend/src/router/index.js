@@ -16,7 +16,8 @@ const Apply = () => import("../views/Apply.vue")
 const EditApply = () => import("../views/EditApply.vue")
 const Exam = () => import("../views/Exam.vue")
 const EditExam = () => import("../views/EditExam.vue")
-const Clock = () => import("../views/Clock.vue")
+const Epidemic = () => import("../views/Epidemic.vue")
+const EditEpidemic = () => import("../views/EditEpidemic.vue")
 const Preview = () => import("../views/Preview.vue")
 const Fill = () => import("../views/Fill.vue")
 const Statistics = () => import("../views/Statistics.vue")
@@ -98,9 +99,14 @@ const routes = [
     component: EditExam
   },
   {
-    path: '/clock/new',
-    name: 'Clock',
-    component: Clock
+    path: '/epidemic/new',
+    name: 'Epidemic',
+    component: Epidemic
+  },
+  {
+    path: '/epidemic/edit',
+    name: 'EditEpidemic',
+    component: EditEpidemic
   },
   {
     path: '/preview',

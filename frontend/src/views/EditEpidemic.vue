@@ -13,6 +13,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -171,19 +172,6 @@
               :picker-options="pickerOptions"
             >
             </el-date-picker>
-          </el-form-item>
-
-          <!-- 定位测试 -->
-          <el-form-item label="定位" v-if="isEditing == false">
-            <iframe
-              id="geoPage"
-              width="0"
-              height="0"
-              frameborder="0"
-              style="display: none"
-              scrolling="no"
-              src="https://apis.map.qq.com/tools/geolocation?key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp"
-            ></iframe>
           </el-form-item>
         </div>
         <div v-if="isEditing">
@@ -346,7 +334,9 @@
                   </el-col>
                 </el-row>
                 <!-- 答案 -->
-                <el-row v-if="item.type != 2 && item.type != 3">
+                <el-row
+                  v-if="item.type != 2 && item.type != 3 && item.type != 5"
+                >
                   <el-form-item
                     v-for="(opt, idx) in item.answers"
                     :key="idx"
@@ -404,7 +394,7 @@
                 <el-form-item label="编辑题目">
                   <el-button
                     icon="el-icon-circle-plus"
-                    v-if="item.type != 2 && item.type != 3"
+                    v-if="item.type != 2 && item.type != 3 && item.type != 5"
                     @click="addDomain(index)"
                     >新增选项</el-button
                   >
@@ -430,6 +420,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </el-button-group>
           <el-button
             id="addButton"
@@ -535,7 +526,115 @@ export default {
       dialogVisible: false,
       popVisible: false,
       opp: "",
+      gaodeMap: {},
     };
+  },
+  created: function () {
+    this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
+    if (this.templateId == undefined) this.templateId = 0;
+    console.log(this.templateId);
+    this.$axios({
+      method: "get",
+      url: "http://139.224.50.146:80/apis/details",
+      params: { password: "", code: this.code },
+    })
+      .then((response) => {
+        console.log(response);
+        if (response.data.success == true) {
+          this.modelForm.title = response.data.title;
+          this.modelForm.description = response.data.description;
+          this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.password = response.data.password;
+          response.data.quota == undefined
+            ? (this.modelForm.quota = 0)
+            : (this.modelForm.quota = response.data.quota);
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
+          var question = {
+            type: "0",
+            required: true,
+            questionName: "",
+            questionSummary: "",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 800,
+            grades: [],
+            answers: [],
+          };
+          var item = {};
+          var i = 0;
+          var j = 0;
+          for (i in response.data.questions) {
+            question = {
+              type: "0",
+              required: true,
+              questionName: "",
+              questionSummary: "",
+              max: 2,
+              min: 1,
+              height: 1,
+              width: 800,
+              grades: [],
+              answers: [],
+            };
+            item = response.data.questions[i];
+            question.questionName = item.stem;
+            question.questionSummary = item.description;
+            question.required = item.required;
+            switch (item.type) {
+              case "choice":
+                question.type = "0";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "multi-choice":
+                question.type = "1";
+                question.max = item.max;
+                question.min = item.min;
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "filling":
+                question.type = "2";
+                question.height = parseInt(item.height);
+                question.width = parseInt(item.width);
+                question.answers.push({ value: "" });
+                question.answers.push({ value: "" });
+                break;
+              case "grade":
+                question.type = "3";
+                for (j in item.grades) {
+                  question.grades.push(item.grades[j]);
+                }
+                break;
+              case "dropdown":
+                question.type = "4";
+                for (j in item.choices) {
+                  question.answers.push({ value: item.choices[j] });
+                }
+                break;
+              case "location":
+                question.type = "5";
+                break;
+            }
+            console.log(question);
+            this.modelForm.questions.push(question);
+            this.activeNames.push(this.modelForm.questions.length - 1);
+          }
+          console.log(this.modelForm.questions);
+        } else {
+          console.log(response.data.message);
+        }
+      })
+      .catch((err) => console.log(err));
   },
   mounted() {},
   methods: {
@@ -631,7 +730,7 @@ export default {
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/normal/new#question" + (this.modelForm.questions.length - 1)
+        "/epidemic/new#question" + (this.modelForm.questions.length - 1)
       );
     },
     resetForm(formName) {
@@ -701,6 +800,9 @@ export default {
                   x = question.answers[j];
                   quest.choices.push(x.value);
                 }
+                break;
+              case "5":
+                quest.type = "location";
                 break;
             }
             console.log(quest);
@@ -813,6 +915,9 @@ export default {
                   x = question.answers[j];
                   quest.choices.push(x.value);
                 }
+                break;
+              case "5":
+                quest.type = "location";
                 break;
             }
             console.log(quest);
@@ -927,6 +1032,9 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
+              case "5":
+                quest.type = "location";
+                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
@@ -1023,6 +1131,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 .normal {

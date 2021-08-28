@@ -421,7 +421,7 @@ export default {
           password: this.modelForm.password,
           startTime: this.modelForm.startTime,
           endTime: this.modelForm.endTime,
-          quota: this.modelForm.quota,
+          quota: parseInt(this.modelForm.quota),
         }),
       }).then(
         (response) => {

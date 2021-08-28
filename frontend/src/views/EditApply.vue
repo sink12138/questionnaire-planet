@@ -770,6 +770,9 @@ export default {
         ],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
+      this.$router.push(
+        "/apply/edit#question" + (this.modelForm.questions.length - 1)
+      );
     },
     resetForm(formName) {
       // 重置
