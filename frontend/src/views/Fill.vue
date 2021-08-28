@@ -313,15 +313,12 @@
         class="ruleForm"
       >
         <div v-for="(item, index_question) in results" :key="index_question">
-          <el-divider content-position="left" style="margin-top: 15px">
-            <div v-show="showIndex">第{{ index_question + 1 }}题</div>
-          </el-divider>
-          <div class="question-title">
+          <div class="question-title" v-if="item.yourAnswer != null">
             <div class="stem">{{ item.stem }}</div>
           </div>
 
           <div class="question-content">
-            <div v-if="item.type == 'choice'">
+            <div v-if="item.type == 'choice' && item.yourAnswer != null">
               <el-form-item label="你的答案">
                 <el-radio-group
                   v-model="item.yourAnswer"
@@ -346,7 +343,8 @@
                   }}</el-radio>
                 </el-radio-group>
               </el-form-item>
-              <el-form-item label="你的得分">
+              <div v-if="item.points != null">
+                <el-form-item label="你的得分">
                 <el-input
                   disabled
                   type="text"
@@ -356,6 +354,7 @@
                 >
                 </el-input>
               </el-form-item>
+              </div>
             </div>
             <div class="multi" v-if="item.type == 'multi-choice'">
               <el-form-item label="你的答案">
@@ -845,6 +844,11 @@ export default {
                     this.answers[i] == [])
                 ) {
                   this.answers[i] = null;
+                }
+              }
+              for (i in this.questions) {
+                if (this.questions[i].type == "grade" && this.answers[i] > 0) {
+                  this.answers[i] = this.answers[i] - 1;
                 }
               }
               let submitData;
