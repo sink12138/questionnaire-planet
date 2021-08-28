@@ -145,12 +145,6 @@
                     ></el-dropdown-item
                   >
                   <el-dropdown-item
-                    ><el-button
-                      type="text"
-                      class="btn"
-                      @click="updateCode(scope.row)"
-                      icon="el-icon-refresh"
-                      >更新链接</el-button
                     ></el-dropdown-item
                   >
                   <el-dropdown-item>
@@ -190,9 +184,13 @@
                 class="tag-copy"
                 @click="copyShareLink"
                 :data-clipboard-text="qrData.text"
-              >
-                复制链接
-              </el-button>
+              >复制链接</el-button>
+              <el-button
+                type="text"
+                class="btn"
+                @click="updateCode()"
+                icon="el-icon-refresh"
+              >更新链接</el-button>
               <a
                 style="margin: 10px"
                 :href="exportLink"
@@ -456,12 +454,12 @@ export default {
         );
       }
     },
-    updateCode(row) {
+    updateCode() {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/code",
         data: JSON.stringify({
-          templateId: row.templateId,
+          templateId: this.templateId,
         }),
       }).then(
         (response) => {
@@ -483,6 +481,7 @@ export default {
     },
     qr(row) {
       this.code = row.code;
+      this.templateId = row.templateId;
       this.qrData.text = window.location.host + "/fill?code=" + this.code;
       this.dialogVisible = true;
     },
