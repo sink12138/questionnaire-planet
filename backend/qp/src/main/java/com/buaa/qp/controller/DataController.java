@@ -431,6 +431,108 @@ public class DataController {
         return map;
     }
 
+    @GetMapping("/analysis")
+    public Map<String, Object> analysis(@RequestParam("templateId") Integer templateId, @RequestParam("indexX") Integer indexX, @RequestParam("indexY") Integer indexY) {
+        Map<String, Object> map = new HashMap<>();
+        try {// check login
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (accountId == null)
+                throw new LoginVerificationException();
+            Template template = templateService.getTemplate(templateId);
+            if (template == null || template.getDeleted()) {
+                throw new ObjectNotFoundException();
+            } else if (!template.getOwner().equals(accountId)) {
+                throw new LoginVerificationException();
+            }
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            if (indexX > questions.size() || indexY > questions.size() || indexX < 0 || indexY < 0) {
+                throw new ParameterFormatException();
+            }
+            if (indexX.equals(indexY))
+                throw new ExtraMessageException("不可交叉分析相同题目");
+            ArrayList<Map<String, Object>> results = new ArrayList<>();
+            ArrayList<ArrayList<Integer>> numberResults = new ArrayList<>();
+            Question questionX = questions.get(indexX);
+            Question questionY = questions.get(indexY);
+            if (questionX.getType().equals("filling") || questionX.getType().equals("location")
+                    || questionY.getType().equals("filling") || questionY.getType().equals("location")) {
+                throw new ExtraMessageException("不支持填空题和定位题");
+            }
+            Map<String, Object> argsMapX = JSON.parseObject(questionX.getArgs());
+            Map<String, Object> argsMapY = JSON.parseObject(questionY.getArgs());
+            ArrayList<String> choicesX;
+            ArrayList<String> choicesY;
+            if (questionX.getType().equals("grade"))
+                choicesX = (ArrayList<String>) JSON.parseArray(argsMapX.get("grades").toString(), String.class);
+            else
+                choicesX = (ArrayList<String>) JSON.parseArray(argsMapX.get("choices").toString(), String.class);
+            if (questionY.getType().equals("grade"))
+                choicesY = (ArrayList<String>) JSON.parseArray(argsMapY.get("grades").toString(), String.class);
+            else
+                choicesY = (ArrayList<String>) JSON.parseArray(argsMapY.get("choices").toString(), String.class);
+            ArrayList<String> choicesXInFormat = choicesFormat(choicesX, questionX.getType());
+            ArrayList<String> choicesYInFormat = choicesFormat(choicesY, questionY.getType());
+            map.put("choicey", choicesY);
+            for (int i = 0; i < choicesX.size(); i++) {
+                ArrayList<Integer> numbers = new ArrayList<>();
+                for (int j = 0; j < choicesY.size(); j ++)
+                    numbers.add(0);
+                numberResults.add(numbers);
+            }
+            ArrayList<Answer> answers = answerService.getAnswersByTid(templateId);
+            ArrayList<ArrayList<String>> answersInFormat = getData(answers, questions, template.getType().equals("exam"), template.getLimited());
+            for (int i = 1; i < answersInFormat.size(); i++) {
+                ArrayList<String> answerInFormat = answersInFormat.get(i);
+                String choiceX = answerInFormat.get(indexX + 1);
+                String choiceY = answerInFormat.get(indexY + 1);
+                for (int j = 0; j < choicesX.size(); j++) {
+                    for (int k = 0; k < choicesY.size(); k++) {
+                        if (choiceX.contains(choicesXInFormat.get(j)) && choiceY.contains(choicesYInFormat.get(k))) {
+                            ArrayList<Integer> numbers = numberResults.get(j);
+                            int number = numbers.get(k);
+                            number ++;
+                            numbers.set(k, number);
+                            numberResults.set(j, numbers);
+
+                        }
+                    }
+                }
+            }
+            ArrayList<ArrayList<String>> strResults = new ArrayList<>();
+            for (ArrayList<Integer> numberResult : numberResults) {
+                int sum = 0;
+                for (Integer number : numberResult)
+                    sum += number;
+                ArrayList<String> strResult = new ArrayList<>();
+                for (Integer number : numberResult) {
+                    if (sum > 0) {
+                        strResult.add(String.format("%d(%.2f", number, ((double) number / sum) * 100.0) + "%)");
+                    } else {
+                        strResult.add(String.format("%d(%.2f", number, 0.0) + "%)");
+                    }
+                }
+
+                strResults.add(strResult);
+            }
+            for (int i = 0; i < choicesX.size(); i ++) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("choicex", choicesX.get(i));
+                result.put("xy", strResults.get(i));
+                results.add(result);
+            }
+            map.put("xyData", results);
+            map.put("success", true);
+        } catch (LoginVerificationException | ObjectNotFoundException | ExtraMessageException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
     @Autowired
     AccountService accountService;
 
@@ -543,5 +645,16 @@ public class DataController {
             answersInFormat.add(answerInFormat);
         }
         return answersInFormat;
+    }
+
+    private ArrayList<String> choicesFormat(ArrayList<String> choices, String questionType) {
+        ArrayList<String> choicesInFormat = new ArrayList<>();
+        if (questionType.equals("choice") || questionType.equals("multi-choice")) {
+            for (int i = 0; i < choices.size(); i ++)
+                choicesInFormat.add((char) ((int) 'A' + i) + "." + choices.get(i));
+        } else {
+            choicesInFormat.addAll(choices);
+        }
+        return choicesInFormat;
     }
 }
