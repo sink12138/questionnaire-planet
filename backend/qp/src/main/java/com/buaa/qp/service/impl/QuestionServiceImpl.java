@@ -98,17 +98,19 @@ public class QuestionServiceImpl implements QuestionService {
             }
             argMaps.get(index).put("choices", shuffleChs);
             question.setArgs(JSON.toJSONString(argMaps.get(index)));
-            if (question.getType().equals("choice")) {
-                Integer correctAnswer = Integer.parseInt(question.getAnswer());
-                question.setAnswer(Integer.toString(choicesList.indexOf(correctAnswer)));
-            }
-            else {
-                ArrayList<Integer> correctAnswers = new ArrayList<>(JSON.parseArray(question.getAnswer(), Integer.class));
-                for (int i = 0; i < correctAnswers.size(); ++i) {
-                    correctAnswers.set(i, choicesList.indexOf(correctAnswers.get(i)));
+            if (question.getAnswer() != null) {
+                if (question.getType().equals("choice")) {
+                    Integer correctAnswer = Integer.parseInt(question.getAnswer());
+                    question.setAnswer(Integer.toString(choicesList.indexOf(correctAnswer)));
                 }
-                Collections.sort(correctAnswers);
-                question.setAnswer(JSON.toJSONString(correctAnswers));
+                else {
+                    ArrayList<Integer> correctAnswers = new ArrayList<>(JSON.parseArray(question.getAnswer(), Integer.class));
+                    for (int i = 0; i < correctAnswers.size(); ++i) {
+                        correctAnswers.set(i, choicesList.indexOf(correctAnswers.get(i)));
+                    }
+                    Collections.sort(correctAnswers);
+                    question.setAnswer(JSON.toJSONString(correctAnswers));
+                }
             }
         }
         ArrayList<Question> shuffledQues = new ArrayList<>();
