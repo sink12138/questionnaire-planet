@@ -126,7 +126,7 @@
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :key="index"
-                    @change="(val)=>changeValue(val, index_question)"
+                    @change="((val)=>{changeValue(val, index_question)})"
                   >
                     <el-radio class="option" :label="index">{{ i }}</el-radio>
                   </el-radio-group></el-form-item
