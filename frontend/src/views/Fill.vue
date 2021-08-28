@@ -103,158 +103,157 @@
         class="ruleForm"
       >
         <div v-for="(item, index_question) in questions" :key="index_question">
-          <el-divider content-position="left" style="margin-top: 15px"
-            ><div v-show="showIndex">
-              第{{ index_question + 1 }}题
-            </div></el-divider
-          >
-          <div class="question-title">
-            <div class="stem">{{ item.stem }}</div>
-            <div class="description">{{ item.description }}</div>
-          </div>
-          <div class="question-content">
-            <div v-if="item.type == 'choice'">
-              <el-form-item
-                label="选项"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-radio-group
-                  v-model="answers[index_question]"
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  @change="changeValue"
-                >
-                  <el-radio class="option" :label="index">{{ i }}</el-radio>
-                </el-radio-group></el-form-item
-              >
+          <div v-if="mark[index_question] == true">
+            <el-divider content-position="left" style="margin-top: 15px"
+              ><div v-show="showIndex">
+                第{{ index_question + 1 }}题
+              </div></el-divider
+            >
+            <div class="question-title">
+              <div class="stem">{{ item.stem }}</div>
+              <div class="description">{{ item.description }}</div>
             </div>
-            <div class="multi" v-if="item.type == 'multi-choice'">
-              至少选择{{ item.min }}项
-              <el-form-item
-                label="选项"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-checkbox-group
-                  v-model="answers[index_question]"
-                  v-for="(i, index) in item.choices"
-                  :min="0"
-                  :max="item.max"
-                  :key="index"
-                  @change="multiChangeValue(index_question)"
+
+            <div class="question-content">
+              <div v-if="item.type == 'choice'">
+                <el-form-item
+                  label="选项"
+                  :rules="{
+                    required: item.required,
+                  }"
                 >
-                  <el-checkbox class="option" :label="index" border>{{
-                    i
-                  }}</el-checkbox>
-                </el-checkbox-group></el-form-item
-              >
-            </div>
-            <div v-if="item.type == 'filling'">
-              <el-form-item
-                label="请输入"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-input
-                  type="textarea"
-                  class="input"
-                  :rows="item.height"
-                  :style="{ '--width': item.width }"
-                  placeholder="请输入内容"
-                  v-model="answers[index_question]"
-                >
-                </el-input
-              ></el-form-item>
-            </div>
-            <div v-if="item.type == 'grade'">
-              <el-form-item
-                label="评分"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-rate
-                  v-model="answers[index_question]"
-                  show-text
-                  :texts="item.grades"
-                >
-                </el-rate>
-              </el-form-item>
-            </div>
-            <div v-if="item.type == 'dropdown'">
-              <el-form-item
-                label="选项"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-select
-                  v-model="answers[index_question]"
-                  clearable
-                  placeholder="请选择"
-                >
-                  <el-option
+                  <el-radio-group
+                    v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :key="index"
-                    :label="i"
-                    :value="index"
+                    @change="(val)=>changeValue(val, index_question)"
                   >
-                  </el-option>
-                </el-select>
-              </el-form-item>
-            </div>
-            <div class="multi" v-if="item.type == 'vote'">
-              <el-form-item
-                label="选项"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-checkbox-group
-                  v-model="answers[index_question]"
-                  v-for="(i, index) in item.choices"
-                  :min="0"
-                  :max="item.max"
-                  :key="index"
-                  @change="multiChangeValue(index_question)"
+                    <el-radio class="option" :label="index">{{ i }}</el-radio>
+                  </el-radio-group></el-form-item
                 >
-                  <el-checkbox class="option" :label="index" border>{{
-                    i
-                  }}</el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
-            </div>
-            <div class="multi" v-if="item.type == 'sign-up'">
-              至少选择{{ item.min }}项
-              <el-form-item
-                label="选项"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-checkbox-group
-                  v-model="answers[index_question]"
-                  v-for="(i, index) in item.choices"
-                  :min="0"
-                  :max="item.max"
-                  :key="index"
-                  @change="multiChangeValue(index_question)"
+              </div>
+              <div class="multi" v-if="item.type == 'multi-choice'">
+                至少选择{{ item.min }}项
+                <el-form-item
+                  label="选项"
+                  :rules="{
+                    required: item.required,
+                  }"
                 >
-                  <el-checkbox
-                    class="option"
-                    :label="index"
-                    border
-                    :disabled="item.remains[index] == 0 ? true : false"
-                    >{{ i }}共{{ item.quotas[index] }},剩余{{
-                      item.remains[index]
-                    }}
-                  </el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
+                  <el-checkbox-group
+                    v-model="answers[index_question]"
+                    v-for="(i, index) in item.choices"
+                    :min="0"
+                    :max="item.max"
+                    :key="index"
+                    @change="multiChangeValue(index_question)"
+                  >
+                    <el-checkbox class="option" :label="index" border>{{
+                      i
+                    }}</el-checkbox>
+                  </el-checkbox-group></el-form-item
+                >
+              </div>
+              <div v-if="item.type == 'filling'">
+                <el-form-item
+                  label="请输入"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-input
+                    type="textarea"
+                    class="input"
+                    :rows="item.height"
+                    :style="{ '--width': item.width }"
+                    placeholder="请输入内容"
+                    v-model="answers[index_question]"
+                  >
+                  </el-input
+                ></el-form-item>
+              </div>
+              <div v-if="item.type == 'grade'">
+                <el-form-item
+                  label="评分"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-rate v-model="answers[index_question]" show-text :texts="item.grades">
+                  </el-rate>
+                </el-form-item>
+              </div>
+              <div v-if="item.type == 'dropdown'">
+                <el-form-item
+                  label="选项"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-select
+                    v-model="answers[index_question]"
+                    clearable
+                    placeholder="请选择"
+                  >
+                    <el-option
+                      v-for="(i, index) in item.choices"
+                      :key="index"
+                      :label="i"
+                      :value="index"
+                    >
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div>
+              <div class="multi" v-if="item.type == 'vote'">
+                <el-form-item
+                  label="选项"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-checkbox-group
+                    v-model="answers[index_question]"
+                    v-for="(i, index) in item.choices"
+                    :min="0"
+                    :max="item.max"
+                    :key="index"
+                    @change="multiChangeValue(index_question)"
+                  >
+                    <el-checkbox class="option" :label="index" border>{{
+                      i
+                    }}</el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+              </div>
+              <div class="multi" v-if="item.type == 'sign-up'">
+                至少选择{{ item.min }}项
+                <el-form-item
+                  label="选项"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-checkbox-group
+                    v-model="answers[index_question]"
+                    v-for="(i, index) in item.choices"
+                    :min="0"
+                    :max="item.max"
+                    :key="index"
+                    @change="multiChangeValue(index_question)"
+                  >
+                    <el-checkbox
+                      class="option"
+                      :label="index"
+                      border
+                      :disabled="item.remains[index] == 0 ? true : false"
+                      >{{ i }}共{{ item.quotas[index] }},剩余{{
+                        item.remains[index]
+                      }}
+                    </el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+              </div>
             </div>
             <div v-if="item.type == 'location'">
               <el-form-item
@@ -280,10 +279,14 @@
               </el-form-item>
             </div>
           </div>
+          
         </div>
       </el-form>
     </div>
     <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+    <div class="conclusion" v-if="submitted == true && type == 'exam'">
+      您的分数是{{ points }}
+    </div>
     <div class="voted" v-if="submitted == true && isVote == true">
       <div class="result">
         <div class="chart">
@@ -299,6 +302,124 @@
           </el-table-column>
         </el-table>
       </div>
+    </div>
+    <div class="question" v-if="submitted == true && type == 'exam'">
+      <el-form
+        :model="results"
+        :rules="rules"
+        ref="ruleForm"
+        label-width="100px"
+        class="ruleForm"
+      >
+        <div v-for="(item, index_question) in results" :key="index_question">
+          <div class="question-title" v-if="item.yourAnswer != null">
+            <div class="stem">{{ item.stem }}</div>
+          </div>
+
+          <div class="question-content">
+            <div v-if="item.type == 'choice' && item.yourAnswer != null">
+              <el-form-item label="你的答案">
+                <el-radio-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-radio-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :key="index"
+                  @change="changeValue"
+                >
+                  <el-radio class="option" :label="index" disabled>{{
+                    i
+                  }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <div v-if="item.points != null">
+                <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+              </div>
+            </div>
+            <div class="multi" v-if="item.type == 'multi-choice'">
+              <el-form-item label="你的答案">
+                <el-checkbox-group
+                  v-model="item.yourAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="正确答案">
+                <el-checkbox-group
+                  v-model="item.correctAnswer"
+                  v-for="(i, index) in item.choices"
+                  :min="0"
+                  :max="item.max"
+                  :key="index"
+                  @change="multiChangeValue(index_question)"
+                >
+                  <el-checkbox class="option" :label="index" border disabled>{{
+                    i
+                  }}</el-checkbox>
+                </el-checkbox-group>
+              </el-form-item>
+              <el-form-item label="你的得分">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的得分"
+                  v-model="item.points"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+            <div v-if="item.type == 'filling'">
+              <el-form-item label="你的答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="你的答案"
+                  v-model="item.yourAnswer"
+                >
+                </el-input>
+              </el-form-item>
+              <el-form-item label="参考答案">
+                <el-input
+                  disabled
+                  type="text"
+                  class="input"
+                  placeholder="无参考答案"
+                  v-model="item.correctAnswer"
+                >
+                </el-input>
+              </el-form-item>
+            </div>
+          </div>
+        </div>
+      </el-form>
     </div>
     <div class="submit" v-if="fillRight == true">
       <el-button @click="submit()" v-if="submitted == false"
@@ -371,8 +492,11 @@ export default {
       results: [],
       questions: [],
       answers: [],
+      mark: [],
+      logic: [],
       myChart: null,
       canvas: null,
+      points: "",
     };
   },
   created: function () {
@@ -408,9 +532,21 @@ export default {
                     this.description = response.data.description;
                     this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
+                    this.logic = response.data.logic;
+                    for (var j = 0; j < this.questions.length; j++) {
+                      this.mark.push(true)
+                    }
+                    for (j = 0; j < this.logic.length; j++) {
+                      this.mark[this.logic[j][2]] = false;
+                    }
                     this.deadlline = response.data.endTime;
                     this.shuffleId = response.data.shuffleId;
                     this.settime();
+                    if (this.type == "vote") {
+                      this.isVote = true;
+                    } else {
+                      this.isVote = false;
+                    }
                     var i = 0;
                     for (i in this.questions) {
                       if (
@@ -613,6 +749,13 @@ export default {
               this.type = response.data.type;
               this.description = response.data.description;
               this.questions = response.data.questions;
+              this.logic = response.data.logic;
+              for (var j = 0; j < this.questions.length; j++) {
+                this.mark.push(true)
+              }
+              for (j = 0; j < this.logic.length; j++) {
+                this.mark[this.logic[j][2]] = false;
+              }
               this.deadlline = response.data.endTime;
               this.shuffleId = response.data.shuffleId;
               this.settime();
@@ -655,6 +798,13 @@ export default {
             this.type = response.data.type;
             this.description = response.data.description;
             this.questions = response.data.questions;
+            this.logic = response.data.logic;
+            for (j = 0; j < this.questions.length; j++) {
+              this.mark.push(true)
+            }
+            for (var j = 0; j < this.logic.length; j++) {
+              this.mark[this.logic[j][2]] = false;
+            }
             this.deadlline = response.data.endTime;
             this.shuffleId = response.data.shuffleId;
             this.settime();
@@ -690,8 +840,20 @@ export default {
     exportQuest() {
       this.$PDFSave(this.$refs.quest, this.title);
     },
-    changeValue() {
+    changeValue(val, index_question) {
       console.log(this.answers);
+      for (var j = 0; j < this.logic.length; j++) {
+        console.log(this.logic[j][0]);
+        console.log(this.logic[j][1]);
+        console.log(this.logic[j][2]);
+        console.log(index_question);
+        console.log(val);
+        if (this.logic[j][0] == index_question) {
+          if (this.logic[j][1] == val) {
+            this.logic[j][2] = true
+          }
+        }
+      }
     },
     multiChangeValue(index) {
       console.log(this.answers[index]);
@@ -716,6 +878,11 @@ export default {
                     this.answers[i] == [])
                 ) {
                   this.answers[i] = null;
+                }
+              }
+              for (i in this.questions) {
+                if (this.questions[i].type == "grade" && this.answers[i] > 0) {
+                  this.answers[i] = this.answers[i] - 1;
                 }
               }
               let submitData;
@@ -749,12 +916,10 @@ export default {
                     } else {
                       this.conclusion = response.data.conclusion;
                     }
-                    if (response.data.results == undefined) {
-                      this.isVote = false;
-                    } else {
-                      this.isVote = true;
+                    if (response.data.results != undefined) {
                       this.results = response.data.results;
                       console.log(this.results);
+                      this.points = response.data.points;
                     }
                   } else {
                     this.$notify({

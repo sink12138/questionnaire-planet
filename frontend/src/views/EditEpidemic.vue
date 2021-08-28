@@ -814,7 +814,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -929,7 +929,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1046,7 +1046,7 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: this.templateId,
+              templateId: parseInt(this.templateId),
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1066,6 +1066,7 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.code = response.data.code;
                 this.templateId = response.data.templateId;
                 this.$message({
                   message: "问卷保存成功！",
