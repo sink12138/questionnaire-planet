@@ -209,11 +209,11 @@ public class ManagementController {
                 throw new ExtraMessageException("无法操作已删除的问卷");
 
             // clone
-            Template newTemplate = new Template(template.getType(), template.getOwner(),
-                    template.getTitle() + "（副本）", template.getDescription(), template.getPassword(),
-                    template.getConclusion(), template.getQuota(), template.getShowIndex(), template.getLimited());
+            template.setTitle(template.getTitle() + "（副本）");
+            template.setEndTime(null);
+            template.setStartTime(null);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            Integer newTemplateId = templateService.submitTemplate(newTemplate, questions);
+            Integer newTemplateId = templateService.submitTemplate(template, questions);
             map.put("success", true);
             map.put("newTemplateId", newTemplateId);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
