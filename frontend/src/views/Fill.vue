@@ -853,7 +853,6 @@ export default {
           }
         }
       }
-      console.log(this.mark);
       this.$forceUpdate();
     },
     multiChangeValue(index) {
