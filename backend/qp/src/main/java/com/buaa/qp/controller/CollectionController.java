@@ -369,16 +369,14 @@ public class CollectionController {
                                 answers.set(i, new ArrayList<>());
                             else {
                                 int maxIndex = parser.toStringList(argsMap.get("choices")).size() - 1;
-                                Set<Integer> choiceSet = new HashSet<>(choices);
-                                int size = choiceSet.size();
+                                choices = new ArrayList<>(new TreeSet<>(choices));
+                                int size = choices.size();
                                 if (size < (int) argsMap.get("min") || size > (int) argsMap.get("max"))
                                     throw new ParameterFormatException();
-                                for (Integer choice : choiceSet) {
+                                for (Integer choice : choices) {
                                     if (choice < 0 || choice > maxIndex)
                                         throw new ParameterFormatException();
                                 }
-                                choices = new ArrayList<>(choiceSet);
-                                Collections.sort(choices);
                                 answers.set(i, choices);
                                 for (Logic logic : logics) {
                                     if (logic.getM().equals(i) && choices.contains(logic.getC()))

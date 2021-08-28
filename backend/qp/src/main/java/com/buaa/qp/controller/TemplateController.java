@@ -378,16 +378,14 @@ public class TemplateController {
                         throw new ExtraMessageException("带有分值的题目必须预设正确答案");
                     if (answerChoices != null) {
                         int maxIndex = choices.size() - 1;
-                        Set<Integer> answerSet = new HashSet<>(answerChoices);
-                        int size = answerSet.size();
+                        answerChoices = new ArrayList<>(new TreeSet<>(answerChoices));
+                        int size = answerChoices.size();
                         if (size < min || size > max)
                             throw new ParameterFormatException();
-                        for (Integer answerIndex : answerSet) {
+                        for (Integer answerIndex : answerChoices) {
                             if (answerIndex < 0 || answerIndex > maxIndex)
                                 throw new ParameterFormatException();
                         }
-                        answerChoices = new ArrayList<>(answerSet);
-                        Collections.sort(answerChoices);
                         questionAnswer = JSON.toJSONString(answerChoices);
                     }
                     argsMap.put("choices", choices);
