@@ -211,14 +211,9 @@ public class ManagementController {
             // clone
             Template newTemplate = new Template(template.getType(), template.getOwner(),
                     template.getTitle() + "（副本）", template.getDescription(), template.getPassword(),
-                    template.getConclusion(), template.getQuota(), template.getShowIndex());
+                    template.getConclusion(), template.getQuota(), template.getShowIndex(), template.getLimited());
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            ArrayList<Question> newQuestions = new ArrayList<>();
-            for (Question question : questions) {
-                Question newQuestion = new Question(question.getType(), question.getStem(), question.getDescription(), question.getRequired(), question.getArgs());
-                newQuestions.add(newQuestion);
-            }
-            Integer newTemplateId = templateService.submitTemplate(newTemplate, newQuestions);
+            Integer newTemplateId = templateService.submitTemplate(newTemplate, questions);
             map.put("success", true);
             map.put("newTemplateId", newTemplateId);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
