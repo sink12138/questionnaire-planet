@@ -7,16 +7,16 @@
       <el-container>
         <el-aside v-bind:class="aside" style="width: 121px">
           <el-menu
-            default-active="this.$route.path"
+            :default-active="this.$route.path"
             class="el-menu-vertical-demo"
-            style="margin: 0"
+            style="margin: 0;text-align: left"
             :collapse="isCollapse"
             router>
             <Button v-if="this.isCollapse" icon="ios-arrow-dropright-circle" @click="changeCollapse()"></Button>
             <Button v-if="this.isCollapse == false" icon="ios-arrow-dropleft-circle" @click="changeCollapse()">收起菜单</Button>
             <router-link to="/questionnaire">
-              <Button icon="md-add-circle" v-if="this.isCollapse"></Button>
-              <Button icon="md-add-circle" v-if="this.isCollapse == false">创建问卷</Button>
+              <Button class="new" icon="md-add-circle" v-if="this.isCollapse"></Button>
+              <Button class="new" icon="md-add-circle" v-if="this.isCollapse == false">创建问卷</Button>
             </router-link>
             <el-menu-item index="/history">
               <i class="el-icon-s-order"></i>
@@ -57,6 +57,9 @@ export default {
   methods: {
     changeCollapse() {
       this.isCollapse = !this.isCollapse
+    },
+    handleOpen() {
+      console.log(this.$router.path)
     }
   }
 }
@@ -83,8 +86,12 @@ export default {
   height: 56px;
   width: 100%;
   font-size: 15px;
+  border: #fff;
   margin: 0;
-  border: #ffffff;
+}
+.new {
+  color: #ffffff;
+  background: rgb(0, 183, 255);
 }
 .aside_collapse {
   width: 65px;
