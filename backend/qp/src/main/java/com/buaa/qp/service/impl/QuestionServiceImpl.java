@@ -89,13 +89,27 @@ public class QuestionServiceImpl implements QuestionService {
         }
         for (String indexStr : choicesMap.keySet()) {
             int index = Integer.parseInt(indexStr);
+            Question question = questions.get(index);
+            ArrayList<Integer> choicesList = choicesMap.get(indexStr);
             ArrayList<String> choices = parser.toStringList(argMaps.get(index).get("choices"));
             ArrayList<String> shuffleChs = new ArrayList<>();
-            for (int num : choicesMap.get(indexStr)) {
+            for (int num : choicesList) {
                 shuffleChs.add(choices.get(num));
             }
             argMaps.get(index).put("choices", shuffleChs);
-            questions.get(index).setArgs(JSON.toJSONString(argMaps.get(index)));
+            question.setArgs(JSON.toJSONString(argMaps.get(index)));
+            if (question.getType().equals("choice")) {
+                Integer correctAnswer = Integer.parseInt(question.getAnswer());
+                question.setAnswer(Integer.toString(choicesList.indexOf(correctAnswer)));
+            }
+            else {
+                ArrayList<Integer> correctAnswers = new ArrayList<>(JSON.parseArray(question.getAnswer(), Integer.class));
+                for (int i = 0; i < correctAnswers.size(); ++i) {
+                    correctAnswers.set(i, choicesList.indexOf(correctAnswers.get(i)));
+                }
+                Collections.sort(correctAnswers);
+                question.setAnswer(JSON.toJSONString(correctAnswers));
+            }
         }
         ArrayList<Question> shuffledQues = new ArrayList<>();
         for (int index : numbersList) {
