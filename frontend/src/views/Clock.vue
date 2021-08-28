@@ -564,7 +564,11 @@ export default {
       if (this.modelForm.questions[index].answers.length > 2) {
         this.modelForm.questions[index].answers.splice(idx, 1);
       } else {
-        this.$message("至少需要两个选项");
+        this.$notify({
+          title: "提示",
+          message: "至少需要两个选项",
+          type: "info"
+        });
       }
     },
     removeQuestion(index) {
@@ -672,9 +676,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -732,18 +737,25 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -784,9 +796,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -844,19 +857,26 @@ export default {
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
                 this.code = response.data.code;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
                 this.$router.push("/preview?code=" + this.code);
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -897,9 +917,10 @@ export default {
                 if (quest.max < quest.min) {
                   var mes =
                     "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
-                  this.$message({
+                  this.$notify({
+                    title: "提示",
                     message: mes,
-                    type: "warning",
+                    type: "warning"
                   });
                   return;
                 }
@@ -956,9 +977,10 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
-                this.$message({
-                  message: "问卷保存成功！",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷保存成功",
+                  type: "success"
                 });
                 this.$axios({
                   method: "post",
@@ -970,33 +992,46 @@ export default {
                   (response) => {
                     console.log(response);
                     if (response.data.success == true) {
-                      this.$message({
-                        message: "问卷发布成功！",
-                        type: "success",
+                      this.$notify({
+                        title: "提示",
+                        message: "问卷发布成功",
+                        type: "success"
                       });
                       this.code = response.data.code;
                       this.qrData.text =
                         window.location.host + "/fill?code=" + this.code;
                       this.dialogVisible = true;
                     } else {
-                      this.$message({
+                      this.$notify({
+                        title: "提示",
                         message: response.data.message,
+                        type: "info"
                       });
                     }
                   },
                   (err) => {
-                    alert(err);
+                    this.$notify({
+                      title: "错误",
+                      message: err,
+                      type: "error"
+                    });
                   }
                 );
                 console.log("发布成功!");
               } else {
-                this.$message({
+                this.$notify({
+                  title: "提示",
                   message: response.data.message,
+                  type: "info"
                 });
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -1007,11 +1042,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制出现错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },
