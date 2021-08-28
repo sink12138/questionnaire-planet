@@ -602,8 +602,9 @@ export default {
                   this.answers[i] = null;
                 }
               }
+              let submitData;
               if (this.type === "exam") {
-                let submitData = JSON.stringify({
+                submitData = JSON.stringify({
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
@@ -611,7 +612,7 @@ export default {
                 });
               }
               else {
-                let submitData = JSON.stringify({
+                submitData = JSON.stringify({
                   code: this.code,
                   password: this.password,
                   answers: this.answers,
