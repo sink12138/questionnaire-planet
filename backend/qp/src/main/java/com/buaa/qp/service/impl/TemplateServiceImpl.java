@@ -1,9 +1,7 @@
 package com.buaa.qp.service.impl;
 
-import com.buaa.qp.dao.AnswerDao;
-import com.buaa.qp.dao.QuestionDao;
-import com.buaa.qp.dao.ShuffleDao;
-import com.buaa.qp.dao.TemplateDao;
+import com.buaa.qp.dao.*;
+import com.buaa.qp.entity.Logic;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.service.TemplateService;
@@ -11,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.TreeSet;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -25,6 +24,9 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
     private ShuffleDao shuffleDao;
+
+    @Autowired
+    private LogicDao logicDao;
 
     @Override
     public Template getTemplate(Integer templateId) {
@@ -50,7 +52,7 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
-    public Integer submitTemplate(Template template, ArrayList<Question> questions) {
+    public Integer submitTemplate(Template template, ArrayList<Question> questions, TreeSet<Logic> logics) {
         templateDao.insert(template);
         if (template.getStartTime() != null || template.getEndTime() != null)
             templateDao.createEvents(template);
@@ -65,20 +67,29 @@ public class TemplateServiceImpl implements TemplateService {
             question.setTemplateId(templateId);
             questionDao.insert(question);
         }
+        for (Logic logic : logics) {
+            logic.setTemplateId(templateId);
+            logicDao.insert(logic);
+        }
         return templateId;
     }
 
     @Override
-    public void modifyTemplate(Template template, ArrayList<Question> questions) {
+    public void modifyTemplate(Template template, ArrayList<Question> questions, TreeSet<Logic> logics) {
         template.setDuration("00:00:00");
         templateDao.update(template);
         Integer templateId = template.getTemplateId();
         answerDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
+        logicDao.deleteByTid(templateId);
         shuffleDao.deleteByTid(templateId);
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
+        }
+        for (Logic logic : logics) {
+            logic.setTemplateId(templateId);
+            logicDao.insert(logic);
         }
     }
 
@@ -104,9 +115,15 @@ public class TemplateServiceImpl implements TemplateService {
     }
 
     @Override
+    public TreeSet<Logic> getLogicsByTid(Integer templateId) {
+        return new TreeSet<>(logicDao.selectByTid(templateId));
+    }
+
+    @Override
     public void deleteTemplate(Integer templateId) {
         shuffleDao.deleteByTid(templateId);
         answerDao.deleteByTid(templateId);
+        logicDao.deleteByTid(templateId);
         questionDao.deleteByTid(templateId);
         templateDao.deleteByTid(templateId);
     }

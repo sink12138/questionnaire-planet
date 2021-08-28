@@ -3,6 +3,7 @@ package com.buaa.qp.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.buaa.qp.entity.Answer;
+import com.buaa.qp.entity.Logic;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
@@ -161,6 +162,7 @@ public class CollectionController {
             if (endTime != null)
                 map.put("endTime", sdf.format(new Date(endTime.getTime() - 28800000)));
 
+            // Questions
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             if (template.getType().equals("exam")) {
                 int shuffleId;
@@ -169,7 +171,6 @@ public class CollectionController {
                     map.put("shuffleId", shuffleId);
                 }
             }
-
             ArrayList<Map<String, Object>> questionMaps = new ArrayList<>();
             for (Question question : questions) {
                 Map<String, Object> questionMap = new HashMap<>();
@@ -201,6 +202,14 @@ public class CollectionController {
                 questionMap.putAll(argsMap);
                 questionMaps.add(questionMap);
             }
+
+            // Logics
+            TreeSet<Logic> logics = templateService.getLogicsByTid(templateId);
+            ArrayList<ArrayList<Integer>> logicTriplets = new ArrayList<>();
+            for (Logic logic : logics) {
+                logicTriplets.add(logic.toList());
+            }
+
             map.put("success", true);
             map.put("type", template.getType());
             map.put("title", template.getTitle());
@@ -212,6 +221,7 @@ public class CollectionController {
                 map.put("password", pwd);
             map.put("showIndex", template.getShowIndex());
             map.put("questions", questionMaps);
+            map.put("logic", logicTriplets);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {

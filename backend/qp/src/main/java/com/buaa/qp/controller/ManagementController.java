@@ -1,5 +1,6 @@
 package com.buaa.qp.controller;
 
+import com.buaa.qp.entity.Logic;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.*;
@@ -213,7 +214,8 @@ public class ManagementController {
             template.setEndTime(null);
             template.setStartTime(null);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
-            Integer newTemplateId = templateService.submitTemplate(template, questions);
+            TreeSet<Logic> logics = templateService.getLogicsByTid(templateId);
+            Integer newTemplateId = templateService.submitTemplate(template, questions, logics);
             map.put("success", true);
             map.put("newTemplateId", newTemplateId);
         } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {

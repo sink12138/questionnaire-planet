@@ -1,6 +1,7 @@
 package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.buaa.qp.entity.Logic;
 import com.buaa.qp.entity.Question;
 import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
@@ -118,13 +119,7 @@ public class TemplateController {
             ArrayList<Question> questions = makeQuestions(type, quota, questionMaps);
 
             // Parameter checks of logics
-            TreeSet<ArrayList<Integer>> logicSet = new TreeSet<>((logic1, logic2) -> {
-                if (!logic1.get(0).equals(logic2.get(0)))
-                    return logic1.get(0) - logic2.get(0);
-                if (!logic1.get(1).equals(logic2.get(1)))
-                    return logic1.get(1) - logic2.get(1);
-                return logic1.get(2) - logic2.get(2);
-            });
+            TreeSet<Logic> logics = new TreeSet<>();
             try {
                 int size = questions.size();
                 for (Object logicObject : logicList) {
@@ -150,7 +145,7 @@ public class TemplateController {
                         throw new ExtraMessageException("后面题目不能作为前面题目的出现条件");
                     if (questions.get(m).getShuffle() || questions.get(n).getShuffle())
                         throw new ExtraMessageException("参与乱序的题目不能设置逻辑关联");
-                    logicSet.add(logic);
+                    logics.add(new Logic(logic));
                 }
             }
             catch (ClassCastException | NumberFormatException e) {
@@ -159,14 +154,13 @@ public class TemplateController {
 
             Template newTemplate = new Template(type, accountId, title, description, password, conclusion,
                     quota, showIndex, startTime, endTime, limited);
-            newTemplate.setLogic(JSON.toJSONString(logicSet));
 
             if (templateId == 0) {
-                templateId = templateService.submitTemplate(newTemplate, questions);
+                templateId = templateService.submitTemplate(newTemplate, questions, logics);
             }
             else {
                 newTemplate.setTemplateId(templateId);
-                templateService.modifyTemplate(newTemplate, questions);
+                templateService.modifyTemplate(newTemplate, questions, logics);
             }
             String code = templateService.getTemplate(templateId).getCode();
             map.put("success", true);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.buaa.qp.dao.LogicDao">
+    <select id="selectByTid" parameterType="Integer" resultType="Logic">
+        select * from logic
+        where template_id = #{templateId}
+    </select>
+    <insert id="insert" parameterType="Logic" useGeneratedKeys="true" keyProperty="logicId">
+        insert into logic(template_id, m, c, n)
+        values (#{templateId}, #{m}, #{c}, #{n})
+    </insert>
+    <delete id="deleteByTid" parameterType="Integer">
+        delete from logic
+        where template_id = #{templateId}
+    </delete>
+</mapper>
