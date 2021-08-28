@@ -339,10 +339,16 @@ public class CollectionController {
                             }
                             break;
                         }
+                        case "epidemic":{
+                        }
                         case "filling": {
                             String text = (String) answerObject;
-                            if (text == null || text.isEmpty())
-                                answers.set(i, "");
+                            if (text == null || text.isEmpty()) {
+                                if (!question.getRequired())
+                                    answers.set(i, "");
+                                else
+                                    throw new ExtraMessageException("有必答题未作答");
+                            }
                             break;
                         }
                         default: {
