@@ -325,6 +325,9 @@ export default {
         } else {
           console.log(response.data.message);
         }
+        while (this.answers.length < this.questions.length) {
+          this.answers.push(null);
+        }
       })
       .catch((err) => console.log(err));
   },
@@ -332,7 +335,7 @@ export default {
     this.gaodeMap = new AMapJS.AMapLoader({
       key: "20f6820df07b227d816cb3a065241c7a",
       version: "1.4.15",
-      plugins: ["AMap.Geolocation"], //需要加载的插件
+      plugins: ["AMap.Geolocation", "AMap.CitySearch"], //需要加载的插件
     });
   },
   methods: {
@@ -343,21 +346,38 @@ export default {
         type: "warning",
       })
         .then(() => {
+          var answertmp = this.answers;
+          var tmp = this;
           this.gaodeMap.load().then(({ AMap }) => {
-            new AMap.Geolocation({
-              enableHighAccuracy: false, //是否使用高精度定位，默认:true
-              timeout: 10000, //超过10秒后停止定位，默认：无穷大
-            }).getCurrentPosition((status, result) => {
-              console.log("状态", status);
-              this.$set(
-                this.answers,
-                index,
-                result.addressComponent.province +
-                  result.addressComponent.city +
-                  result.addressComponent.district
-              );
-              console.log("位置", this.answers[index]);
+            var citysearch = new AMap.CitySearch();
+            //自动获取用户IP，返回当前城市
+            citysearch.getLocalCity(function (status, result) {
+              if (status === "complete" && result.info === "OK") {
+                if (result && result.city && result.bounds) {
+                  var cityinfo = result.city;
+                  console.log("您当前所在城市：", cityinfo);
+                  tmp.$set(answertmp, index, cityinfo);
+                  console.log("您当前所在城市：", answertmp[index]);
+                  //地图显示当前城市
+                }
+              } else {
+                console.log(result.info);
+              }
             });
+            // new AMap.Geolocation({
+            //   enableHighAccuracy: false, //是否使用高精度定位，默认:true
+            //   timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            // }).getCurrentPosition((status, result) => {
+            //   console.log("状态", status);
+            //   this.$set(
+            //     this.answers,
+            //     index,
+            //     result.addressComponent.province +
+            //       result.addressComponent.city +
+            //       result.addressComponent.district
+            //   );
+            //   console.log("位置", this.answers[index]);
+            // });
           });
         })
         .catch(() => {
