@@ -478,16 +478,10 @@ public class CollectionController {
                                 }
                             }
                         }
-                    }
-                    results.add(result);
-                }
-                int i = 1;
-                for (Map<String, Object> result : results) {
-                    if (template.getShowIndex()) {
                         String stem = (String) (result.get("stem"));
-                        result.put("stem", i + "." + stem);
+                        result.put("stem", (i + 1) + "." + stem);
+                        results.add(result);
                     }
-                    i ++;
                 }
 
                 // Add results to the returned map
