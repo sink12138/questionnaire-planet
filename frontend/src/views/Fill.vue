@@ -846,7 +846,7 @@ export default {
         this.mark[this.logic[j][2]] = false;
       }
 
-      for (var j = 0; j < this.logic.length; j++) {
+      for (j = 0; j < this.logic.length; j++) {
         if (this.logic[j][0] == index_question) {
           if (this.logic[j][1] == val) {
             this.mark[this.logic[j][2]] = true
