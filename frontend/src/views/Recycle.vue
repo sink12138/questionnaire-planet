@@ -146,22 +146,28 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已彻底删除。",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷彻底删除成功",
+                  type: "success"
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info"
           });
         });
     },
@@ -176,15 +182,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷已恢复。",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷恢复成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },

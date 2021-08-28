@@ -389,10 +389,10 @@ export default {
                     }
                   } else {
                     console.log(response.data.message);
-                    this.$message({
+                    this.$notify({
+                      title: "提示",
                       message: response.data.message,
-                      type: "warning",
-                      showClose: true,
+                      type: "warning"
                     });
                   }
                 })
@@ -401,10 +401,10 @@ export default {
           }
         } else {
           console.log(response.data.message);
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: response.data.message,
-            type: "warning",
-            showClose: true,
+            type: "warning"
           });
         }
       })
@@ -465,7 +465,11 @@ export default {
               }
             }, 1000);
           } else {
-            this.$message.error(res.data.message);
+            this.$notify({
+              title: "提示",
+              message: res.data.message,
+              type: "error"
+            });
           }
           console.log(res);
         });
@@ -487,14 +491,19 @@ export default {
         if (res.data.success == true) {
           sessionStorage.setItem("isLogin", true);
           this.$store.commit("login");
-          this.$message({
-            message: "登录成功！",
-            type: "success",
+          this.$notify({
+            title: "提示",
+            message: "登录成功",
+            type: "success"
           });
           this.dialogFormVisible1 = false;
           this.isLogin();
         } else {
-          alert("用户名或密码错误！");
+          this.$notify({
+            title: "提示",
+            message: "用户名或密码错误",
+            type: "error"
+          });
         }
         console.log(res);
       });
@@ -526,10 +535,10 @@ export default {
               }
             } else {
               console.log(response.data.message);
-              this.$message({
+              this.$notify({
+                title: "提示",
                 message: response.data.message,
-                type: "warning",
-                showClose: true,
+                type: "warning"
               });
             }
           })
@@ -565,10 +574,18 @@ export default {
             }
           } else {
             if (response.data.message === "密码错误") {
-              alert("问卷密码错误！");
+              this.$notify({
+                title: "提示",
+                message: "问卷密码错误！",
+                type: "error"
+              });
             }
             else {
-              this.$message.error(response.data.message);
+              this.$notify({
+                title: "提示",
+                message: response.data.message,
+                type: "error"
+              });
             }
             
           }
@@ -642,14 +659,19 @@ export default {
                       console.log(this.results);
                     }
                   } else {
-                    this.$message({
+                    this.$notify({
+                      title: "提示",
                       message: response.data.message,
-                      type: "info",
+                      type: "info"
                     });
                   }
                 },
                 (err) => {
-                  alert(err);
+                  this.$notify({
+                    title: "错误",
+                    message: err,
+                    type: "error"
+                  });
                 }
               );
             } else {
@@ -659,9 +681,10 @@ export default {
           });
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消提交",
+            type: "info"
           });
         });
     },

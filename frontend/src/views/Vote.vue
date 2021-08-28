@@ -740,7 +740,11 @@ export default {
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -862,7 +866,11 @@ export default {
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -1000,7 +1008,11 @@ export default {
                     }
                   },
                   (err) => {
-                    alert(err);
+                    this.$notify({
+                      title: "错误",
+                      message: err,
+                      type: "error"
+                    });
                   }
                 );
                 console.log("发布成功!");
@@ -1011,7 +1023,11 @@ export default {
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
           console.log("保存成功!");
@@ -1022,11 +1038,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "错误",
+          message: "已复制链接到剪贴板",
+          type: "error"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制发生错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },

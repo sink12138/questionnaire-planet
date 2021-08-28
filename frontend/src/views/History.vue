@@ -144,6 +144,15 @@
                       >预览问卷</el-button
                     ></el-dropdown-item
                   >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="updateCode(scope.row)"
+                      icon="el-icon-refresh"
+                      >更新链接</el-button
+                    ></el-dropdown-item
+                  >
                   <el-dropdown-item>
                     <el-button
                       type="text"
@@ -181,13 +190,9 @@
                 class="tag-copy"
                 @click="copyShareLink"
                 :data-clipboard-text="qrData.text"
-              >复制链接</el-button>
-              <el-button
-                type="text"
-                class="btn"
-                @click="updateCode()"
-                icon="el-icon-refresh"
-              >更新链接</el-button>
+              >
+                复制链接
+              </el-button>
               <a
                 style="margin: 10px"
                 :href="exportLink"
@@ -323,8 +328,10 @@ export default {
           "/adjust?templateId=" + this.quest + "&code=" + this.code
         );
       } else {
-        this.$message({
+        this.$notify({
+          title: "提示",
           message: "问卷已发布！",
+          type: "warning"
         });
       }
     },
@@ -338,8 +345,10 @@ export default {
             "/normal/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "vote") {
@@ -351,8 +360,10 @@ export default {
             "/vote/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "sign-up") {
@@ -364,8 +375,10 @@ export default {
             "/apply/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       } else if (row.type == "exam") {
@@ -377,8 +390,10 @@ export default {
             "/exam/edit?templateId=" + this.quest + "&code=" + this.code
           );
         } else {
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "问卷已发布！",
+            type: "warning"
           });
         }
       }
@@ -401,9 +416,10 @@ export default {
               (response) => {
                 console.log(response);
                 if (response.data.success == true) {
-                  this.$message({
-                    message: "问卷发布成功！",
-                    type: "success",
+                  this.$notify({
+                    title: "提示",
+                    message: "问卷发布成功",
+                    type: "success"
                   });
                   this.code = response.data.code;
                   this.qrData.text =
@@ -413,14 +429,19 @@ export default {
                 }
               },
               (err) => {
-                alert(err);
+                this.$notify({
+                  title: "错误",
+                  message: err,
+                  type: "error"
+                });
               }
             );
           })
           .catch(() => {
-            this.$message({
-              type: "info",
+            this.$notify({
+              title: "提示",
               message: "已取消发布",
+              type: "info"
             });
           });
       } else {
@@ -434,9 +455,10 @@ export default {
           (response) => {
             console.log(response);
             if (response.data.success == true) {
-              this.$message({
-                message: "问卷发布成功！",
-                type: "success",
+              this.$notify({
+                title: "提示",
+                message: "问卷发布成功",
+                type: "success"
               });
               this.code = response.data.code;
               this.qrData.text =
@@ -446,25 +468,30 @@ export default {
             }
           },
           (err) => {
-            alert(err);
+            this.$notify({
+              title: "错误",
+              message: err,
+              type: "error"
+            });
           }
         );
       }
     },
-    updateCode() {
+    updateCode(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/code",
         data: JSON.stringify({
-          templateId: this.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "更新链接成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "更新链接成功",
+              type: "success"
             });
             row.code = response.data.code;
             this.qrData.text = window.location.host + "/fill?code=" + row.code;
@@ -472,13 +499,16 @@ export default {
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
     qr(row) {
       this.code = row.code;
-      this.templateId = row.templateId;
       this.qrData.text = window.location.host + "/fill?code=" + this.code;
       this.dialogVisible = true;
     },
@@ -493,15 +523,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷关闭成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷关闭成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -516,15 +551,20 @@ export default {
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷复制成功！",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷复制成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
@@ -545,22 +585,28 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已删除。",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷删除成功",
+                  type: "success"
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info"
           });
         });
     },
@@ -576,11 +622,19 @@ export default {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success"
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制发生错误",
+          type: "error"
+        });
         clipboard.destroy();
       });
     },
