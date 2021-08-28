@@ -319,6 +319,7 @@ export default {
       showIndex: true,
       remain: "∞",
       password: "",
+      shuffleId: "",
       deadlline: "",
       nowtime: "",
       lefttime: 0,
@@ -378,6 +379,7 @@ export default {
                     this.showIndex = response.data.showIndex;
                     this.questions = response.data.questions;
                     this.deadlline = response.data.endTime;
+                    this.shuffleId = response.data.shuffleId;
                     this.settime();
                     var i = 0;
                     for (i in this.questions) {
@@ -514,6 +516,7 @@ export default {
               this.description = response.data.description;
               this.questions = response.data.questions;
               this.deadlline = response.data.endTime;
+              this.shuffleId = response.data.shuffleId;
               this.settime();
               var i = 0;
               for (i in this.questions) {
@@ -551,6 +554,7 @@ export default {
             this.description = response.data.description;
             this.questions = response.data.questions;
             this.deadlline = response.data.endTime;
+            this.shuffleId = response.data.shuffleId;
             this.settime();
             this.dialogFormVisible2 = false;
             var i = 0;
@@ -598,11 +602,22 @@ export default {
                   this.answers[i] = null;
                 }
               }
-              let submitData = JSON.stringify({
-                code: this.code,
-                password: this.password,
-                answers: this.answers,
-              });
+              if (this.type === "exam") {
+                let submitData = JSON.stringify({
+                  code: this.code,
+                  password: this.password,
+                  answers: this.answers,
+                  shuffleId: this.shuffleId
+                });
+              }
+              else {
+                let submitData = JSON.stringify({
+                  code: this.code,
+                  password: this.password,
+                  answers: this.answers,
+                });
+              }
+              
               console.log(submitData);
               this.$axios({
                 method: "post",
