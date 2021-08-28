@@ -88,7 +88,8 @@ public class TemplateController {
                 throw new ParameterFormatException();
             if (type == null)
                 throw new ParameterFormatException();
-            if (!type.equals("normal") && !type.equals("vote") && !type.equals("sign-up") && !type.equals("exam"))
+            if (!type.equals("normal") && !type.equals("vote") && !type.equals("sign-up")
+                    && !type.equals("exam") && !type.equals("epidemic"))
                 throw new ParameterFormatException();
             Date now = sdf.parse(sdf.format(new Date()));
             if (startTime != null && !startTime.after(now))
@@ -471,6 +472,9 @@ public class TemplateController {
                     argsMap.put("remains", remains);
                     argsMap.put("max", max);
                     argsMap.put("min", min);
+                    break;
+                }
+                case "location": {
                     break;
                 }
                 default:
