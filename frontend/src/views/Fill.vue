@@ -850,7 +850,7 @@ export default {
         console.log(val);
         if (this.logic[j][0] == index_question) {
           if (this.logic[j][1] == val) {
-            this.logic[j][2] = true
+            this.mark[this.logic[j][2]] = true
           }
         }
       }
