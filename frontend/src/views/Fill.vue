@@ -1070,7 +1070,7 @@ export default {
 
       for (j = 0; j < this.logic.length; j++) {
         if (this.logic[j][0] == index_question) {
-          if (this.logic[j][1] == val) {
+          if (this.mark[index_question] && this.logic[j][1] == val) {
             this.mark[this.logic[j][2]] = true;
           }
         }
