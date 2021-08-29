@@ -1020,6 +1020,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "normal",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
