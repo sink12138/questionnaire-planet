@@ -7,6 +7,8 @@ import com.buaa.qp.exception.ParameterFormatException;
 import java.util.ArrayList;
 
 public interface AnswerService {
+    Object quotaLock = new Object();
+
     ArrayList<Answer> getAnswersByTid(Integer TemplateId);
 
     Answer getAnswerById(Integer answerId);
