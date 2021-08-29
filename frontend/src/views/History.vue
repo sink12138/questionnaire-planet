@@ -342,7 +342,7 @@ export default {
         } else {
           this.$notify({
             title: "提示",
-            message: "问卷已发布！",
+            message: "已发布的问卷不能编辑！",
             type: "warning",
           });
         }
@@ -357,7 +357,7 @@ export default {
         } else {
           this.$notify({
             title: "提示",
-            message: "问卷已发布！",
+            message: "已发布的问卷不能编辑！",
             type: "warning",
           });
         }
@@ -372,7 +372,7 @@ export default {
         } else {
           this.$notify({
             title: "提示",
-            message: "问卷已发布！",
+            message: "已发布的问卷不能编辑！",
             type: "warning",
           });
         }
@@ -387,7 +387,7 @@ export default {
         } else {
           this.$notify({
             title: "提示",
-            message: "问卷已发布！",
+            message: "已发布的问卷不能编辑！",
             type: "warning",
           });
         }
@@ -402,7 +402,7 @@ export default {
         } else {
           this.$notify({
             title: "提示",
-            message: "问卷已发布！",
+            message: "已发布的问卷不能编辑！",
             type: "warning",
           });
         }
