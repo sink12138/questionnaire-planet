@@ -325,20 +325,12 @@ export default {
       this.total = this.searchQue.length;
     },
     adjust(row) {
-      if (row.released == false) {
-        this.code = row.code;
-        this.quest = row.templateId;
-        console.log(this.quest);
-        this.$router.push(
-          "/adjust?templateId=" + this.quest + "&code=" + this.code
-        );
-      } else {
-        this.$notify({
-          title: "提示",
-          message: "问卷已发布！",
-          type: "warning",
-        });
-      }
+      this.code = row.code;
+      this.quest = row.templateId;
+      console.log(this.quest);
+      this.$router.push(
+        "/adjust?templateId=" + this.quest + "&code=" + this.code
+      );
     },
     edit(row) {
       if (row.type == "normal") {
