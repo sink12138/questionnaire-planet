@@ -53,16 +53,15 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public Integer submitTemplate(Template template, ArrayList<Question> questions, TreeSet<Logic> logics) {
-        templateDao.insert(template);
-        if (template.getStartTime() != null || template.getEndTime() != null)
-            templateDao.createEvents(template);
-        Integer templateId = template.getTemplateId();
         String code = generateCode();
         while (templateDao.selectByCode(code) != null) {
             code = generateCode();
         }
         template.setCode(code);
-        templateDao.updateCode(template);
+        templateDao.insert(template);
+        if (template.getStartTime() != null || template.getEndTime() != null)
+            templateDao.createEvents(template);
+        Integer templateId = template.getTemplateId();
         for (Question question : questions) {
             question.setTemplateId(templateId);
             questionDao.insert(question);
