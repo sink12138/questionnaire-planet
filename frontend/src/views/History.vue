@@ -3,10 +3,11 @@
     <div class="top">
       <div class="search">
         <el-input
-        v-model.trim="search"
-        style="width: 320px"
-        clearable
-        placeholder="请输入要搜索的问卷">
+          v-model.trim="search"
+          style="width: 320px"
+          clearable
+          placeholder="请输入要搜索的问卷"
+        >
           <el-dropdown trigger="click" slot="prepend" placement="bottom">
             <span class="el-dropdown-link">
               <el-button><i class="el-icon-s-operation"></i></el-button>
@@ -29,7 +30,11 @@
               >
             </el-dropdown-menu>
           </el-dropdown>
-          <el-button slot="append" icon="el-icon-search" @click="searchQuest"></el-button>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="searchQuest"
+          ></el-button>
         </el-input>
       </div>
       <ButtonGroup size="large">
@@ -39,41 +44,37 @@
     </div>
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
-        <el-table 
-        :data="searchQue" 
-        border 
-        style="width: 100%" 
-        :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266'}"
-        filter-placement="bottom">
+        <el-table
+          :data="searchQue"
+          border
+          style="width: 100%"
+          :header-cell-style="{
+            'text-align': 'center',
+            background: '#eee',
+            color: '#606266',
+          }"
+          filter-placement="bottom"
+        >
           <el-table-column fixed prop="title" label="标题" width="150">
           </el-table-column>
           <el-table-column
             label="状态"
             width="100"
-            :filters="[{text:'回收中',value:true},{text:'未发布',value:false}]"
+            :filters="[
+              { text: '回收中', value: true },
+              { text: '未发布', value: false },
+            ]"
             :filter-method="filterHandler"
           >
             <template slot-scope="scope">
-                <p>{{ scope.row.released == true ? '正在回收':'未发布' }}</p>
+              <p>{{ scope.row.released == true ? "正在回收" : "未发布" }}</p>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="answerCount"
-            label="收集数量"
-            width="100"
-          >
+          <el-table-column prop="answerCount" label="收集数量" width="100">
           </el-table-column>
-          <el-table-column
-            prop="creationTime"
-            label="创建时间"
-            width="150"
-          >
+          <el-table-column prop="creationTime" label="创建时间" width="150">
           </el-table-column>
-          <el-table-column
-            prop="releaseTime"
-            label="最后发布"
-            width="150"
-          >
+          <el-table-column prop="releaseTime" label="最后发布" width="150">
           </el-table-column>
           <el-table-column prop="duration" label="收集时长" width="150">
           </el-table-column>
@@ -91,20 +92,14 @@
                 v-else
                 >关闭</el-button
               >
-              <el-button
-                @click="adjust(scope.row)"
-                icon="el-icon-edit"
+              <el-button @click="adjust(scope.row)" icon="el-icon-edit"
                 >微调</el-button
               >
-              <el-button
-                @click="statistics(scope.row)"
-                icon="el-icon-pie-chart"
+              <el-button @click="statistics(scope.row)" icon="el-icon-pie-chart"
                 >数据分析</el-button
               >
               <el-dropdown placement="bottom" style="margin-left: 10px">
-                <el-button
-                  icon="el-icon-more-outline"
-                  style="color: black"
+                <el-button icon="el-icon-more-outline" style="color: black"
                   >更多操作</el-button
                 >
                 <el-dropdown-menu slot="dropdown">
@@ -177,11 +172,7 @@
         >
           <div class="share">
             <div>
-              <vue-qr
-                ref="Qrcode"
-                :text="qrData.text"
-                :logoSrc="qrData.logo"
-              >
+              <vue-qr ref="Qrcode" :text="qrData.text" :logoSrc="qrData.logo">
               </vue-qr>
             </div>
             <div>
@@ -289,10 +280,24 @@ export default {
     },
     duration() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.duration < b.duration) {
+        var time1 = a.duration.split(":");
+        var time2 = b.duration.split(":");
+        if (parseInt(time1[0]) < parseInt(time2[0])) {
           return -1;
-        } else if (a.duration == b.duration) {
-          return 0;
+        } else if (parseInt(time1[0]) == parseInt(time2[0])) {
+          if (parseInt(time1[1]) < parseInt(time2[1])) {
+            return -1;
+          } else if (parseInt(time1[1]) == parseInt(time2[1])) {
+            if (parseInt(time1[2]) < parseInt(time2[2])) {
+              return -1;
+            } else if (parseInt(time1[2]) == parseInt(time2[2])) {
+              return 0;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
         } else {
           return 1;
         }
@@ -331,7 +336,7 @@ export default {
         this.$notify({
           title: "提示",
           message: "问卷已发布！",
-          type: "warning"
+          type: "warning",
         });
       }
     },
@@ -348,7 +353,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "问卷已发布！",
-            type: "warning"
+            type: "warning",
           });
         }
       } else if (row.type == "vote") {
@@ -363,7 +368,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "问卷已发布！",
-            type: "warning"
+            type: "warning",
           });
         }
       } else if (row.type == "sign-up") {
@@ -378,7 +383,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "问卷已发布！",
-            type: "warning"
+            type: "warning",
           });
         }
       } else if (row.type == "exam") {
@@ -393,7 +398,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "问卷已发布！",
-            type: "warning"
+            type: "warning",
           });
         }
       } else if (row.type == "epidemic") {
@@ -408,7 +413,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "问卷已发布！",
-            type: "warning"
+            type: "warning",
           });
         }
       }
@@ -434,7 +439,7 @@ export default {
                   this.$notify({
                     title: "提示",
                     message: "问卷发布成功",
-                    type: "success"
+                    type: "success",
                   });
                   this.code = response.data.code;
                   this.qrData.text =
@@ -447,7 +452,7 @@ export default {
                 this.$notify({
                   title: "错误",
                   message: err,
-                  type: "error"
+                  type: "error",
                 });
               }
             );
@@ -456,7 +461,7 @@ export default {
             this.$notify({
               title: "提示",
               message: "已取消发布",
-              type: "info"
+              type: "info",
             });
           });
       } else {
@@ -473,7 +478,7 @@ export default {
               this.$notify({
                 title: "提示",
                 message: "问卷发布成功",
-                type: "success"
+                type: "success",
               });
               this.code = response.data.code;
               this.qrData.text =
@@ -486,7 +491,7 @@ export default {
             this.$notify({
               title: "错误",
               message: err,
-              type: "error"
+              type: "error",
             });
           }
         );
@@ -506,7 +511,7 @@ export default {
             this.$notify({
               title: "提示",
               message: "更新链接成功",
-              type: "success"
+              type: "success",
             });
             row.code = response.data.code;
             this.qrData.text = window.location.host + "/fill?code=" + row.code;
@@ -517,7 +522,7 @@ export default {
           this.$notify({
             title: "错误",
             message: err,
-            type: "error"
+            type: "error",
           });
         }
       );
@@ -541,7 +546,7 @@ export default {
             this.$notify({
               title: "提示",
               message: "问卷关闭成功",
-              type: "success"
+              type: "success",
             });
             location.reload();
           }
@@ -550,7 +555,7 @@ export default {
           this.$notify({
             title: "错误",
             message: err,
-            type: "error"
+            type: "error",
           });
         }
       );
@@ -569,7 +574,7 @@ export default {
             this.$notify({
               title: "提示",
               message: "问卷复制成功",
-              type: "success"
+              type: "success",
             });
             location.reload();
           }
@@ -578,7 +583,7 @@ export default {
           this.$notify({
             title: "错误",
             message: err,
-            type: "error"
+            type: "error",
           });
         }
       );
@@ -603,7 +608,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: "问卷删除成功",
-                  type: "success"
+                  type: "success",
                 });
                 location.reload();
               }
@@ -612,7 +617,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "error"
+                type: "error",
               });
             }
           );
@@ -621,7 +626,7 @@ export default {
           this.$notify({
             title: "提示",
             message: "已取消删除",
-            type: "info"
+            type: "info",
           });
         });
     },
@@ -640,7 +645,7 @@ export default {
         this.$notify({
           title: "提示",
           message: "已复制链接到剪贴板",
-          type: "success"
+          type: "success",
         });
         clipboard.destroy();
       });
@@ -648,7 +653,7 @@ export default {
         this.$notify({
           title: "错误",
           message: "复制发生错误",
-          type: "error"
+          type: "error",
         });
         clipboard.destroy();
       });
@@ -664,8 +669,8 @@ export default {
       this.$router.push("/statistics?templateId=" + this.quest);
     },
     filterHandler(value, row) {
-      return row['released'] === value;
-    }
+      return row["released"] === value;
+    },
   },
 };
 </script>
