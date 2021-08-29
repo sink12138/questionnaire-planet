@@ -223,10 +223,24 @@ export default {
     },
     duration() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.duration < b.duration) {
+        var time1 = a.duration.split(":");
+        var time2 = b.duration.split(":");
+        if (parseInt(time1[0]) < parseInt(time2[0])) {
           return -1;
-        } else if (a.duration == b.duration) {
-          return 0;
+        } else if (parseInt(time1[0]) == parseInt(time2[0])) {
+          if (parseInt(time1[1]) < parseInt(time2[1])) {
+            return -1;
+          } else if (parseInt(time1[1]) == parseInt(time2[1])) {
+            if (parseInt(time1[2]) < parseInt(time2[2])) {
+              return -1;
+            } else if (parseInt(time1[2]) == parseInt(time2[2])) {
+              return 0;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
         } else {
           return 1;
         }
