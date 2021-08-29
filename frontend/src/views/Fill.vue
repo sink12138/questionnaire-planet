@@ -135,7 +135,7 @@
                   </el-radio-group></el-form-item
                 >
               </div>
-              <div class="multi" v-if="item.type == 'multi-choice'">
+              <div v-if="item.type == 'multi-choice'">
                 至少选择{{ item.min }}项
                 <el-form-item
                   label="选项"
@@ -144,6 +144,7 @@
                   }"
                 >
                   <el-checkbox-group
+                    class="multi"
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :min="0"
@@ -181,8 +182,10 @@
                   :rules="{
                     required: item.required,
                   }"
+                  
                 >
                   <el-rate
+                    style="margin-top: 12px"
                     v-model="answers[index_question]"
                     show-text
                     :texts="item.grades"
@@ -212,7 +215,7 @@
                   </el-select>
                 </el-form-item>
               </div>
-              <div class="multi" v-if="item.type == 'vote'">
+              <div v-if="item.type == 'vote'">
                 <el-form-item
                   label="选项"
                   :rules="{
@@ -220,6 +223,7 @@
                   }"
                 >
                   <el-checkbox-group
+                    class="multi" 
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :min="0"
@@ -233,7 +237,7 @@
                   </el-checkbox-group>
                 </el-form-item>
               </div>
-              <div class="multi" v-if="item.type == 'sign-up'">
+              <div v-if="item.type == 'sign-up'">
                 至少选择{{ item.min }}项
                 <el-form-item
                   label="选项"
@@ -242,6 +246,7 @@
                   }"
                 >
                   <el-checkbox-group
+                    class="multi"
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :min="0"
@@ -486,7 +491,7 @@ export default {
       isVote: false,
       locked: false,
       login: false,
-      fillRight: false,
+      fillRight: true,//
       title: "未找到问卷",
       type: "normal",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
@@ -514,9 +519,57 @@ export default {
       dialogFormVisible2: false,
       formLabelWidth: "100px",
       results: [],
-      questions: [],
+      questions: [//
+            {
+                "type": "choice",
+                "choices": [
+                    "11",
+                    "12"
+                ],
+                "required": true,
+                "stem": "q1"
+            },
+            {
+                "min": 1,
+                "max": 2,
+                "type": "multi-choice",
+                "choices": [
+                    "21","22"
+                ],
+                "required": true,
+                "stem": "q2"
+            },
+            {
+                "width": "800px",
+                "type": "filling",
+                "required": true,
+                "stem": "q3",
+                "height": 1
+            },
+            {
+                "grades": [
+                    "非常不满意",
+                    "不满意",
+                    "一般",
+                    "满意",
+                    "非常满意"
+                ],
+                "type": "grade",
+                "required": true,
+                "stem": "q4"
+            },
+            {
+                "type": "dropdown",
+                "choices": [
+                    "51",
+                    "52"
+                ],
+                "required": false,
+                "stem": "q5"
+            }
+      ],
       answers: [],
-      mark: [],
+      mark: [true,true,true,true,true,],//
       logic: [],
       myChart: null,
       canvas: null,
@@ -1084,31 +1137,18 @@ export default {
     loadChart: function () {
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
-        type: "bar",
+        type: 'bar',
         data: {
-          labels: [],
-          datasets: [
-            {
-              data: [],
-              backgroundColor: [
-                "rgba(2, 62, 138, 1)",
-                "rgba(0, 150, 199, 1)",
-                "rgba(72, 202, 228, 1)",
-                "rgba(144, 224, 239, 1)",
-                "rgba(173, 232, 244, 1)",
-                "rgba(202, 240, 248, 1)",
-                "rgba(68, 108, 179, 1)",
-                "rgba(52, 152, 219, 1)",
-                "rgba(89, 171, 227, 1)",
-                "rgba(137, 196, 244, 1)",
-              ],
-            },
-          ],
-        },
+            labels: [],
+            datasets: [{
+              label: "投票结果",
+              backgroundColor: "rgb(72, 202, 228)",
+              data: []
+            }]
+        }
       });
     },
     updateChart: function (item) {
-      this.loadChart();
       console.log("update", item);
       this.myChart.data.labels = item["answers"];
       this.myChart.data.datasets[0].data = item["counts"];
@@ -1139,57 +1179,6 @@ export default {
 .results {
   display: flex;
   justify-content: space-between;
-}
-.editor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  background-color: #f3f3f3;
-  display: flex;
-  width: 200px;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  font-family: 仿宋;
-  font-size: 18px;
-  font-weight: bolder;
-}
-.logo {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 40px;
-  margin-bottom: 60px;
-}
-.web-title {
-  margin-left: 15px;
-  font-family: 仿宋;
-  font-weight: 800;
-  font-size: 26px;
-  position: relative;
-}
-.export {
-  position: fixed;
-  bottom: 60px;
-}
-.router-link-active {
-  text-decoration: none;
-}
-a {
-  text-decoration: none;
-  color: #000;
-}
-a:hover {
-  color: rgba(46, 140, 219, 0.94);
-}
-.editor .el-button {
-  font-family: 仿宋;
-  height: 50px;
-  width: 120px;
-  color: #000000;
-  font-size: 20px;
-  font-weight: bolder;
-  margin: 20px;
 }
 .question {
   margin: 0 auto;
