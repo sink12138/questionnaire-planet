@@ -2,11 +2,11 @@
   <div class="normal">
     <Header class="header"></Header>
     <div class="editor">
-      <el-tabs style="width: 200px" stretch="true">
+      <el-tabs type="card" style="width: 200px" stretch="true">
         <el-tab-pane>
-          <span slot="label" style="font-size: 15px"
-            ><i class="el-icon-edit-outline"></i>编辑题目</span
-          >
+          <span slot="label" style="font-size: 15px">
+            <i class="el-icon-edit-outline"></i>编辑
+          </span>
           <div class="editor_1">
             <el-button @click="addQuestion(0)">单选题</el-button>
             <el-button @click="addQuestion(1)">多选题</el-button>
@@ -17,7 +17,7 @@
         </el-tab-pane>
         <el-tab-pane>
           <span slot="label" style="font-size: 15px"
-            ><i class="el-icon-set-up"></i>问卷操作</span
+            ><i class="el-icon-set-up"></i>操作</span
           >
           <div class="editor_2">
             <el-button @click="resetForm('modelForm')">重置</el-button>
@@ -556,6 +556,10 @@ export default {
     },
     end() {
       this.$refs.modelForm.clearValidate();
+    },
+    setColor(key) {
+      if (key == this.isEditing) return '#ddd'
+      else return '#fff'
     },
     editing() {
       this.isEditing = true;
@@ -1097,8 +1101,8 @@ export default {
   grid-row-end: 3;
   width: 200px;
   height: 100%;
-  background-color: #f0f0f0;
-  opacity: 0.9;
+  background-color: #ffffff;
+  opacity: 1;
 }
 .main {
   grid-column-start: 2;
@@ -1120,15 +1124,12 @@ export default {
   grid-row-start: 2;
   grid-row-end: 3;
   background-color: #f0f0f0;
-  opacity: 0.9;
+  opacity: 1;
 }
 .button_group {
   position: fixed;
 }
 .button_group .el-button {
-  border-radius: 0;
-  border: white;
-  border-bottom: #000000;
   font-size: 15px;
 }
 .basic {
@@ -1141,15 +1142,17 @@ export default {
 }
 .editor .el-button {
   border-radius: 0;
-  font-size: 18px;
+  width: 66%;
+  font-size: 17px;
   color: #000000;
-  background-color: #f0f0f0;
-  margin: 0;
+  background-color: #ffffff;
+  margin: 5px;
 }
 .editor_1,
 .editor_2 {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 .question_name {
   display: flex;
