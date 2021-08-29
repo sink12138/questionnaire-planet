@@ -175,12 +175,4 @@ public class AccountServiceImpl implements AccountService {
             javaMailSender.send(mimeMessage);
         }
     }
-
-    @Override
-    public boolean isShuffleIdMatched(Integer shuffleId, Integer accountId, Integer templateId) {
-        if (shuffleId == null)
-            return false;
-        return shuffleId.equals(shuffleDao.selectIdByAccountTemplateId(accountId, templateId));
-    }
-
 }

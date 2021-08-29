@@ -2,18 +2,21 @@ package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.buaa.qp.entity.*;
+import com.buaa.qp.entity.Answer;
+import com.buaa.qp.entity.Logic;
+import com.buaa.qp.entity.Question;
+import com.buaa.qp.entity.Template;
 import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
-import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.QuestionService;
 import com.buaa.qp.service.TemplateService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -571,9 +574,6 @@ public class CollectionController {
         }
         return map;
     }
-
-    @Autowired
-    AccountService accountService;
 
     @GetMapping("/results")
     public Map<String, Object> results(@RequestParam(value = "code", required = false) String code,
