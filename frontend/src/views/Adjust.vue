@@ -587,7 +587,7 @@ export default {
               (response) => {
                 console.log(response);
                 if (response.data.success == true) {
-                  this.$$notify({
+                  this.$notify({
                     title: "提示",
                     message: "问卷发布成功",
                     type: "success",
