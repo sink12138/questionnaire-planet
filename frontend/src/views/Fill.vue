@@ -632,6 +632,10 @@ export default {
                     }).then((response) => {
                       console.log(response);
                       if (response.data.success == true) {
+                        this.type = response.data.type;
+                        if(this.type == 'vote'){
+                          this.isVote = true;
+                        }
                         if (response.data.conclusion == undefined) {
                           this.conclusion = "感谢您的提交!";
                         } else {
