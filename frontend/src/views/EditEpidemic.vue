@@ -1221,7 +1221,6 @@ export default {
   text-align: left;
 }
 .editor .el-button {
-  border-radius: 0;
   width: 66%;
   font-size: 17px;
   color: #000000;
@@ -1233,6 +1232,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.editor .el-button:hover {
+  background-color: rgba(168, 216, 255, 0.9);
 }
 .question_name {
   display: flex;
