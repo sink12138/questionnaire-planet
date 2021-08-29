@@ -683,6 +683,7 @@ export default {
     addlogic() {
       this.modelForm.logic.push([this.fromquestion, this.option, this.toquestion])
       console.log(this.modelForm.logic)
+      alert("逻辑添加成功！")
     },
     resetForm(formName) {
       // 重置
