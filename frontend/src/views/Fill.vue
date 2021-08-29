@@ -126,7 +126,11 @@
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :key="index"
-                    @change="((val)=>{changeValue(val, index_question)})"
+                    @change="
+                      (val) => {
+                        changeValue(val, index_question);
+                      }
+                    "
                   >
                     <el-radio class="option" :label="index">{{ i }}</el-radio>
                   </el-radio-group></el-form-item
@@ -179,7 +183,11 @@
                     required: item.required,
                   }"
                 >
-                  <el-rate v-model="answers[index_question]" show-text :texts="item.grades">
+                  <el-rate
+                    v-model="answers[index_question]"
+                    show-text
+                    :texts="item.grades"
+                  >
                   </el-rate>
                 </el-form-item>
               </div>
@@ -279,7 +287,6 @@
               </el-form-item>
             </div>
           </div>
-          
         </div>
       </el-form>
     </div>
@@ -344,15 +351,15 @@
               </el-form-item>
               <div v-if="item.points != null">
                 <el-form-item label="你的得分">
-                <el-input
-                  disabled
-                  type="text"
-                  class="input"
-                  placeholder="你的得分"
-                  v-model="item.points"
-                >
-                </el-input>
-              </el-form-item>
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="你的得分"
+                    v-model="item.points"
+                  >
+                  </el-input>
+                </el-form-item>
               </div>
             </div>
             <div class="multi" v-if="item.type == 'multi-choice'">
@@ -384,16 +391,18 @@
                   }}</el-checkbox>
                 </el-checkbox-group>
               </el-form-item>
-              <el-form-item label="你的得分">
-                <el-input
-                  disabled
-                  type="text"
-                  class="input"
-                  placeholder="你的得分"
-                  v-model="item.points"
-                >
-                </el-input>
-              </el-form-item>
+              <div v-if="item.points != null">
+                <el-form-item label="你的得分">
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="你的得分"
+                    v-model="item.points"
+                  >
+                  </el-input>
+                </el-form-item>
+              </div>
             </div>
             <div v-if="item.type == 'filling'">
               <el-form-item label="你的答案">
@@ -406,16 +415,32 @@
                 >
                 </el-input>
               </el-form-item>
-              <el-form-item label="参考答案">
+              <el-form-item
+                label="参考答案"
+                v-for="(opt, idx) in item.correctAnswer"
+                :key="idx"
+              >
                 <el-input
                   disabled
                   type="text"
                   class="input"
                   placeholder="无参考答案"
-                  v-model="item.correctAnswer"
+                  v-model="item.correctAnswer[idx]"
                 >
                 </el-input>
               </el-form-item>
+              <div v-if="item.points != null">
+                <el-form-item label="你的得分">
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="你的得分"
+                    v-model="item.points"
+                  >
+                  </el-input>
+                </el-form-item>
+              </div>
             </div>
           </div>
         </div>
@@ -534,7 +559,7 @@ export default {
                     this.questions = response.data.questions;
                     this.logic = response.data.logic;
                     for (var j = 0; j < this.questions.length; j++) {
-                      this.mark.push(true)
+                      this.mark.push(true);
                     }
                     for (j = 0; j < this.logic.length; j++) {
                       this.mark[this.logic[j][2]] = false;
@@ -751,7 +776,7 @@ export default {
               this.questions = response.data.questions;
               this.logic = response.data.logic;
               for (var j = 0; j < this.questions.length; j++) {
-                this.mark.push(true)
+                this.mark.push(true);
               }
               for (j = 0; j < this.logic.length; j++) {
                 this.mark[this.logic[j][2]] = false;
@@ -800,7 +825,7 @@ export default {
             this.questions = response.data.questions;
             this.logic = response.data.logic;
             for (j = 0; j < this.questions.length; j++) {
-              this.mark.push(true)
+              this.mark.push(true);
             }
             for (var j = 0; j < this.logic.length; j++) {
               this.mark[this.logic[j][2]] = false;
@@ -844,14 +869,18 @@ export default {
       console.log(this.answers);
       for (var j = 0; j < this.logic.length; j++) {
         if (this.logic[j][0] == index_question) {
+          this.mark[this.logic[j][2]] = false;
+        }
+      }
+
+      for (j = 0; j < this.logic.length; j++) {
+        if (this.logic[j][0] == index_question) {
           if (this.logic[j][1] == val) {
-            this.mark[this.logic[j][2]] = true
-          }
-          else {
-            this.mark[this.logic[j][2]] = false
+            this.mark[this.logic[j][2]] = true;
           }
         }
       }
+      this.$forceUpdate();
     },
     multiChangeValue(index) {
       console.log(this.answers[index]);

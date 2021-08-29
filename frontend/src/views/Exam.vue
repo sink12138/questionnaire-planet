@@ -466,7 +466,7 @@
                     </div>
                   </el-form-item>
                 </el-row>
-                <!-- 选项 -->
+                <!-- 答案 -->
                 <div v-if="item.type == '0'">
                   <el-form-item label="答案">
                     <el-radio-group
@@ -498,17 +498,33 @@
                   >
                 </div>
                 <div v-if="item.type == '2'">
-                  <el-form-item label="参考答案">
-                    <el-input
-                      type="textarea"
-                      class="input"
-                      :rows="item.height"
-                      :style="{ '--width': item.width }"
-                      placeholder="请输入内容"
-                      v-model="item.answer"
+                  <el-row v-if="item.type == 2">
+                    <el-form-item
+                      v-for="(opt, idx) in item.answer"
+                      :key="idx"
+                      :label="`选项${idx + 1}`"
+                      :prop="`questions.${index}.answer.${idx}`"
+                      :rules="[
+                        {
+                          required: true,
+                          message: '请输入参考答案',
+                          trigger: 'blur',
+                        },
+                      ]"
                     >
-                    </el-input
-                  ></el-form-item>
+                      <el-input
+                        v-model="item.answer[idx]"
+                        style="width: 200px"
+                        clearable
+                        placeholder="请输入参考答案"
+                      />
+                      <el-button
+                        style="margin-left: 20px"
+                        @click.prevent="removeAnswer(index, idx)"
+                        >删除</el-button
+                      >
+                    </el-form-item>
+                  </el-row>
                 </div>
                 <el-form-item label="编辑题目">
                   <el-button
@@ -516,6 +532,12 @@
                     v-show="item.type != 2 && item.type != 3"
                     @click="addDomain(index)"
                     >新增选项</el-button
+                  >
+                  <el-button
+                    icon="el-icon-circle-plus"
+                    v-show="item.type == 2"
+                    @click="addAnswer(index)"
+                    >新增答案</el-button
                   >
                   <el-button icon="el-icon-s-order" @click="copyQuestion(index)"
                     >复制题目</el-button
@@ -706,9 +728,13 @@ export default {
         this.$notify({
           title: "提示",
           message: "至少需要两个选项",
-          type: "info"
+          type: "info",
         });
       }
+    },
+    removeAnswer(index, idx) {
+      // 删除答案
+      this.modelForm.questions[index].answer.splice(idx, 1);
     },
     removeQuestion(index) {
       //删除题目
@@ -773,6 +799,10 @@ export default {
       // 新增选项
       this.modelForm.questions[index].answers.push({ value: "" });
     },
+    addAnswer(index) {
+      // 新增答案
+      this.modelForm.questions[index].answer.push("");
+    },
     addQuestion(index) {
       // 新增题目
       this.modelForm.questions.push({
@@ -832,7 +862,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: mes,
-                  type: "warning"
+                  type: "warning",
                 });
                 return;
               }
@@ -865,7 +895,7 @@ export default {
                   this.$notify({
                     title: "提示",
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -926,13 +956,13 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
-                  type: "success"
+                  type: "success",
                 });
               } else {
                 this.$notify({
                   title: "提示",
                   message: response.data.message,
-                  type: "info"
+                  type: "info",
                 });
               }
             },
@@ -940,7 +970,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "error"
+                type: "error",
               });
             }
           );
@@ -980,7 +1010,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: mes,
-                  type: "warning"
+                  type: "warning",
                 });
                 return;
               }
@@ -1013,7 +1043,7 @@ export default {
                   this.$notify({
                     title: "提示",
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -1075,14 +1105,14 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
-                  type: "success"
+                  type: "success",
                 });
                 this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$notify({
                   title: "提示",
                   message: response.data.message,
-                  type: "info"
+                  type: "info",
                 });
               }
             },
@@ -1090,7 +1120,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "error"
+                type: "error",
               });
             }
           );
@@ -1130,7 +1160,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: mes,
-                  type: "warning"
+                  type: "warning",
                 });
                 return;
               }
@@ -1163,7 +1193,7 @@ export default {
                   this.$notify({
                     title: "提示",
                     message: mes,
-                    type: "warning"
+                    type: "warning",
                   });
                   return;
                 }
@@ -1225,7 +1255,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
-                  type: "success"
+                  type: "success",
                 });
                 this.$axios({
                   method: "post",
@@ -1240,7 +1270,7 @@ export default {
                       this.$notify({
                         title: "提示",
                         message: "问卷发布成功",
-                        type: "success"
+                        type: "success",
                       });
                       this.code = response.data.code;
                       this.qrData.text =
@@ -1250,7 +1280,7 @@ export default {
                       this.$notify({
                         title: "提示",
                         message: response.data.message,
-                        type: "info"
+                        type: "info",
                       });
                     }
                   },
@@ -1258,7 +1288,7 @@ export default {
                     this.$notify({
                       title: "错误",
                       message: err,
-                      type: "error"
+                      type: "error",
                     });
                   }
                 );
@@ -1267,7 +1297,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: response.data.message,
-                  type: "info"
+                  type: "info",
                 });
               }
             },
@@ -1275,7 +1305,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "error"
+                type: "error",
               });
             }
           );
@@ -1290,7 +1320,7 @@ export default {
         this.$notify({
           title: "提示",
           message: "已复制链接到剪贴板",
-          type: "success"
+          type: "success",
         });
         clipboard.destroy();
       });
@@ -1298,7 +1328,7 @@ export default {
         this.$notify({
           title: "错误",
           message: "复制出现错误",
-          type: "error"
+          type: "error",
         });
         clipboard.destroy();
       });
