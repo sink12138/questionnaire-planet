@@ -335,6 +335,7 @@
                       :precision="1"
                       :step="0.5"
                       :max="20"
+                      :min="0.5"
                       step-strictly
                     ></el-input-number>
                   </el-form-item>
