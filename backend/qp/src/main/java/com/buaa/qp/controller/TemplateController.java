@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -231,11 +232,11 @@ public class TemplateController {
                 throw new ParameterFormatException();
             Date now = sdf.parse(sdf.format(new Date()));
             if (startTime != null && !startTime.after(now))
-                throw new ExtraMessageException("自动发布时间不得早于当前时间");
+                throw new ExtraMessageException("自动发布时间不能早于当前时间");
             if (endTime != null && !endTime.after(now))
-                throw new ExtraMessageException("自动关闭时间不得早于当前时间");
+                throw new ExtraMessageException("自动关闭时间不能早于当前时间");
             if (startTime != null && endTime != null && !startTime.before(endTime))
-                throw new ExtraMessageException("开始时间不得晚于结束时间");
+                throw new ExtraMessageException("开始时间不能晚于结束时间");
 
             Template template = templateService.getTemplate(templateId);
             if (template == null)
@@ -244,8 +245,8 @@ public class TemplateController {
                 throw new LoginVerificationException();
             if (template.getDeleted())
                 throw new ExtraMessageException("已删除的问卷不能编辑");
-            if (template.getReleased())
-                throw new ExtraMessageException("已发布的问卷不能编辑");
+            if (template.getReleased() && startTime != null)
+                throw new ExtraMessageException("已发布的问卷不能设置自动发布时间");
 
             template.setTitle(title);
             template.setDescription(description);
@@ -501,9 +502,8 @@ public class TemplateController {
                         throw new ParameterFormatException();
                     }
                     for (Integer q : quotas) {
-                        if (q < 1) {
-                            throw new ParameterFormatException();
-                        }
+                        if (q < 1)
+                            throw new ExtraMessageException("限额应大于零");
                     }
                     if (max == null || max > choices.size()) max = choices.size();
                     if (min == null || min < 1) min = 1;
