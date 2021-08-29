@@ -464,6 +464,10 @@
             <el-button type="primary" @click="addlogic">添加逻辑</el-button>
           </el-form-item>
         </el-form>
+        <div>
+          <p>已添加的关联逻辑：</p>
+          <p v-for="(item, i) in modelForm.logic" :key="i">题目{{ this.modelForm.questions[item[0]]["questionName"] }}选择了{{ this.modelForm.questions[item[0]]["answer"][item[1]]["value"] }}时，将显示题目{{ this.modelForm.questions[item[2]]["questionName"] }}</p>
+        </div>
       </div>
       <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
