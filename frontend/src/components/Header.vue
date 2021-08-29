@@ -176,13 +176,18 @@ export default {
         if (res.data.success == true) {
           sessionStorage.setItem("isLogin", true);
           this.$store.commit("login");
-          this.$message({
+          this.$notify({
+            title: "提示",
             message: "登录成功！",
             type: "success",
           });
           this.dialogFormVisible1 = false;
         } else {
-          alert("用户名或密码错误！");
+          this.$notify({
+            title: "提示",
+            message: "用户名或密码错误",
+            type: "error",
+          });
         }
         console.log(res);
       });
@@ -197,8 +202,10 @@ export default {
       });
       console.log("logout submit!");
       this.$store.commit("logout");
-      this.$message({
-        message: "退出登录成功！",
+      this.$notify({
+        title: "提示",
+        message: "退出登录成功",
+        type: "success",
       });
     },
     register: function(){
@@ -219,13 +226,14 @@ export default {
               console.log(res);
               console.log(registerdata);
               if (res.data.success == false) {
-                this.$message({
-                  showClose: true,
+                this.$notify({
+                  title: "提示",
                   message: res.data.message,
+                  type: "info",
                 });
               } else {
-                this.$message({
-                  showClose: true,
+                this.$notify({
+                  title: "提示",
                   message: "注册完毕，请查看邮箱验证账号",
                   type: "success",
                 });

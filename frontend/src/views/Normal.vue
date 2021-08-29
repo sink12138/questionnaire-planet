@@ -419,6 +419,8 @@
           </el-collapse>
         </div>
       </el-form>
+      <div class="logic">
+      </div>
       <div class="foot" v-if="isEditing">
         <el-popover placement="top" width="1200px" v-model="popVisible">
           <el-button-group>

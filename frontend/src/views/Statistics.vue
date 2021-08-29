@@ -60,16 +60,30 @@
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
-          <div>{{this.sum(countList)}}</div>
-          <RadioGroup v-model="chartShow" type="button">
-              <Radio label="pie">Pie</Radio>
-              <Radio label="bar">Bar</Radio>
-              <Radio label="line">Line</Radio>
-          </RadioGroup>
-          <div class="chart">
-            <canvas v-show="this.chartShow === 'pie'" id="myPieChart"></canvas>
-            <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 300px"></canvas>
-            <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 300px"></canvas>
+          <div class="overview">
+            <el-descriptions direction="vertical" :column="2" border>
+              <el-descriptions-item label="题目题干" :span="2">
+                {{this.stem}}
+              </el-descriptions-item>
+              <el-descriptions-item label="填写次数">
+                {{this.sum(countList)}}
+              </el-descriptions-item>
+              <el-descriptions-item label="类型">
+                {{this.type}}
+              </el-descriptions-item>
+            </el-descriptions>
+            <el-card style="text-align: center">
+              <RadioGroup v-model="chartShow" type="button" size="large">
+                <Radio label="pie"><Icon type="md-pie" />饼图</Radio>
+                <Radio label="bar"><Icon type="md-podium" />柱状图</Radio>
+                <Radio label="line"><Icon type="md-trending-up" />折线图</Radio>
+              </RadioGroup>
+              <div class="chart">
+                <canvas v-show="this.chartShow === 'pie'" id="myPieChart"></canvas>
+                <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 360px"></canvas>
+                <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 360px"></canvas>
+              </div>
+            </el-card>
           </div>
           <div class="sum-table" style="width: 480px">
             <el-table
@@ -168,11 +182,13 @@ export default {
       sumData: [
         {
           stem: 'q1',
+          type: 'choice',
           answers: ['a1','a2','A3'],
           counts: [2,4,6]
         },
         {
           stem: 'q2',
+          type: 'filling',
           answers: ['a1','a2','A3'],
           counts: [6,9,9]
         }
@@ -277,18 +293,22 @@ export default {
       this.$axios({
         method: "get",
         url: "http://139.224.50.146:80/apis/cross",
-        data: JSON.stringify({
+        params: {
           templateId: parseInt(this.templateId),
           indexX: parseInt(this.x),
           indexY: parseInt(this.y),
-        }),
+        },
       }).then((response) => {
         console.log(response);
         if (response.data.success == true) {
           this.choicesy = response.data.choicesY;
           this.xyData = response.data.xyData;
         } else {
-          console.log(response.data.message);
+          this.$notify({
+            title: "提示",
+            message: response.data.message,
+            type: "info",
+          })
         }
       }).catch((error) => {
         console.log(error)
@@ -296,7 +316,32 @@ export default {
     },
     loadData(item) {
       this.stem = item['stem']
-      this.type = item['type']
+      switch(item['type']) {
+        case "choice":
+          this.type = '单项选择题';
+          break;
+        case "multi-choice":
+          this.type = '多项选择题';
+          break;
+        case "filling":
+          this.type = '填空题';
+          break;
+        case "grade":
+          this.type = '评分题';
+          break;
+        case "dropdown":
+          this.type = '下拉题';
+          break;
+        case "vote":
+          this.type = '投票题';
+          break;
+        case "sign-up":
+          this.type = '报名题';
+          break;
+        case "location":
+          this.type = '定位题';
+          break;
+      }
       this.answerList = item['answers']
       this.countList = item['counts']
       if (this.type == 'grade') {
@@ -445,15 +490,19 @@ export default {
   padding: 36px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-around;
+  align-items: flex-start;
 }
 .cross-over {
   padding: 36px;
 }
+.overview {
+  display: flex;
+  flex-direction: column;
+}
 .chart {
-  height: 400px;
-  width: 400px;
+  height: 360px;
+  width: 360px;
 }
 .editor .el-button {
   border: #fff;
