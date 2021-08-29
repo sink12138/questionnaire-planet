@@ -709,7 +709,7 @@ export default {
       this.popVisible = false;
       this.modelForm.questions.push({
         type: index.toString(),
-        required: true,
+        required: false,
         questionName: "",
         questionSummary: "",
         max: 2,
