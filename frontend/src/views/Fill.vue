@@ -261,7 +261,7 @@
                         :label="index"
                         border
                         :disabled="item.remains[index] == 0 ? true : false"
-                        >{{ i }}共{{ item.quotas[index] }},剩余{{
+                        >{{ i }}       共{{ item.quotas[index] }},剩余{{
                           item.remains[index]
                         }}
                       </el-checkbox>

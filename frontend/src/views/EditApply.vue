@@ -78,7 +78,7 @@
         :style="{'background-color': setColor('logic')}" 
         icon="ios-link-outline" 
         @click="pageChange('logic')">
-          题目逻辑
+          逻辑关联
         </Button>
         <Button 
         :style="{'background-color': setColor('info')}" 
