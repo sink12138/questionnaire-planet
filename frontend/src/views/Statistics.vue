@@ -62,14 +62,17 @@
         <div class="data-sum" v-show="this.show === 'sum'">
           <div class="overview">
             <el-descriptions direction="vertical" :column="2" border>
-              <el-descriptions-item label="题目题干" :span="2">
+              <el-descriptions-item label="题目题干" label-class-name="my-label">
                 {{this.stem}}
               </el-descriptions-item>
-              <el-descriptions-item label="填写次数">
+              <el-descriptions-item label="填写次数" label-class-name="my-label">
                 {{this.sum(countList)}}
               </el-descriptions-item>
-              <el-descriptions-item label="类型">
+              <el-descriptions-item label="类型" label-class-name="my-label">
                 {{this.type}}
+              </el-descriptions-item>
+              <el-descriptions-item v-if="this.type == '评分题'" label="平均分" label-class-name="my-label">
+                {{this.avg}}
               </el-descriptions-item>
             </el-descriptions>
             <el-card style="text-align: center">
@@ -80,8 +83,8 @@
               </RadioGroup>
               <div class="chart">
                 <canvas v-show="this.chartShow === 'pie'" id="myPieChart"></canvas>
-                <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 360px"></canvas>
-                <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 360px"></canvas>
+                <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 320px"></canvas>
+                <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 320px"></canvas>
               </div>
             </el-card>
           </div>
@@ -110,27 +113,32 @@
           </div>
         </div>
         <div class="cross-over" v-show="this.show === 'xy'">
-          <el-select v-model="x" placeholder="x">
-            <el-option
-            v-for="(item, index) in questionList"
-            :key="index"
-            :label="item"
-            :value="index">
-            </el-option>
-          </el-select>
-          <el-select v-model="y" placeholder="y">
-            <el-option
-            v-for="(item, index) in questionList"
-            :key="index"
-            :label="item"
-            :value="index">
-            </el-option>
-          </el-select>
-          <el-button @click="cross()">开始分析</el-button>
+          <div class="select">
+            <div class="info">定义行(需要分析的题目)</div>
+            <el-select v-model="x" placeholder="x">
+              <el-option
+              v-for="(item, index) in questionList"
+              :key="index"
+              :label="item"
+              :value="index">
+              </el-option>
+            </el-select>
+            <div class="info">定义列(作为样本的属性)</div>
+            <el-select v-model="y" placeholder="y">
+              <el-option
+              v-for="(item, index) in questionList"
+              :key="index"
+              :label="item"
+              :value="index">
+              </el-option>
+            </el-select>
+            <el-button @click="cross()">开始分析</el-button>
+          </div>
           <el-table
           :data="xyData"
           border
-          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}">
+          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}"
+          style="width: 66%">
             <el-table-column
             prop="choiceX"
             label="选项">
@@ -160,16 +168,22 @@ export default {
   },
   data() {
     return {
+      stem: null,
+      type: null,
+      avg: null,
       show: "data",
       chartShow: "pie",
-      questionList: ['q1','q2','q3'],
+      questionList: ['q1','q2','q3'],//问题列表
+      answerList: [],//某问题回答列表
+      countList: [],//下标与回答列表对应的回答人数
       answerData: [
       {
         answerId: 12,
         'q1': 'a1',
         'q2': 'a2',
         'q3': 'a3',
-        answerTime: 'time111'
+        answerTime: 'time111',
+        points: '20/100'
       },
       {
         answerId: 13,
@@ -191,6 +205,13 @@ export default {
           type: 'filling',
           answers: ['a1','a2','A3'],
           counts: [6,9,9]
+        },
+        {
+          stem: 'q2',
+          type: 'grade',
+          answers: ['2','4','5'],
+          counts: [6,9,9],
+          avg: '3.5'
         }
       ],
       x: 0,
@@ -206,12 +227,13 @@ export default {
           "xy": ['n21','n22','n23']
         }
       ],
-      answerList: [],
-      countList: [1,2,3],
-      stem: '',
-      type: '',
-      avg: '',
       canvas: null,
+      templateTitle: null,
+      templateType: null,
+      totalPoints: null,
+      allPoints: null,
+      countPoints: null,
+      avgPoints: null
     }
   },
   created: function () {
@@ -241,6 +263,10 @@ export default {
       console.log(response);
       if (response.data.success == true) {
         this.sumData = response.data.results;
+        this.totalPoints = response.data.totalPoints;
+        this.allPoints = response.data.allPoints;
+        this.countPoints = response.data.counts;
+        this.avgPoints = response.data.avgPoints;
       } else {
         console.log(response.data.message);
       }
@@ -342,11 +368,9 @@ export default {
           this.type = '定位题';
           break;
       }
+      this.avg = item['avg']
       this.answerList = item['answers']
       this.countList = item['counts']
-      if (this.type == 'grade') {
-        this.avg = this.item['avg']
-      }
       this.updateChart()
     },
     loadChart() {
@@ -395,6 +419,18 @@ export default {
             labels: [],
             datasets: [{
               label: "折线图",
+              data: []
+            }]
+        }
+      })
+      var ctx4 = document.getElementById('myExamChart');
+      this.myBarChart = new Chart(ctx4,{
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+              label: "柱状图",
+              backgroundColor: "rgb(72, 202, 228)",
               data: []
             }]
         }
@@ -490,15 +526,35 @@ export default {
   padding: 36px;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: flex-start;
 }
 .cross-over {
   padding: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .overview {
   display: flex;
   flex-direction: column;
+}
+.select {
+  display: flex;
+  width: 66%;
+  margin-bottom: 30px;
+  justify-content: space-between;
+  align-items: center;
+}
+.info {
+  font-size: 15px;
+}
+.select .el-button {
+  height: 45px;
+  background: rgb(0, 183, 255);
+  color: #ffffff;
+  font-size: 15px;
+  margin: 0;
 }
 .chart {
   height: 360px;
