@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.buaa.qp.service.AnswerService.quotaLock;
+
 @RestController
 public class CollectionController {
     @Autowired
@@ -31,8 +33,6 @@ public class CollectionController {
 
     @Autowired
     private QuestionService questionService;
-
-    private static final Object quotaLock = new Object();
 
     @GetMapping("/attempt")
     public Map<String, Object> attempt(@RequestParam(value = "code", required = false) String code) {
@@ -125,8 +125,8 @@ public class CollectionController {
                 allowed = !visitor;
                 isOwner = !visitor;
             }
+            String pwd = template.getPassword();
             if (!isOwner && template.getReleased()) {
-                String pwd = template.getPassword();
                 if (pwd == null || pwd.equals(password))
                     allowed = true;
                 else
@@ -135,9 +135,21 @@ public class CollectionController {
             if (!allowed)
                 throw new ExtraMessageException("问卷不存在或无权访问");
 
-            String pwd = template.getPassword();
             String conclusion = template.getConclusion();
             Integer quota = template.getQuota();
+            if (template.getLimited() && (visitor || !isOwner)) {
+                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
+                if (oldAnswer != null)
+                    throw new ExtraMessageException("已填过问卷");
+            }
+            if (quota != null) {
+                int remain = quota - answerService.countAnswers(templateId);
+                if (remain < 0) remain = 0;
+                if (remain == 0 && (visitor || !isOwner))
+                    throw new ExtraMessageException("问卷已满额");
+                map.put("remain", remain);
+            }
+
             if (isOwner) {
                 if (pwd != null)
                     map.put("password", pwd);
@@ -146,17 +158,6 @@ public class CollectionController {
                 if (quota != null)
                     map.put("quota", quota);
                 map.put("limited", template.getLimited());
-            }
-            if (template.getLimited() && (visitor || !isOwner)) {
-                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
-                if (oldAnswer != null)
-                    throw new ExtraMessageException("已填过问卷");
-            }
-            if (quota != null) {
-                int remain = quota - answerService.countAnswers(templateId);
-                if (remain == 0 && (visitor || !isOwner))
-                    throw new ExtraMessageException("问卷名额已满");
-                map.put("remain", remain);
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date startTime = template.getStartTime();
@@ -186,6 +187,7 @@ public class CollectionController {
                     questionMap.put("description", dsc);
                 if (template.getType().equals("exam")) {
                     if (isOwner) {
+                        questionMap.put("shuffle", question.getShuffle());
                         if (question.getAnswer() != null) {
                             switch (question.getType()) {
                                 case "filling":
@@ -199,7 +201,6 @@ public class CollectionController {
                                     break;
                             }
                         }
-                        questionMap.put("shuffle", question.getShuffle());
                     }
                     if (question.getPoints() != null)
                         questionMap.put("points", question.getPoints());
@@ -226,6 +227,77 @@ public class CollectionController {
             map.put("showIndex", template.getShowIndex());
             map.put("questions", questionMaps);
             map.put("logic", logicTriplets);
+        }
+        catch (ParameterFormatException | ObjectNotFoundException |
+                ExtraMessageException | LoginVerificationException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        }
+        catch (Exception exception) {
+            exception.printStackTrace();
+            map.clear();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    @GetMapping("/remains")
+    public Map<String, Object> remains(@RequestParam(value = "code", required = false) String code,
+                                       @RequestParam(value = "password", required = false) String password) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // Parameter checks
+            if (code == null)
+                throw new ParameterFormatException();
+            if (password != null && password.isEmpty()) password = null;
+
+            // Existence checks
+            Template template = templateService.getTemplate(code);
+            if (template == null)
+                throw new ObjectNotFoundException();
+            int templateId = template.getTemplateId();
+
+            // Login checks
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (template.getLimited() && accountId == null)
+                throw new LoginVerificationException();
+
+            // Authority checks
+            if (!template.getReleased())
+                throw new ExtraMessageException("问卷不存在或无权访问");
+            String pwd = template.getPassword();
+            if (pwd != null && !pwd.equals(password))
+                throw new ExtraMessageException("密码错误");
+            Integer quota = template.getQuota();
+            if (quota == null && !template.getType().equals("sign-up"))
+                throw new ExtraMessageException("此问卷无限额信息");
+            if (template.getLimited()) {
+                Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
+                if (oldAnswer != null)
+                    throw new ExtraMessageException("已填过问卷");
+            }
+
+            if (quota != null) {
+                int remain = quota - answerService.countAnswers(templateId);
+                if (remain < 0) remain = 0;
+                map.put("overall", remain);
+            }
+            ArrayList<Map<String, Object>> detailedMaps = new ArrayList<>();
+            ClassParser parser = new ClassParser();
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            for (int i = 0; i < questions.size(); ++i) {
+                Question question = questions.get(i);
+                if (question.getType().equals("sign-up")) {
+                    Map<String, Object> detailedMap = new HashMap<>();
+                    detailedMap.put("index", i);
+                    Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                    detailedMap.put("remains", parser.toIntegerList(argsMap.get("remains")));
+                    detailedMaps.add(detailedMap);
+                }
+            }
+            map.put("detailed", detailedMaps);
+            map.put("success", true);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {
@@ -437,7 +509,7 @@ public class CollectionController {
             else synchronized (quotaLock) {
                 int answerCount = answerService.countAnswers(templateId);
                 if (quota != null && answerCount >= quota)
-                    throw new ExtraMessageException("问卷名额已满");
+                    throw new ExtraMessageException("问卷已满额");
 
                 // Synchronization for sign-up questionnaires
                 if (template.getType().equals("sign-up")) {
@@ -463,7 +535,7 @@ public class CollectionController {
                         ArrayList<Integer> choices = signUpAnswers.get(i);
                         for (Integer ch : choices) {
                             if (remains.get(ch) <= 0)
-                                throw new ExtraMessageException("部分选项名额已满");
+                                throw new ExtraMessageException("部分选项已满额");
                         }
                     }
                     // Update the remains
