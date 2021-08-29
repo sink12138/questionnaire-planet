@@ -445,7 +445,9 @@
         <el-form :inline="true" class="demo-form-inline">
           <el-form-item label="如果：">
             <el-select v-model="fromquestion" placeholder="题目">
-              <el-option v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion" :label="'第' + (index_fromquestion + 1) + '题'" :value="index_fromquestion"></el-option>
+              <div v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion">
+                <el-option v-if="fromquestion['type'] == '0'" :label="'第' + (index_fromquestion + 1) + '题'" :value="index_fromquestion"></el-option>
+              </div>
             </el-select>
           </el-form-item>
           <el-form-item label="选择了：">
