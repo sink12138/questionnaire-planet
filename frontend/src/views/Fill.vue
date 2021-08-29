@@ -92,7 +92,7 @@
         <div style="font-size: 15px;margin: 10px">
           {{ description }}
         </div>
-        <div style="font-size: 18px;margin: 5px">
+        <div style="font-size: 18px;margin: 5px" v-if="remain != '∞'">
           问卷剩余{{ remain }}份
         </div>
       </div>
@@ -261,7 +261,7 @@
                         :label="index"
                         border
                         :disabled="item.remains[index] == 0 ? true : false"
-                        >{{ i }}共{{ item.quotas[index] }},剩余{{
+                        >{{ i }}       共{{ item.quotas[index] }},剩余{{
                           item.remains[index]
                         }}
                       </el-checkbox>

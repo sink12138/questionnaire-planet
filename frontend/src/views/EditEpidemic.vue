@@ -78,7 +78,7 @@
         :style="{'background-color': setColor('logic')}" 
         icon="ios-link-outline" 
         @click="pageChange('logic')">
-          题目逻辑
+          逻辑关联
         </Button>
         <Button 
         :style="{'background-color': setColor('info')}" 
@@ -218,6 +218,12 @@
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
+                    <div v-if="item.type == 0">单选题</div>
+                    <div v-if="item.type == 1">多选题</div>
+                    <div v-if="item.type == 2">填空题</div>
+                    <div v-if="item.type == 3">评分题</div>
+                    <div v-if="item.type == 4">下拉题</div>
+                    <div v-if="item.type == 5">定位题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题 -->
@@ -581,7 +587,7 @@ export default {
             max: 2,
             min: 1,
             height: 1,
-            width: 800,
+            width: 600,
             grades: [],
             answers: [],
           };
@@ -597,7 +603,7 @@ export default {
               max: 2,
               min: 1,
               height: 1,
-              width: 800,
+              width: 600,
               grades: [],
               answers: [],
             };
@@ -700,7 +706,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         grades: [],
         answers: [],
       };
@@ -743,7 +749,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
         answers: [{ value: "" }, { value: "" }],
       });
