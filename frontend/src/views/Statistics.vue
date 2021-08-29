@@ -4,6 +4,13 @@
     <div class="editor">
       <Button class="new" icon="md-arrow-round-back">所有问卷</Button>
       <el-button 
+      v-if="this.templateType == 'exam'"
+      :style="{'background-color': setColor('exam')}" 
+      icon="el-icon-document-checked" 
+      @click="changeShow('exam')">
+        得分情况
+      </el-button>
+      <el-button 
       :style="{'background-color': setColor('data')}" 
       icon="el-icon-tickets" 
       @click="changeShow('data')">
@@ -29,6 +36,22 @@
     </div>
     <div class="fill">
       <div class="main">
+        <div class="exam-result" v-show="(this.show === 'exam')&&(this.templateType == 'exam')">
+          <el-descriptions direction="vertical" :column="2" border style="height: 300px;width: 400px">
+            <el-descriptions-item label="试卷标题" :span="2">
+              {{this.templateTitle}}
+            </el-descriptions-item>
+            <el-descriptions-item label="试卷总分">
+              {{this.totalPoints}}
+            </el-descriptions-item>
+            <el-descriptions-item label="平均得分">
+              {{this.avgPoints}}
+            </el-descriptions-item>
+          </el-descriptions>
+          <el-card style="text-align: center;height: 600px;width: 600px">
+            <canvas id="myExamChart"></canvas>
+          </el-card>
+        </div>
         <div class="all-data" v-show="this.show === 'data'">
           <el-table
           :data="answerData"
@@ -60,19 +83,22 @@
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
-          <div class="overview">
+          <div class="optin-overview">
             <el-descriptions direction="vertical" :column="2" border>
-              <el-descriptions-item label="题目题干" :span="2">
+              <el-descriptions-item label="题目题干" label-class-name="my-label">
                 {{this.stem}}
               </el-descriptions-item>
-              <el-descriptions-item label="填写次数">
+              <el-descriptions-item label="填写次数" label-class-name="my-label">
                 {{this.sum(countList)}}
               </el-descriptions-item>
-              <el-descriptions-item label="类型">
+              <el-descriptions-item label="类型" label-class-name="my-label">
                 {{this.type}}
               </el-descriptions-item>
+              <el-descriptions-item v-if="this.type == '评分题'" label="平均分" label-class-name="my-label">
+                {{this.avg}}
+              </el-descriptions-item>
             </el-descriptions>
-            <el-card style="text-align: center">
+            <el-card style="text-align: center;">
               <RadioGroup v-model="chartShow" type="button" size="large">
                 <Radio label="pie"><Icon type="md-pie" />饼图</Radio>
                 <Radio label="bar"><Icon type="md-podium" />柱状图</Radio>
@@ -80,8 +106,8 @@
               </RadioGroup>
               <div class="chart">
                 <canvas v-show="this.chartShow === 'pie'" id="myPieChart"></canvas>
-                <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 360px"></canvas>
-                <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 360px"></canvas>
+                <canvas v-show="this.chartShow === 'bar'" id="myBarChart" style="height: 320px"></canvas>
+                <canvas v-show="this.chartShow === 'line'" id="myLineChart" style="height: 320px"></canvas>
               </div>
             </el-card>
           </div>
@@ -110,27 +136,32 @@
           </div>
         </div>
         <div class="cross-over" v-show="this.show === 'xy'">
-          <el-select v-model="x" placeholder="x">
-            <el-option
-            v-for="(item, index) in questionList"
-            :key="index"
-            :label="item"
-            :value="index">
-            </el-option>
-          </el-select>
-          <el-select v-model="y" placeholder="y">
-            <el-option
-            v-for="(item, index) in questionList"
-            :key="index"
-            :label="item"
-            :value="index">
-            </el-option>
-          </el-select>
-          <el-button @click="cross()">开始分析</el-button>
+          <div class="select">
+            <div class="info">定义行(需要分析的题目)</div>
+            <el-select v-model="x" placeholder="选择行">
+              <el-option
+              v-for="(item, index) in questionList"
+              :key="index"
+              :label="item"
+              :value="index">
+              </el-option>
+            </el-select>
+            <div class="info">定义列(作为样本的属性)</div>
+            <el-select v-model="y" placeholder="选择列">
+              <el-option
+              v-for="(item, index) in questionList"
+              :key="index"
+              :label="item"
+              :value="index">
+              </el-option>
+            </el-select>
+            <el-button @click="cross()">开始分析</el-button>
+          </div>
           <el-table
           :data="xyData"
           border
-          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}">
+          :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','border-color':'#bbb'}"
+          style="width: 66%">
             <el-table-column
             prop="choiceX"
             label="选项">
@@ -160,58 +191,27 @@ export default {
   },
   data() {
     return {
+      stem: null,
+      type: null,
+      avg: null,
       show: "data",
       chartShow: "pie",
-      questionList: ['q1','q2','q3'],
-      answerData: [
-      {
-        answerId: 12,
-        'q1': 'a1',
-        'q2': 'a2',
-        'q3': 'a3',
-        answerTime: 'time111'
-      },
-      {
-        answerId: 13,
-        'q1': 'a21',
-        'q2': 'a22',
-        'q3': 'a23',
-        answerTime: 'time222'
-      },
-      ],
-      sumData: [
-        {
-          stem: 'q1',
-          type: 'choice',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
-        },
-        {
-          stem: 'q2',
-          type: 'filling',
-          answers: ['a1','a2','A3'],
-          counts: [6,9,9]
-        }
-      ],
-      x: 0,
-      y: 0,
-      choicesy:['y1','y2','y3'],
-      xyData: [
-        {
-          choiceX: 'x1',
-          "xy": ['n11','n12','n13']
-        },
-        {
-          choiceX: 'x2',
-          "xy": ['n21','n22','n23']
-        }
-      ],
+      questionList: [],
       answerList: [],
-      countList: [1,2,3],
-      stem: '',
-      type: '',
-      avg: '',
+      countList: [],
+      answerData: [],
+      sumData: [],
+      x: null,
+      y: null,
+      choicesy:[],
+      xyData: [],
       canvas: null,
+      templateTitle: null,
+      templateType: null,
+      totalPoints: null,
+      allPoints: [],
+      countPoints: [],
+      avgPoints: null
     }
   },
   created: function () {
@@ -241,6 +241,12 @@ export default {
       console.log(response);
       if (response.data.success == true) {
         this.sumData = response.data.results;
+        this.templateTitle = response.data.title;
+        this.templateType = response.data.type;
+        this.totalPoints = response.data.totalPoints;
+        this.allPoints = response.data.allPoints;
+        this.countPoints = response.data.counts;
+        this.avgPoints = response.data.avgPoints;
       } else {
         console.log(response.data.message);
       }
@@ -301,7 +307,7 @@ export default {
       }).then((response) => {
         console.log(response);
         if (response.data.success == true) {
-          this.choicesy = response.data.choicesY;
+          this.choicesy = response.data.choiceY;
           this.xyData = response.data.xyData;
         } else {
           this.$notify({
@@ -342,11 +348,9 @@ export default {
           this.type = '定位题';
           break;
       }
+      this.avg = item['avg']
       this.answerList = item['answers']
       this.countList = item['counts']
-      if (this.type == 'grade') {
-        this.avg = this.item['avg']
-      }
       this.updateChart()
     },
     loadChart() {
@@ -399,6 +403,18 @@ export default {
             }]
         }
       })
+      var ctx4 = document.getElementById('myExamChart');
+      this.myExamChart = new Chart(ctx4,{
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+              label: "分数分析",
+              backgroundColor: "rgb(72, 202, 228)",
+              data: []
+            }]
+        }
+      })
     },
     updateChart() {
       console.log('uuuppp')
@@ -411,6 +427,11 @@ export default {
       this.myLineChart.data.labels = this.answerList
       this.myLineChart.data.datasets[0].data = this.countList
       this.myLineChart.update()
+      if (this.templateType == 'exam') {
+        this.myExamChart.data.labels = this.allPoints
+        this.myExamChart.data.datasets[0].data = this.countPoints
+        this.myExamChart.update()
+      }
     },
     handleDownload:function() {
       this.$axios({
@@ -483,6 +504,13 @@ export default {
   background: #fff;
   opacity: 0.94;
 }
+.exam-result {
+  padding: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
 .all-data {
   padding: 36px;
 }
@@ -490,15 +518,35 @@ export default {
   padding: 36px;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: center;
   align-items: flex-start;
 }
 .cross-over {
   padding: 36px;
-}
-.overview {
   display: flex;
   flex-direction: column;
+  align-items: center;
+}
+.option-overview {
+  display: flex;
+  flex-direction: column;
+}
+.select {
+  display: flex;
+  width: 66%;
+  margin-bottom: 30px;
+  justify-content: space-between;
+  align-items: center;
+}
+.info {
+  font-size: 15px;
+}
+.select .el-button {
+  height: 45px;
+  background: rgb(0, 183, 255);
+  color: #ffffff;
+  font-size: 15px;
+  margin: 0;
 }
 .chart {
   height: 360px;

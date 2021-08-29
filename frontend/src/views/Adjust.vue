@@ -95,7 +95,7 @@
                   <el-row>
                     <el-col :span="10">
                       <!-- 显示题号 -->
-                      <el-form-item label="是否显示题号">
+                      <el-form-item label="显示题号">
                         <el-switch v-model="modelForm.showIndex"> </el-switch>
                       </el-form-item>
                     </el-col>
@@ -137,7 +137,7 @@
                       v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
-                      placeholder="收集指定数量后停止回收"
+                      placeholder="收集指定数量后将无法提交"
                     />
                   </el-form-item>
                   <!-- 发布时间 -->
@@ -587,7 +587,7 @@ export default {
               (response) => {
                 console.log(response);
                 if (response.data.success == true) {
-                  this.$$notify({
+                  this.$notify({
                     title: "提示",
                     message: "问卷发布成功",
                     type: "success",
@@ -677,7 +677,7 @@ export default {
   height: 100%;
   flex-direction: column;
   align-items: center;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 18px;
   font-weight: bolder;
 }
@@ -690,7 +690,7 @@ export default {
 }
 .web-title {
   margin-left: 15px;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-weight: 800;
   font-size: 26px;
   position: relative;
@@ -706,7 +706,7 @@ a:hover {
   color: rgba(46, 140, 219, 0.94);
 }
 .editor .el-button {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   height: 50px;
   width: 120px;
   color: #000000;

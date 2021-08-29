@@ -75,382 +75,395 @@
         <el-button type="primary" @click="unlock">确认</el-button>
       </div>
     </el-dialog>
-
-    <div class="head" v-if="submitted == false">
-      <h1>
-        {{ title }}
-      </h1>
-      <h3>
-        {{ description }}
-      </h3>
-      <h3>问卷剩余{{ remain }}份</h3>
-
-      <div
-        v-if="type === 'exam'"
-        class="timer"
-        style="position: absolute; float: right; right: 10px"
-      >
-        <p>截止时间：{{ deadlline }}</p>
-        <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+    <div class="fill-header"></div>
+    <div class="fill-page">
+      <div class="head" v-if="submitted == false">
+        <div
+          v-if="(type === 'exam')&&(deadlline != '')&&(deadlline != undefined)"
+          class="timer"
+          style="font-size: 15px"
+        >
+          <p style="color: red">{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+          <p>截止时间：{{ deadlline }}</p>
+        </div>
+        <div style="font-size: 28px;padding-top:20px;margin-bottom: 5px">
+          {{ title }}
+        </div>
+        <div style="font-size: 15px;margin: 10px">
+          {{ description }}
+        </div>
+        <div style="font-size: 18px;margin: 5px">
+          问卷剩余{{ remain }}份
+        </div>
       </div>
-    </div>
-    <div class="question" v-if="submitted == false">
-      <el-form
-        :model="answers"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="ruleForm"
-      >
-        <div v-for="(item, index_question) in questions" :key="index_question">
-          <div v-if="mark[index_question] == true">
-            <el-divider content-position="left" style="margin-top: 15px"
-              ><div v-show="showIndex">
-                第{{ index_question + 1 }}题
-              </div></el-divider
-            >
-            <div class="question-title">
+      <div class="question" v-if="submitted == false">
+        <el-form
+          :model="answers"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="ruleForm"
+        >
+          <div v-for="(item, index_question) in questions" :key="index_question">
+            <div v-if="mark[index_question] == true">
+              <el-divider content-position="left" style="margin-top: 15px">
+                <div v-show="showIndex">第{{ index_question + 1 }}题</div>
+                <div v-if="item.points != undefined">（{{ item.points }}分）</div>
+              </el-divider>
+              <div class="question-title">
+                <div class="stem">{{ item.stem }}</div>
+                <div class="description">{{ item.description }}</div>
+              </div>
+
+              <div class="question-content">
+                <div v-if="item.type == 'choice'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-radio-group
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :key="index"
+                      @change="
+                        (val) => {
+                          changeValue(val, index_question);
+                        }
+                      "
+                    >
+                      <el-radio class="option" :label="index">{{ i }}</el-radio>
+                    </el-radio-group></el-form-item
+                  >
+                </div>
+                <div v-if="item.type == 'multi-choice'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      class="multi"
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border>{{
+                        i
+                      }}</el-checkbox>
+                    </el-checkbox-group></el-form-item
+                  >
+                </div>
+                <div v-if="item.type == 'filling'">
+                  <el-form-item
+                    label="请输入"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-input
+                      type="textarea"
+                      class="input"
+                      :rows="item.height"
+                      :style="{ '--width': item.width }"
+                      placeholder="请输入内容"
+                      v-model="answers[index_question]"
+                    >
+                    </el-input
+                  ></el-form-item>
+                </div>
+                <div v-if="item.type == 'grade'">
+                  <el-form-item
+                    label="评分"
+                    :rules="{
+                      required: item.required,
+                    }"
+                    
+                  >
+                    <el-rate
+                      style="margin-top: 12px"
+                      v-model="answers[index_question]"
+                      show-text
+                      :texts="item.grades"
+                    >
+                    </el-rate>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'dropdown'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-select
+                      v-model="answers[index_question]"
+                      clearable
+                      placeholder="请选择"
+                    >
+                      <el-option
+                        v-for="(i, index) in item.choices"
+                        :key="index"
+                        :label="i"
+                        :value="index"
+                      >
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'vote'">
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      class="multi" 
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox class="option" :label="index" border>{{
+                        i
+                      }}</el-checkbox>
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
+                <div v-if="item.type == 'sign-up'">
+                  至少选择{{ item.min }}项
+                  <el-form-item
+                    label="选项"
+                    :rules="{
+                      required: item.required,
+                    }"
+                  >
+                    <el-checkbox-group
+                      class="multi"
+                      v-model="answers[index_question]"
+                      v-for="(i, index) in item.choices"
+                      :min="0"
+                      :max="item.max"
+                      :key="index"
+                      @change="multiChangeValue(index_question)"
+                    >
+                      <el-checkbox
+                        class="option"
+                        :label="index"
+                        border
+                        :disabled="item.remains[index] == 0 ? true : false"
+                        >{{ i }}共{{ item.quotas[index] }},剩余{{
+                          item.remains[index]
+                        }}
+                      </el-checkbox>
+                    </el-checkbox-group>
+                  </el-form-item>
+                </div>
+              </div>
+              <div v-if="item.type == 'location'">
+                <el-form-item
+                  label="定位"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-location-information"
+                    @click="getLocation(index_question)"
+                    >点击获取定位</el-button
+                  >
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="您的位置"
+                    v-model="answers[index_question]"
+                  >
+                  </el-input>
+                </el-form-item>
+              </div>
+            </div>
+          </div>
+        </el-form>
+      </div>
+      <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+      <div class="conclusion" v-if="submitted == true && type == 'exam'">
+        您的分数是{{ points }}
+      </div>
+      <div class="voted" v-if="submitted == true && isVote == true">
+        <div class="result">
+          <el-card>
+          <div class="chart">
+              <canvas id="myChart"></canvas>
+          </div>
+          </el-card>
+          <el-table :data="results" max-height="300">
+            <el-table-column fixed type="index" width="80"> </el-table-column>
+            <el-table-column prop="stem" label="题目题干"> </el-table-column>
+            <el-table-column>
+              <template slot-scope="scope">
+                <el-button @click="updateChart(scope.row)">投票结果</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+      <div class="question" v-if="submitted == true">
+        <el-form
+          :model="results"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="ruleForm"
+        >
+          <div v-for="(item, index_question) in results" :key="index_question">
+            <div class="question-title" v-if="item.yourAnswer != null">
               <div class="stem">{{ item.stem }}</div>
-              <div class="description">{{ item.description }}</div>
             </div>
 
             <div class="question-content">
-              <div v-if="item.type == 'choice'">
-                <el-form-item
-                  label="选项"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
+              <div v-if="item.type == 'choice' && item.yourAnswer != null">
+                <el-form-item label="你的答案">
                   <el-radio-group
-                    v-model="answers[index_question]"
+                    v-model="item.yourAnswer"
                     v-for="(i, index) in item.choices"
                     :key="index"
-                    @change="
-                      (val) => {
-                        changeValue(val, index_question);
-                      }
-                    "
+                    @change="changeValue"
                   >
-                    <el-radio class="option" :label="index">{{ i }}</el-radio>
-                  </el-radio-group></el-form-item
-                >
+                    <el-radio class="option" :label="index" disabled>{{
+                      i
+                    }}</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <el-form-item label="正确答案">
+                  <el-radio-group
+                    v-model="item.correctAnswer"
+                    v-for="(i, index) in item.choices"
+                    :key="index"
+                    @change="changeValue"
+                  >
+                    <el-radio class="option" :label="index" disabled>{{
+                      i
+                    }}</el-radio>
+                  </el-radio-group>
+                </el-form-item>
+                <div v-if="item.points != null">
+                  <el-form-item label="你的得分">
+                    <el-input
+                      disabled
+                      type="text"
+                      class="input"
+                      placeholder="你的得分"
+                      v-model="item.points"
+                    >
+                    </el-input>
+                  </el-form-item>
+                </div>
               </div>
               <div class="multi" v-if="item.type == 'multi-choice'">
-                至少选择{{ item.min }}项
-                <el-form-item
-                  label="选项"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
+                <el-form-item label="你的答案">
                   <el-checkbox-group
-                    v-model="answers[index_question]"
+                    v-model="item.yourAnswer"
                     v-for="(i, index) in item.choices"
                     :min="0"
                     :max="item.max"
                     :key="index"
                     @change="multiChangeValue(index_question)"
                   >
-                    <el-checkbox class="option" :label="index" border>{{
+                    <el-checkbox class="option" :label="index" border disabled>{{
                       i
                     }}</el-checkbox>
-                  </el-checkbox-group></el-form-item
-                >
+                  </el-checkbox-group>
+                </el-form-item>
+                <el-form-item label="正确答案">
+                  <el-checkbox-group
+                    v-model="item.correctAnswer"
+                    v-for="(i, index) in item.choices"
+                    :min="0"
+                    :max="item.max"
+                    :key="index"
+                    @change="multiChangeValue(index_question)"
+                  >
+                    <el-checkbox class="option" :label="index" border disabled>{{
+                      i
+                    }}</el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+                <div v-if="item.points != null">
+                  <el-form-item label="你的得分">
+                    <el-input
+                      disabled
+                      type="text"
+                      class="input"
+                      placeholder="你的得分"
+                      v-model="item.points"
+                    >
+                    </el-input>
+                  </el-form-item>
+                </div>
               </div>
               <div v-if="item.type == 'filling'">
+                <el-form-item label="你的答案">
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="你的答案"
+                    v-model="item.yourAnswer"
+                  >
+                  </el-input>
+                </el-form-item>
                 <el-form-item
-                  label="请输入"
-                  :rules="{
-                    required: item.required,
-                  }"
+                  label="参考答案"
+                  v-for="(opt, idx) in item.correctAnswer"
+                  :key="idx"
                 >
                   <el-input
-                    type="textarea"
+                    disabled
+                    type="text"
                     class="input"
-                    :rows="item.height"
-                    :style="{ '--width': item.width }"
-                    placeholder="请输入内容"
-                    v-model="answers[index_question]"
+                    placeholder="无参考答案"
+                    v-model="item.correctAnswer[idx]"
                   >
-                  </el-input
-                ></el-form-item>
-              </div>
-              <div v-if="item.type == 'grade'">
-                <el-form-item
-                  label="评分"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
-                  <el-rate
-                    v-model="answers[index_question]"
-                    show-text
-                    :texts="item.grades"
-                  >
-                  </el-rate>
+                  </el-input>
                 </el-form-item>
-              </div>
-              <div v-if="item.type == 'dropdown'">
-                <el-form-item
-                  label="选项"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
-                  <el-select
-                    v-model="answers[index_question]"
-                    clearable
-                    placeholder="请选择"
-                  >
-                    <el-option
-                      v-for="(i, index) in item.choices"
-                      :key="index"
-                      :label="i"
-                      :value="index"
+                <div v-if="item.points != null">
+                  <el-form-item label="你的得分">
+                    <el-input
+                      disabled
+                      type="text"
+                      class="input"
+                      placeholder="你的得分"
+                      v-model="item.points"
                     >
-                    </el-option>
-                  </el-select>
-                </el-form-item>
+                    </el-input>
+                  </el-form-item>
+                </div>
               </div>
-              <div class="multi" v-if="item.type == 'vote'">
-                <el-form-item
-                  label="选项"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
-                  <el-checkbox-group
-                    v-model="answers[index_question]"
-                    v-for="(i, index) in item.choices"
-                    :min="0"
-                    :max="item.max"
-                    :key="index"
-                    @change="multiChangeValue(index_question)"
-                  >
-                    <el-checkbox class="option" :label="index" border>{{
-                      i
-                    }}</el-checkbox>
-                  </el-checkbox-group>
-                </el-form-item>
-              </div>
-              <div class="multi" v-if="item.type == 'sign-up'">
-                至少选择{{ item.min }}项
-                <el-form-item
-                  label="选项"
-                  :rules="{
-                    required: item.required,
-                  }"
-                >
-                  <el-checkbox-group
-                    v-model="answers[index_question]"
-                    v-for="(i, index) in item.choices"
-                    :min="0"
-                    :max="item.max"
-                    :key="index"
-                    @change="multiChangeValue(index_question)"
-                  >
-                    <el-checkbox
-                      class="option"
-                      :label="index"
-                      border
-                      :disabled="item.remains[index] == 0 ? true : false"
-                      >{{ i }}共{{ item.quotas[index] }},剩余{{
-                        item.remains[index]
-                      }}
-                    </el-checkbox>
-                  </el-checkbox-group>
-                </el-form-item>
-              </div>
-            </div>
-            <div v-if="item.type == 'location'">
-              <el-form-item
-                label="定位"
-                :rules="{
-                  required: item.required,
-                }"
-              >
-                <el-button
-                  type="primary"
-                  icon="el-icon-location-information"
-                  @click="getLocation(index_question)"
-                  >点击获取定位</el-button
-                >
-                <el-input
-                  disabled
-                  type="text"
-                  class="input"
-                  placeholder="您的位置"
-                  v-model="answers[index_question]"
-                >
-                </el-input>
-              </el-form-item>
             </div>
           </div>
-        </div>
-      </el-form>
-    </div>
-    <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
-    <div class="conclusion" v-if="submitted == true && type == 'exam'">
-      您的分数是{{ points }}
-    </div>
-    <div class="voted" v-if="submitted == true && isVote == true">
-      <div class="result">
-        <div class="chart">
-          <canvas id="myChart"></canvas>
-        </div>
-        <el-table :data="results" max-height="300">
-          <el-table-column fixed type="index" width="80"> </el-table-column>
-          <el-table-column prop="stem" label="题目题干"> </el-table-column>
-          <el-table-column>
-            <template slot-scope="scope">
-              <el-button @click="updateChart(scope.row)">投票结果</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        </el-form>
+      </div>
+      <div class="submit" v-if="fillRight == true">
+        <el-button 
+        style="margin-bottom: 20px"
+        @click="submit()" 
+        v-if="submitted == false"
+          >提交问卷</el-button
+        >
       </div>
     </div>
-    <div class="question" v-if="submitted == true && type == 'exam'">
-      <el-form
-        :model="results"
-        :rules="rules"
-        ref="ruleForm"
-        label-width="100px"
-        class="ruleForm"
-      >
-        <div v-for="(item, index_question) in results" :key="index_question">
-          <div class="question-title" v-if="item.yourAnswer != null">
-            <div class="stem">{{ item.stem }}</div>
-          </div>
-
-          <div class="question-content">
-            <div v-if="item.type == 'choice' && item.yourAnswer != null">
-              <el-form-item label="你的答案">
-                <el-radio-group
-                  v-model="item.yourAnswer"
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  @change="changeValue"
-                >
-                  <el-radio class="option" :label="index" disabled>{{
-                    i
-                  }}</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item label="正确答案">
-                <el-radio-group
-                  v-model="item.correctAnswer"
-                  v-for="(i, index) in item.choices"
-                  :key="index"
-                  @change="changeValue"
-                >
-                  <el-radio class="option" :label="index" disabled>{{
-                    i
-                  }}</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <div v-if="item.points != null">
-                <el-form-item label="你的得分">
-                  <el-input
-                    disabled
-                    type="text"
-                    class="input"
-                    placeholder="你的得分"
-                    v-model="item.points"
-                  >
-                  </el-input>
-                </el-form-item>
-              </div>
-            </div>
-            <div class="multi" v-if="item.type == 'multi-choice'">
-              <el-form-item label="你的答案">
-                <el-checkbox-group
-                  v-model="item.yourAnswer"
-                  v-for="(i, index) in item.choices"
-                  :min="0"
-                  :max="item.max"
-                  :key="index"
-                  @change="multiChangeValue(index_question)"
-                >
-                  <el-checkbox class="option" :label="index" border disabled>{{
-                    i
-                  }}</el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
-              <el-form-item label="正确答案">
-                <el-checkbox-group
-                  v-model="item.correctAnswer"
-                  v-for="(i, index) in item.choices"
-                  :min="0"
-                  :max="item.max"
-                  :key="index"
-                  @change="multiChangeValue(index_question)"
-                >
-                  <el-checkbox class="option" :label="index" border disabled>{{
-                    i
-                  }}</el-checkbox>
-                </el-checkbox-group>
-              </el-form-item>
-              <div v-if="item.points != null">
-                <el-form-item label="你的得分">
-                  <el-input
-                    disabled
-                    type="text"
-                    class="input"
-                    placeholder="你的得分"
-                    v-model="item.points"
-                  >
-                  </el-input>
-                </el-form-item>
-              </div>
-            </div>
-            <div v-if="item.type == 'filling'">
-              <el-form-item label="你的答案">
-                <el-input
-                  disabled
-                  type="text"
-                  class="input"
-                  placeholder="你的答案"
-                  v-model="item.yourAnswer"
-                >
-                </el-input>
-              </el-form-item>
-              <el-form-item
-                label="参考答案"
-                v-for="(opt, idx) in item.correctAnswer"
-                :key="idx"
-              >
-                <el-input
-                  disabled
-                  type="text"
-                  class="input"
-                  placeholder="无参考答案"
-                  v-model="item.correctAnswer[idx]"
-                >
-                </el-input>
-              </el-form-item>
-              <div v-if="item.points != null">
-                <el-form-item label="你的得分">
-                  <el-input
-                    disabled
-                    type="text"
-                    class="input"
-                    placeholder="你的得分"
-                    v-model="item.points"
-                  >
-                  </el-input>
-                </el-form-item>
-              </div>
-            </div>
-          </div>
-        </div>
-      </el-form>
-    </div>
-    <div class="submit" v-if="fillRight == true">
-      <el-button @click="submit()" v-if="submitted == false"
-        >提交问卷</el-button
-      >
-    </div>
+    <div class="fill-footer"></div>
   </div>
 </template>
 
@@ -484,12 +497,12 @@ export default {
     return {
       code: "",
       submitted: false,
-      isVote: false,
+      isVote: true,
       locked: false,
       login: false,
       fillRight: false,
       title: "未找到问卷",
-      type: "normal",
+      type: "exam",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
       conclusion: "谢谢",
       showIndex: true,
@@ -522,6 +535,8 @@ export default {
       myChart: null,
       canvas: null,
       points: "",
+      answerId: 0,
+      remains: [],
     };
   },
   created: function () {
@@ -585,6 +600,34 @@ export default {
                     while (this.answers.length < this.questions.length) {
                       this.answers.push(null);
                     }
+                    if (this.type == "sign-up") {
+                      this.getRemains();
+                    }
+                  } else if (response.data.message == "已填过问卷") {
+                    this.submitted = true;
+                    this.$axios({
+                      method: "get",
+                      url: "http://139.224.50.146:80/apis/results",
+                      params: {
+                        code: this.code,
+                        shuffleId: 0,
+                        answerId: 0,
+                      },
+                    }).then((response) => {
+                      console.log(response);
+                      if (response.data.success == true) {
+                        if (response.data.conclusion == undefined) {
+                          this.conclusion = "感谢您的提交!";
+                        } else {
+                          this.conclusion = response.data.conclusion;
+                        }
+                        if (response.data.results != undefined) {
+                          this.results = response.data.results;
+                          console.log(this.results);
+                          this.points = response.data.points;
+                        }
+                      }
+                    });
                   } else {
                     console.log(response.data.message);
                     this.$notify({
@@ -630,6 +673,33 @@ export default {
     });
   },
   methods: {
+    getRemains() {
+      setTimeout(() => {
+        this.$axios({
+          method: "get",
+          url: "http://139.224.50.146/apis/remains",
+          params: {
+            code: this.code,
+            password: this.password,
+            visitor: true,
+          },
+        }).then((response) => {
+          console.log(response);
+          if (response.data.success == true) {
+            this.remains = response.data.detailed;
+            var i = 0;
+            for (i in this.remains) {
+              this.$set(
+                this.questions[this.remains[i].index],
+                "remains",
+                this.remains[i].remains
+              );
+            }
+          }
+        });
+        this.getRemains();
+      }, 5000);
+    },
     getLocation(index) {
       this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
         confirmButtonText: "同意",
@@ -679,7 +749,99 @@ export default {
           });
         });
     },
-    forceSubmit: function () {},
+    forceSubmit: function () {
+      this.$refs["ruleForm"].validate((valid) => {
+        if (valid) {
+          while (this.answers.length < this.questions.length) {
+            this.answers.push(null);
+          }
+          var i = 0;
+          for (i in this.questions) {
+            if (
+              (this.questions[i].type == "grade" && this.answers[i] == 0) ||
+              (this.questions[i].type == "multi-choice" &&
+                this.answers[i] == [])
+            ) {
+              this.answers[i] = null;
+            }
+          }
+          for (i in this.questions) {
+            if (this.questions[i].type == "grade" && this.answers[i] > 0) {
+              this.answers[i] = this.answers[i] - 1;
+            }
+          }
+          let submitData;
+          if (this.type === "exam") {
+            submitData = JSON.stringify({
+              code: this.code,
+              password: this.password,
+              answers: this.answers,
+              shuffleId: this.shuffleId,
+            });
+          } else {
+            submitData = JSON.stringify({
+              code: this.code,
+              password: this.password,
+              answers: this.answers,
+            });
+          }
+
+          console.log(submitData);
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/answer",
+            data: submitData,
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.answerId = response.data.answerId;
+                this.submitted = true;
+                this.$axios({
+                  method: "get",
+                  url: "http://139.224.50.146:80/apis/results",
+                  params: {
+                    code: this.code,
+                    answerId: this.answerId,
+                    shuffleId: this.shuffleId,
+                  },
+                }).then((response) => {
+                  console.log(response);
+                  if (response.data.success == true) {
+                    if (response.data.conclusion == undefined) {
+                      this.conclusion = "感谢您的提交!";
+                    } else {
+                      this.conclusion = response.data.conclusion;
+                    }
+                    if (response.data.results != undefined) {
+                      this.results = response.data.results;
+                      console.log(this.results);
+                      this.points = response.data.points;
+                    }
+                  }
+                });
+              } else {
+                this.$notify({
+                  title: "提示",
+                  message: response.data.message,
+                  type: "info",
+                });
+              }
+            },
+            (err) => {
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error",
+              });
+            }
+          );
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
     settime: function () {
       if (this.type === "exam") {
         /*获取服务器时间*/
@@ -710,7 +872,7 @@ export default {
                 60 * this.minute;
 
               if (this.lefttime == 0) {
-                this.submit();
+                this.forceSubmit();
                 clearInterval(this.timer);
               }
             }, 1000);
@@ -747,7 +909,40 @@ export default {
             type: "success",
           });
           this.dialogFormVisible1 = false;
-          this.isLogin();
+          this.$axios({
+            method: "get",
+            url: "http://139.224.50.146:80/apis/attempt",
+            params: { code: this.code },
+          }).then((response) => {
+            if (response.data.answered == true) {
+              this.submitted = true;
+              this.$axios({
+                method: "get",
+                url: "http://139.224.50.146:80/apis/results",
+                params: {
+                  code: this.code,
+                  shuffleId: 0,
+                  answerId: 0,
+                },
+              }).then((response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  if (response.data.conclusion == undefined) {
+                    this.conclusion = "感谢您的提交!";
+                  } else {
+                    this.conclusion = response.data.conclusion;
+                  }
+                  if (response.data.results != undefined) {
+                    this.results = response.data.results;
+                    console.log(this.results);
+                    this.points = response.data.points;
+                  }
+                }
+              });
+            } else {
+              this.isLogin();
+            }
+          });
         } else {
           this.$notify({
             title: "提示",
@@ -937,17 +1132,31 @@ export default {
                 (response) => {
                   console.log(response);
                   if (response.data.success == true) {
+                    this.answerId = response.data.answerId;
                     this.submitted = true;
-                    if (response.data.conclusion == undefined) {
-                      this.conclusion = "感谢您的提交!";
-                    } else {
-                      this.conclusion = response.data.conclusion;
-                    }
-                    if (response.data.results != undefined) {
-                      this.results = response.data.results;
-                      console.log(this.results);
-                      this.points = response.data.points;
-                    }
+                    this.$axios({
+                      method: "get",
+                      url: "http://139.224.50.146:80/apis/results",
+                      params: {
+                        code: this.code,
+                        answerId: this.answerId,
+                        shuffleId: this.shuffleId,
+                      },
+                    }).then((response) => {
+                      console.log(response);
+                      if (response.data.success == true) {
+                        if (response.data.conclusion == undefined) {
+                          this.conclusion = "感谢您的提交!";
+                        } else {
+                          this.conclusion = response.data.conclusion;
+                        }
+                        if (response.data.results != undefined) {
+                          this.results = response.data.results;
+                          console.log(this.results);
+                          this.points = response.data.points;
+                        }
+                      }
+                    });
                   } else {
                     this.$notify({
                       title: "提示",
@@ -983,29 +1192,17 @@ export default {
       this.myChart = new Chart(ctx1, {
         type: "bar",
         data: {
-          labels: [],
-          datasets: [
-            {
+            labels: [],
+            datasets: [{
+              label: '',
+              backgroundColor: "rgb(72, 202, 228)",
               data: [],
-              backgroundColor: [
-                "rgba(2, 62, 138, 1)",
-                "rgba(0, 150, 199, 1)",
-                "rgba(72, 202, 228, 1)",
-                "rgba(144, 224, 239, 1)",
-                "rgba(173, 232, 244, 1)",
-                "rgba(202, 240, 248, 1)",
-                "rgba(68, 108, 179, 1)",
-                "rgba(52, 152, 219, 1)",
-                "rgba(89, 171, 227, 1)",
-                "rgba(137, 196, 244, 1)",
-              ],
             },
           ],
         },
       });
     },
     updateChart: function (item) {
-      this.loadChart();
       console.log("update", item);
       this.myChart.data.labels = item["answers"];
       this.myChart.data.datasets[0].data = item["counts"];
@@ -1025,7 +1222,23 @@ export default {
 
 <style scoped>
 #quest {
+  background-color: #eee;
+  background-image: url("../assets/Fill_bg.jpg");
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+.fill-header {
+  height: 60px;
+}
+.fill-footer {
+  height: 60px;
+}
+.fill-page {
+  margin: 0 auto;
+  top: 20px;
   height: 100%;
+  width: 1000px;
+  background: #fff;
 }
 .voted {
   height: 80%;
@@ -1036,57 +1249,6 @@ export default {
 .results {
   display: flex;
   justify-content: space-between;
-}
-.editor {
-  position: fixed;
-  left: 0;
-  top: 0;
-  background-color: #f3f3f3;
-  display: flex;
-  width: 200px;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  font-family: 仿宋;
-  font-size: 18px;
-  font-weight: bolder;
-}
-.logo {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 40px;
-  margin-bottom: 60px;
-}
-.web-title {
-  margin-left: 15px;
-  font-family: 仿宋;
-  font-weight: 800;
-  font-size: 26px;
-  position: relative;
-}
-.export {
-  position: fixed;
-  bottom: 60px;
-}
-.router-link-active {
-  text-decoration: none;
-}
-a {
-  text-decoration: none;
-  color: #000;
-}
-a:hover {
-  color: rgba(46, 140, 219, 0.94);
-}
-.editor .el-button {
-  font-family: 仿宋;
-  height: 50px;
-  width: 120px;
-  color: #000000;
-  font-size: 20px;
-  font-weight: bolder;
-  margin: 20px;
 }
 .question {
   margin: 0 auto;
@@ -1127,5 +1289,9 @@ a:hover {
 .chart {
   height: 280px;
   width: 560px;
+}
+.submit .el-button {
+  color: #fff;
+  background-color: rgb(0, 183, 255);
 }
 </style>

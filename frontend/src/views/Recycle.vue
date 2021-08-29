@@ -40,7 +40,7 @@
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
         <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
-          <el-table-column fixed prop="title" label="标题" width="150">
+          <el-table-column fixed prop="title" label="标题" width="200">
           </el-table-column>
           <el-table-column
             prop="answerCount"
@@ -60,7 +60,7 @@
             width="150"
           >
           </el-table-column>
-          <el-table-column prop="duration" label="收集时长" width="150">
+          <el-table-column prop="duration" label="收集时长" width="100">
           </el-table-column>
           <el-table-column label="操作" width="280">
             <template slot-scope="scope">
@@ -223,10 +223,24 @@ export default {
     },
     duration() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.duration < b.duration) {
+        var time1 = a.duration.split(":");
+        var time2 = b.duration.split(":");
+        if (parseInt(time1[0]) < parseInt(time2[0])) {
           return -1;
-        } else if (a.duration == b.duration) {
-          return 0;
+        } else if (parseInt(time1[0]) == parseInt(time2[0])) {
+          if (parseInt(time1[1]) < parseInt(time2[1])) {
+            return -1;
+          } else if (parseInt(time1[1]) == parseInt(time2[1])) {
+            if (parseInt(time1[2]) < parseInt(time2[2])) {
+              return -1;
+            } else if (parseInt(time1[2]) == parseInt(time2[2])) {
+              return 0;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
         } else {
           return 1;
         }
