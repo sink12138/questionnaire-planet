@@ -302,7 +302,10 @@
           </div>
         </el-form>
       </div>
-      <div class="conclusion" v-if="submitted == true">{{ conclusion }}</div>
+      <div class="conclusion" v-if="submitted == true" style="display: flex;flex-direction: column;align-items:center;margin-top: 30px">
+        <SuccessIcon style="margin-left: 35px"></SuccessIcon>
+        {{ conclusion }}
+      </div>
       <div class="conclusion" v-if="submitted == true && type == 'exam'">
         您的分数是{{ points }}
       </div>
@@ -484,8 +487,12 @@
 <script>
 import AMapJS from "amap-js";
 import Chart from "chart.js/auto";
+import SuccessIcon from "../components/svg_success.vue";
 Chart.defaults.font.size = 15;
 export default {
+  components: {
+    SuccessIcon: SuccessIcon
+  },
   data() {
     var checkEmail = (rule, value, callback) => {
       if (!value) {
@@ -511,12 +518,12 @@ export default {
     return {
       code: "",
       submitted: false,
-      isVote: true,
+      isVote: false,
       locked: false,
       login: false,
       fillRight: false,
       title: "未找到问卷",
-      type: "exam",
+      type: "normal",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
       conclusion: "谢谢",
       showIndex: true,
@@ -1247,13 +1254,8 @@ export default {
   background-color: #eee;
   background-image: url("../assets/Fill_bg.jpg");
   background-size: 100%;
+  height: 100%;
   background-repeat: no-repeat;
-}
-.fill-header {
-  height: 60px;
-}
-.fill-footer {
-  height: 60px;
 }
 .fill-page {
   margin: 0 auto;
@@ -1261,6 +1263,7 @@ export default {
   height: 100%;
   width: 1000px;
   background: #fff;
+  overflow-y: scroll;
 }
 .voted {
   height: 80%;
