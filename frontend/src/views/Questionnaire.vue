@@ -56,7 +56,7 @@
                             <question-pic></question-pic>
                         </div>
                         <h2 class="title">创建疫情打卡问卷</h2>
-                        <h3 class="subtitle">创建包含预设题目的疫情打卡问卷</h3>
+                        <h3 class="subtitle">搜集学生身体情况，同时能定位其所处位置</h3>
                         <router-link to="/epidemic/new">
                             <el-button>开始</el-button>
                         </router-link>
@@ -137,7 +137,7 @@ export default {
     background-color: rgba(46, 219, 161, 0.75);
 }
 .create_by_epide {
-    background-color: rgba(212, 212, 212, 0.75);
+    background-color: rgba(46, 219, 219, 0.75);
 }
 </style>
 

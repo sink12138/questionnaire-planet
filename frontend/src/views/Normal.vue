@@ -465,7 +465,7 @@
         v-for="(item, index) in modelForm.questions"
         :key="index"
       >
-        <AnchorLink :href="'#question' + index" :title="'题目' + (index + 1)" />
+        <AnchorLink :href="'#question' + index" :title="(index+1)+'.'+item.questionName" />
       </Anchor>
     </div>
   </div>
