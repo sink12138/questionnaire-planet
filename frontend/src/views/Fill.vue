@@ -310,7 +310,7 @@
         </el-table>
       </div>
     </div>
-    <div class="question" v-if="submitted == true && type == 'exam'">
+    <div class="question" v-if="submitted == true">
       <el-form
         :model="results"
         :rules="rules"
@@ -593,6 +593,8 @@ export default {
                       url: "http://139.224.50.146:80/apis/results",
                       params: {
                         code: this.code,
+                        shuffleId: 0,
+                        answerId: 0,
                       },
                     }).then((response) => {
                       console.log(response);
@@ -783,6 +785,8 @@ export default {
                 url: "http://139.224.50.146:80/apis/results",
                 params: {
                   code: this.code,
+                  shuffleId: 0,
+                  answerId: 0,
                 },
               }).then((response) => {
                 console.log(response);
