@@ -95,7 +95,7 @@
                   <el-row>
                     <el-col :span="10">
                       <!-- 显示题号 -->
-                      <el-form-item label="是否显示题号">
+                      <el-form-item label="显示题号">
                         <el-switch v-model="modelForm.showIndex"> </el-switch>
                       </el-form-item>
                     </el-col>
@@ -137,7 +137,7 @@
                       v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
-                      placeholder="收集指定数量后停止回收"
+                      placeholder="收集指定数量后将无法提交"
                     />
                   </el-form-item>
                   <!-- 发布时间 -->
