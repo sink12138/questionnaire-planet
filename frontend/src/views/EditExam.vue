@@ -1159,6 +1159,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "exam",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
@@ -1308,6 +1309,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "exam",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
@@ -1459,6 +1461,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "exam",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
