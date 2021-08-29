@@ -2,14 +2,12 @@ package com.buaa.qp.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.buaa.qp.entity.Answer;
-import com.buaa.qp.entity.Logic;
-import com.buaa.qp.entity.Question;
-import com.buaa.qp.entity.Template;
+import com.buaa.qp.entity.*;
 import com.buaa.qp.exception.ExtraMessageException;
 import com.buaa.qp.exception.LoginVerificationException;
 import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
+import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.service.QuestionService;
 import com.buaa.qp.service.TemplateService;
@@ -423,80 +421,8 @@ public class CollectionController {
 
             // Calculate the score if this is an exam
             if (template.getType().equals("exam")) {
-                ArrayList<Map<String, Object>> results = new ArrayList<>();
-                double fullMarks = 0;
-                double totalMarks = 0;
-                for (int i = 0; i < questions.size(); i++) {
-                    Question current_q = questions.get(i);
-                    Map<String, Object> result = new HashMap<>();
-                    if (current_q.getAnswer() != null){
-                        result.put("stem", current_q.getStem());
-                        String type = current_q.getType();
-                        result.put("type", type);
-                        double getPoints = 0;
-                        if (current_q.getPoints() != null)
-                            fullMarks += Double.parseDouble(current_q.getPoints());
-                        if (type.equals("filling")) {
-                            result.put("yourAnswer", answers.get(i));
-                            ArrayList<String> correctAnswers = (ArrayList<String>) JSON.parseArray(current_q.getAnswer(), String.class);
-                            result.put("correctAnswer", correctAnswers);
-                            if (correctAnswers.contains((String) answers.get(i))) {
-                                getPoints = Double.parseDouble(current_q.getPoints());
-                            }
-                            result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
-                        } else if (type.equals("choice") || type.equals("multi-choice")){
-                            Map<String, Object> argsMap = JSON.parseObject(current_q.getArgs());
-                            ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
-                            result.put("choices", choices);
-                            if (type.equals("multi-choice")) {
-                                ArrayList<Integer> correctChoices = (ArrayList<Integer>) JSON.parseArray(current_q.getAnswer(), Integer.class);
-                                result.put("correctAnswer", correctChoices);
-                                ArrayList<Integer> yourChoice = parser.toIntegerList(answers.get(i));
-                                if (yourChoice.isEmpty())
-                                    result.put("yourAnswer", "");
-                                else
-                                    result.put("yourAnswer", yourChoice);
-                                if (current_q.getPoints() != null) {
-                                    if (yourChoice.size() <= correctChoices.size()) {
-                                        int correctNum = 0;
-                                        for (int index : correctChoices) {
-                                            if (yourChoice.contains(index)) {
-                                                correctNum++;
-                                            }
-                                        }
-                                        if (correctNum == yourChoice.size()) {
-                                            getPoints = Double.parseDouble(current_q.getPoints()) * ((double) correctNum / (double) correctChoices.size());
-                                        }
-                                    }
-                                    result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
-                                }
-                            } else {
-                                int correctChoice = Integer.parseInt(current_q.getAnswer());
-                                int yourChoice = (Integer) answers.get(i);
-                                if (yourChoice < 0) {
-                                    result.put("yourAnswer", "");
-                                } else {
-                                    result.put("yourAnswer", yourChoice);
-                                }
-                                result.put("correctAnswer", correctChoice);
-                                if (current_q.getPoints() != null && yourChoice == correctChoice) {
-                                    getPoints = Double.parseDouble(current_q.getPoints());
-                                }
-                                assert current_q.getPoints() != null;
-                                result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
-                            }
-                        }
-                        totalMarks += getPoints;
-                        String stem = (String) (result.get("stem"));
-                        result.put("stem", (i + 1) + "." + stem);
-                        results.add(result);
-                    }
-                }
-
-                // Add results to the returned map
-                map.put("results", results);
-                String points = String.format("%.2f/%.2f", totalMarks, fullMarks);
-                map.put("points", points);
+                Map<String, Object> calculateResult = examCalculate(answers, questions);
+                String points = (String) calculateResult.get("points");
                 // Set the points of the answer for database storage
                 answer.setPoints(points);
             }
@@ -556,56 +482,10 @@ public class CollectionController {
                 answerService.submitAnswer(answer);
             }
 
-            // Collect the conclusion and results after the submission
-            if (template.getConclusion() != null)
-                map.put("conclusion", template.getConclusion());
-
-            // vote results
-            if (template.getType().equals("vote")) {
-                ArrayList<Answer> allAnswers = answerService.getAnswersByTid(templateId);
-                ArrayList<Map<String, Object>> results = new ArrayList<>();
-                for (Question question : questions) {
-                    if (question.getType().equals("vote")) {
-                        Map<String, Object> result = new HashMap<>();
-                        ArrayList<String> answerContents = new ArrayList<>();
-                        ArrayList<Integer> answerCounts = new ArrayList<>();
-                        result.put("stem", question.getStem());
-                        Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
-                        ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
-                        for (String choice : choices) {
-                            answerContents.add(choice);
-                            answerCounts.add(0);
-                        }
-                        result.put("answers", answerContents);
-                        result.put("counts", answerCounts);
-                        results.add(result);
-                    }
-                }
-                for (Answer answerData: allAnswers) {
-                    int qIndex = 0;
-                    for (int i = 0; i < questions.size(); i++) {
-                        if (questions.get(i).getType().equals("vote")) {
-                            List<Object> answerContents = JSON.parseArray(answerData.getContent(), Object.class);
-                            String choiceStr = answerContents.get(i).toString();
-                            ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
-                            for (Integer j : chIndexes) {
-                                @SuppressWarnings("unchecked")
-                                ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(qIndex).get("counts");
-                                Integer number = choiceCounts.get(j);
-                                number += 1;
-                                choiceCounts.set(j, number);
-                            }
-                            qIndex ++;
-                        }
-                    }
-                }
-                map.put("results", results);
-            }
             map.put("success", true);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {
-            map.clear();
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
@@ -616,4 +496,185 @@ public class CollectionController {
         }
         return map;
     }
+
+    @Autowired
+    AccountService accountService;
+
+    @GetMapping("/results")
+    public Map<String, Object> results(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "shuffleId", required = false) Integer shuffleId) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // param check
+            if (code == null) {
+                throw new ParameterFormatException();
+            }
+            Template template = templateService.getTemplate(code);
+            if (template == null || template.getDeleted()) {
+                throw new ObjectNotFoundException();
+            }
+            Integer templateId = template.getTemplateId();
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+            if (template.getLimited() && accountId == null)
+                throw new LoginVerificationException();
+            Answer answer = answerService.getOldAnswer(templateId, accountId);
+            if (answer == null) {
+                throw new ExtraMessageException("您仍可继续填写问卷或尚未填写此问卷");
+            }
+            ArrayList<Object> answers = (ArrayList<Object>) JSON.parseArray(answer.getContent(), Object.class);
+            ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+            if (template.getType().equals("exam")) {
+                if (shuffleId == null)
+                    throw new ParameterFormatException();
+                if (!accountService.isShuffleIdMatched(shuffleId, accountId, templateId)) {
+                    throw new ExtraMessageException("序号不匹配");
+                }
+                answerService.shuffleAnswer(answers, shuffleId);
+                questionService.shuffleQuestions(questions, shuffleId, accountId);
+                Map<String, Object> calculateResults = examCalculate(answers, questions);
+                map.put("results", calculateResults.get("results"));
+                map.put("points", calculateResults.get("points"));
+            } else if (template.getType().equals("vote")) {
+                map.put("results", voteCalculate(templateId));
+            }
+
+            // Collect the conclusion and results after the submission
+            if (template.getConclusion() != null)
+                map.put("conclusion", template.getConclusion());
+            map.put("success", true);
+        } catch (ParameterFormatException | ObjectNotFoundException |
+                ExtraMessageException | LoginVerificationException exc) {
+            map.put("success", false);
+            map.put("message", exc.toString());
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            map.clear();
+            map.put("success", false);
+            map.put("message", "操作失败");
+        }
+        return map;
+    }
+
+    private ArrayList<Map<String, Object>> voteCalculate(Integer templateId) {
+        ArrayList<Answer> allAnswers = answerService.getAnswersByTid(templateId);
+        ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
+        ArrayList<Map<String, Object>> results = new ArrayList<>();
+        for (Question question : questions) {
+            if (question.getType().equals("vote")) {
+                Map<String, Object> result = new HashMap<>();
+                ArrayList<String> answerContents = new ArrayList<>();
+                ArrayList<Integer> answerCounts = new ArrayList<>();
+                result.put("stem", question.getStem());
+                Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                for (String choice : choices) {
+                    answerContents.add(choice);
+                    answerCounts.add(0);
+                }
+                result.put("answers", answerContents);
+                result.put("counts", answerCounts);
+                results.add(result);
+            }
+        }
+        for (Answer answerData: allAnswers) {
+            int qIndex = 0;
+            for (int i = 0; i < questions.size(); i++) {
+                if (questions.get(i).getType().equals("vote")) {
+                    List<Object> answerContents = JSON.parseArray(answerData.getContent(), Object.class);
+                    String choiceStr = answerContents.get(i).toString();
+                    ArrayList<Integer> chIndexes = (ArrayList<Integer>) JSON.parseArray(choiceStr, Integer.class);
+                    for (Integer j : chIndexes) {
+                        @SuppressWarnings("unchecked")
+                        ArrayList<Integer> choiceCounts = (ArrayList<Integer>) results.get(qIndex).get("counts");
+                        Integer number = choiceCounts.get(j);
+                        number += 1;
+                        choiceCounts.set(j, number);
+                    }
+                    qIndex ++;
+                }
+            }
+        }
+        return results;
+    }
+
+    private Map<String, Object> examCalculate(ArrayList<Object> answers, ArrayList<Question> questions) {
+        Map<String, Object> calculateResult = new HashMap<>();
+        ArrayList<Map<String, Object>> results = new ArrayList<>();
+        double fullMarks = 0;
+        double totalMarks = 0;
+        for (int i = 0; i < questions.size(); i++) {
+            Question current_q = questions.get(i);
+            Map<String, Object> result = new HashMap<>();
+            if (current_q.getAnswer() != null){
+                result.put("stem", current_q.getStem());
+                String type = current_q.getType();
+                result.put("type", type);
+                double getPoints = 0;
+                if (current_q.getPoints() != null)
+                    fullMarks += Double.parseDouble(current_q.getPoints());
+                if (type.equals("filling")) {
+                    result.put("yourAnswer", answers.get(i));
+                    ArrayList<String> correctAnswers = (ArrayList<String>) JSON.parseArray(current_q.getAnswer(), String.class);
+                    result.put("correctAnswer", correctAnswers);
+                    if (correctAnswers.contains((String) answers.get(i))) {
+                        getPoints = Double.parseDouble(current_q.getPoints());
+                    }
+                    result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
+                } else if (type.equals("choice") || type.equals("multi-choice")){
+                    Map<String, Object> argsMap = JSON.parseObject(current_q.getArgs());
+                    ArrayList<String> choices = (ArrayList<String>) JSON.parseArray(argsMap.get("choices").toString(), String.class);
+                    result.put("choices", choices);
+                    if (type.equals("multi-choice")) {
+                        ArrayList<Integer> correctChoices = (ArrayList<Integer>) JSON.parseArray(current_q.getAnswer(), Integer.class);
+                        result.put("correctAnswer", correctChoices);
+                        ClassParser parser = new ClassParser();
+                        ArrayList<Integer> yourChoice = parser.toIntegerList(answers.get(i));
+                        if (yourChoice.isEmpty())
+                            result.put("yourAnswer", "");
+                        else
+                            result.put("yourAnswer", yourChoice);
+                        if (current_q.getPoints() != null) {
+                            if (yourChoice.size() <= correctChoices.size()) {
+                                int correctNum = 0;
+                                for (int index : correctChoices) {
+                                    if (yourChoice.contains(index)) {
+                                        correctNum++;
+                                    }
+                                }
+                                if (correctNum == yourChoice.size()) {
+                                    getPoints = Double.parseDouble(current_q.getPoints()) * ((double) correctNum / (double) correctChoices.size());
+                                }
+                            }
+                            result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
+                        }
+                    } else {
+                        int correctChoice = Integer.parseInt(current_q.getAnswer());
+                        int yourChoice = (Integer) answers.get(i);
+                        if (yourChoice < 0) {
+                            result.put("yourAnswer", "");
+                        } else {
+                            result.put("yourAnswer", yourChoice);
+                        }
+                        result.put("correctAnswer", correctChoice);
+                        if (current_q.getPoints() != null && yourChoice == correctChoice) {
+                            getPoints = Double.parseDouble(current_q.getPoints());
+                        }
+                        assert current_q.getPoints() != null;
+                        result.put("points", String.format("%.2f/%.2f", getPoints, Double.parseDouble(current_q.getPoints())));
+                    }
+                }
+                totalMarks += getPoints;
+                String stem = (String) (result.get("stem"));
+                result.put("stem", (i + 1) + "." + stem);
+                results.add(result);
+            }
+        }
+
+        // Add results to the returned map
+        calculateResult.put("results", results);
+        String points = String.format("%.2f/%.2f", totalMarks, fullMarks);
+        calculateResult.put("points", points);
+        return calculateResult;
+    }
+
+    
 }
