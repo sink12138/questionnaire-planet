@@ -522,6 +522,7 @@ export default {
       myChart: null,
       canvas: null,
       points: "",
+      answerId: 0,
     };
   },
   created: function () {
@@ -585,6 +586,29 @@ export default {
                     while (this.answers.length < this.questions.length) {
                       this.answers.push(null);
                     }
+                  } else if (response.data.message == "已填过问卷") {
+                    this.submitted = true;
+                    this.$axios({
+                      method: "get",
+                      url: "http://139.224.50.146:80/apis/results",
+                      params: {
+                        code: this.code,
+                      },
+                    }).then((response) => {
+                      console.log(response);
+                      if (response.data.success == true) {
+                        if (response.data.conclusion == undefined) {
+                          this.conclusion = "感谢您的提交!";
+                        } else {
+                          this.conclusion = response.data.conclusion;
+                        }
+                        if (response.data.results != undefined) {
+                          this.results = response.data.results;
+                          console.log(this.results);
+                          this.points = response.data.points;
+                        }
+                      }
+                    });
                   } else {
                     console.log(response.data.message);
                     this.$notify({
@@ -937,17 +961,31 @@ export default {
                 (response) => {
                   console.log(response);
                   if (response.data.success == true) {
+                    this.answerId = response.data.answerId;
                     this.submitted = true;
-                    if (response.data.conclusion == undefined) {
-                      this.conclusion = "感谢您的提交!";
-                    } else {
-                      this.conclusion = response.data.conclusion;
-                    }
-                    if (response.data.results != undefined) {
-                      this.results = response.data.results;
-                      console.log(this.results);
-                      this.points = response.data.points;
-                    }
+                    this.$axios({
+                      method: "get",
+                      url: "http://139.224.50.146:80/apis/results",
+                      params: {
+                        code: this.code,
+                        answerId: this.answerId,
+                        shuffleId: this.shuffleId,
+                      },
+                    }).then((response) => {
+                      console.log(response);
+                      if (response.data.success == true) {
+                        if (response.data.conclusion == undefined) {
+                          this.conclusion = "感谢您的提交!";
+                        } else {
+                          this.conclusion = response.data.conclusion;
+                        }
+                        if (response.data.results != undefined) {
+                          this.results = response.data.results;
+                          console.log(this.results);
+                          this.points = response.data.points;
+                        }
+                      }
+                    });
                   } else {
                     this.$notify({
                       title: "提示",
