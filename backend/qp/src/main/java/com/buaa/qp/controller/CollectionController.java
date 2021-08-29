@@ -641,6 +641,7 @@ public class CollectionController {
             } else if (template.getType().equals("vote")) {
                 map.put("results", voteCalculate(templateId));
             }
+            map.put("type", template.getType());
 
             if (template.getConclusion() != null)
                 map.put("conclusion", template.getConclusion());
