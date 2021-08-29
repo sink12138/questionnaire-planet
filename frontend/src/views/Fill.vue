@@ -79,20 +79,22 @@
     <div class="fill-page">
       <div class="head" v-if="submitted == false">
         <div
-          v-if="(type === 'exam')&&(deadlline != '')&&(deadlline != undefined)"
+          v-if="type === 'exam' && deadlline != '' && deadlline != undefined"
           class="timer"
           style="font-size: 15px"
         >
-          <p style="color: red">{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+          <p style="color: red">
+            {{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒
+          </p>
           <p>截止时间：{{ deadlline }}</p>
         </div>
-        <div style="font-size: 28px;padding-top:20px;margin-bottom: 5px">
+        <div style="font-size: 28px; padding-top: 20px; margin-bottom: 5px">
           {{ title }}
         </div>
-        <div style="font-size: 15px;margin: 10px">
+        <div style="font-size: 15px; margin: 10px">
           {{ description }}
         </div>
-        <div style="font-size: 18px;margin: 5px" v-if="remain != '∞'">
+        <div style="font-size: 18px; margin: 5px" v-if="remain != '∞'">
           问卷剩余{{ remain }}份
         </div>
       </div>
@@ -104,11 +106,16 @@
           label-width="100px"
           class="ruleForm"
         >
-          <div v-for="(item, index_question) in questions" :key="index_question">
+          <div
+            v-for="(item, index_question) in questions"
+            :key="index_question"
+          >
             <div v-if="mark[index_question] == true">
               <el-divider content-position="left" style="margin-top: 15px">
                 <div v-show="showIndex">第{{ index_question + 1 }}题</div>
-                <div v-if="item.points != undefined">（{{ item.points }}分）</div>
+                <div v-if="item.points != undefined">
+                  （{{ item.points }}分）
+                </div>
               </el-divider>
               <div class="question-title">
                 <div class="stem">{{ item.stem }}</div>
@@ -184,7 +191,6 @@
                     :rules="{
                       required: item.required,
                     }"
-                    
                   >
                     <el-rate
                       style="margin-top: 12px"
@@ -225,7 +231,7 @@
                     }"
                   >
                     <el-checkbox-group
-                      class="multi" 
+                      class="multi"
                       v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
@@ -261,7 +267,7 @@
                         :label="index"
                         border
                         :disabled="item.remains[index] == 0 ? true : false"
-                        >{{ i }}       共{{ item.quotas[index] }},剩余{{
+                        >{{ i }} 共{{ item.quotas[index] }},剩余{{
                           item.remains[index]
                         }}
                       </el-checkbox>
@@ -306,9 +312,9 @@
       <div class="voted" v-if="submitted == true && isVote == true">
         <div class="result">
           <el-card>
-          <div class="chart">
+            <div class="chart">
               <canvas id="myChart"></canvas>
-          </div>
+            </div>
           </el-card>
           <el-table :data="results" max-height="300">
             <el-table-column fixed type="index" width="80"> </el-table-column>
@@ -383,9 +389,13 @@
                     :key="index"
                     @change="multiChangeValue(index_question)"
                   >
-                    <el-checkbox class="option" :label="index" border disabled>{{
-                      i
-                    }}</el-checkbox>
+                    <el-checkbox
+                      class="option"
+                      :label="index"
+                      border
+                      disabled
+                      >{{ i }}</el-checkbox
+                    >
                   </el-checkbox-group>
                 </el-form-item>
                 <el-form-item label="正确答案">
@@ -397,9 +407,13 @@
                     :key="index"
                     @change="multiChangeValue(index_question)"
                   >
-                    <el-checkbox class="option" :label="index" border disabled>{{
-                      i
-                    }}</el-checkbox>
+                    <el-checkbox
+                      class="option"
+                      :label="index"
+                      border
+                      disabled
+                      >{{ i }}</el-checkbox
+                    >
                   </el-checkbox-group>
                 </el-form-item>
                 <div v-if="item.points != null">
@@ -458,10 +472,10 @@
         </el-form>
       </div>
       <div class="submit" v-if="fillRight == true">
-        <el-button 
-        style="margin-bottom: 20px"
-        @click="submit()" 
-        v-if="submitted == false"
+        <el-button
+          style="margin-bottom: 20px"
+          @click="submit()"
+          v-if="submitted == false"
           >提交问卷</el-button
         >
       </div>
@@ -539,6 +553,7 @@ export default {
       answers: [],
       mark: [],
       logic: [],
+      choice: [],
       myChart: null,
       canvas: null,
       points: "",
@@ -582,6 +597,7 @@ export default {
                     this.logic = response.data.logic;
                     for (var j = 0; j < this.questions.length; j++) {
                       this.mark.push(true);
+                      this.choice.push(-1);
                     }
                     for (j = 0; j < this.logic.length; j++) {
                       this.mark[this.logic[j][2]] = false;
@@ -693,6 +709,7 @@ export default {
         }).then((response) => {
           console.log(response);
           if (response.data.success == true) {
+            this.$set(this, "remain", response.data.overall);
             this.remains = response.data.detailed;
             var i = 0;
             for (i in this.remains) {
@@ -979,6 +996,7 @@ export default {
               this.logic = response.data.logic;
               for (var j = 0; j < this.questions.length; j++) {
                 this.mark.push(true);
+                this.choice.push(-1);
               }
               for (j = 0; j < this.logic.length; j++) {
                 this.mark[this.logic[j][2]] = false;
@@ -1028,6 +1046,7 @@ export default {
             this.logic = response.data.logic;
             for (j = 0; j < this.questions.length; j++) {
               this.mark.push(true);
+              this.choice.push(-1);
             }
             for (var j = 0; j < this.logic.length; j++) {
               this.mark[this.logic[j][2]] = false;
@@ -1069,17 +1088,15 @@ export default {
     },
     changeValue(val, index_question) {
       console.log(this.answers);
-      for (var j = 0; j < this.logic.length; j++) {
-        if (this.logic[j][0] == index_question) {
-          this.mark[this.logic[j][2]] = false;
-        }
-      }
+      this.choice[index_question] = val;
 
       for (j = 0; j < this.logic.length; j++) {
-        if (this.logic[j][0] == index_question) {
-          if (this.logic[j][1] == val) {
-            this.mark[this.logic[j][2]] = true;
-          }
+        this.mark[this.logic[j][2]] = false;
+      }
+
+      for (var j = 0; j < this.logic.length; j++) {
+        if (this.mark[this.logic[j][0]] && this.logic[j][1] == this.choice[this.logic[j][0]]) {
+          this.mark[this.logic[j][2]] = true;
         }
       }
       this.$forceUpdate();
@@ -1199,9 +1216,10 @@ export default {
       this.myChart = new Chart(ctx1, {
         type: "bar",
         data: {
-            labels: [],
-            datasets: [{
-              label: '',
+          labels: [],
+          datasets: [
+            {
+              label: "",
               backgroundColor: "rgb(72, 202, 228)",
               data: [],
             },
