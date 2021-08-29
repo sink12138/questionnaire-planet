@@ -487,7 +487,7 @@
         v-for="(item, index) in modelForm.questions"
         :key="index"
       >
-        <AnchorLink :href="'#question' + index" :title="'题目' + (index + 1)" />
+        <AnchorLink :href="'#question' + index" :title="(index+1)+'.'+item.questionName" />
       </Anchor>
     </div>
   </div>
@@ -665,7 +665,7 @@ export default {
       this.popVisible = false;
       this.modelForm.questions.push({
         type: index.toString(),
-        required: true,
+        required: false,
         questionName: "",
         questionSummary: "",
         max: 2,

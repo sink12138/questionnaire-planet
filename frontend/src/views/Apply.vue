@@ -704,7 +704,7 @@ export default {
       // 新增题目
       this.modelForm.questions.push({
         type: index.toString(),
-        required: true,
+        required: false,
         questionName: "",
         questionSummary: "",
         max: 2,

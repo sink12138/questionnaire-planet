@@ -79,17 +79,19 @@
               <el-button
                 @click="release(scope.row)"
                 icon="el-icon-video-play"
+                style="background-color: #CCFFBF;color: #000"
                 v-if="scope.row.released == false"
                 >发布</el-button
               >
               <el-button
                 @click="close(scope.row)"
                 icon="el-icon-video-pause"
+                style="background-color: #FFBFBF;color: #000"
                 v-else
                 >关闭</el-button
               >
               <el-button @click="adjust(scope.row)" icon="el-icon-edit"
-                >微调</el-button
+                >设置</el-button
               >
               <el-button @click="statistics(scope.row)" icon="el-icon-pie-chart"
                 >数据分析</el-button
