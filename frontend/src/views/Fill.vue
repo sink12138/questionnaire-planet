@@ -300,9 +300,11 @@
     </div>
     <div class="voted" v-if="submitted == true && isVote == true">
       <div class="result">
+        <el-card>
         <div class="chart">
-          <canvas id="myChart"></canvas>
+            <canvas id="myChart"></canvas>
         </div>
+        </el-card>
         <el-table :data="results" max-height="300">
           <el-table-column fixed type="index" width="80"> </el-table-column>
           <el-table-column prop="stem" label="题目题干"> </el-table-column>
@@ -487,8 +489,8 @@ export default {
     };
     return {
       code: "",
-      submitted: false,
-      isVote: false,
+      submitted: true,
+      isVote: true,
       locked: false,
       login: false,
       fillRight: true,//
@@ -518,7 +520,18 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       formLabelWidth: "100px",
-      results: [],
+      results: [
+        {
+          stem: 'ddd',
+          answers: ['1','2'],
+          counts: [4,6]
+        },
+        {
+          stem: 'fff',
+          answers: ['2','4'],
+          counts: [4,5]
+        }
+      ],
       questions: [//
             {
                 "type": "choice",
@@ -1110,7 +1123,7 @@ export default {
         data: {
             labels: [],
             datasets: [{
-              label: "投票结果",
+              label: '',
               backgroundColor: "rgb(72, 202, 228)",
               data: []
             }]
