@@ -215,15 +215,15 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
+                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
+                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
+                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
+                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
+                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>
+                    <div v-if="item.type == 5" class="question-index">(报名题)</div>
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
-                    <div v-if="item.type == 0">单选题</div>
-                    <div v-if="item.type == 1">多选题</div>
-                    <div v-if="item.type == 2">填空题</div>
-                    <div v-if="item.type == 3">评分题</div>
-                    <div v-if="item.type == 4">下拉题</div>
-                    <div v-if="item.type == 5">报名题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题题目 -->
