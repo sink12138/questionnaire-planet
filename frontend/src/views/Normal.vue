@@ -77,7 +77,7 @@
         :style="{'background-color': setColor('logic')}" 
         icon="ios-link-outline" 
         @click="pageChange('logic')">
-          题目逻辑
+          逻辑关联
         </Button>
         <Button 
         :style="{'background-color': setColor('info')}" 
@@ -213,14 +213,14 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
+                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
+                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
+                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
+                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
+                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
-                    <div v-if="item.type == 0">单选题</div>
-                    <div v-if="item.type == 1">多选题</div>
-                    <div v-if="item.type == 2">填空题</div>
-                    <div v-if="item.type == 3">评分题</div>
-                    <div v-if="item.type == 4">下拉题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题 -->
@@ -464,6 +464,10 @@
             <el-button type="primary" @click="addlogic">添加逻辑</el-button>
           </el-form-item>
         </el-form>
+        <div>
+          <p>已添加的关联逻辑：</p>
+          <p v-for="(item, i) in modelForm.logic" :key="i">题目{{ this.modelForm.questions[item[0]]["questionName"] }}选择了{{ this.modelForm.questions[item[0]]["answer"][item[1]]["value"] }}时，将显示题目{{ this.modelForm.questions[item[2]]["questionName"] }}</p>
+        </div>
       </div>
       <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
