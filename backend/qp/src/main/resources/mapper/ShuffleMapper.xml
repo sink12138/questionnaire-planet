@@ -7,7 +7,9 @@
     </select>
     <select id="selectIdByAccountTemplateId" resultType="Integer">
         select shuffle_id from shuffle
-        where account_id = #{accountId} and template_id = #{templateId};
+        where account_id = #{accountId} and template_id = #{templateId}
+        order by shuffle_id desc
+        limit 1;
     </select>
     <insert id="insert" parameterType="Shuffle" useGeneratedKeys="true" keyProperty="shuffleId">
         insert into shuffle(account_id, template_id, numbers, choices)
