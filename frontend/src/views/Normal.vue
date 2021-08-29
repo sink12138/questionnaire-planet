@@ -567,7 +567,7 @@ export default {
             max: 2,
             min: 1,
             height: 1,
-            width: 800,
+            width: 600,
             grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
             answers: [{ value: "" }, { value: "" }],
           },
@@ -633,7 +633,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         grades: [],
         answers: [],
       };
@@ -676,7 +676,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
         answers: [{ value: "" }, { value: "" }],
       });
