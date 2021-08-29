@@ -83,6 +83,11 @@
                 <span>{{ scope.row['answerTime'] }}</span>
               </template>
             </el-table-column>
+            <el-table-column label="回答用户名" v-if="username == true">
+              <template slot-scope="scope">
+                <span>{{ scope.row['username'] }}</span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
@@ -214,7 +219,8 @@ export default {
       totalPoints: null,
       allPoints: [],
       countPoints: [],
-      avgPoints: null
+      avgPoints: null,
+      username: false,
     }
   },
   created: function () {
@@ -230,6 +236,9 @@ export default {
       if (response.data.success == true) {
         this.questionList = response.data.stems;
         this.answerData = response.data.answers;
+        if (this.answerData[0]['username']) {
+          this.username = true;
+        }
       } else {
         console.log(response.data.message);
       }
