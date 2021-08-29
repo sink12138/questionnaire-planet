@@ -4,6 +4,12 @@
     <div class="editor">
       <Button class="new" icon="md-arrow-round-back">所有问卷</Button>
       <el-button 
+      :style="{'background-color': setColor('exam')}" 
+      icon="el-icon-document-checked" 
+      @click="changeShow('exam')">
+        得分情况
+      </el-button>
+      <el-button 
       :style="{'background-color': setColor('data')}" 
       icon="el-icon-tickets" 
       @click="changeShow('data')">
@@ -61,6 +67,8 @@
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
           <div class="overview">
+          </div>
+          <div class="optin-overview">
             <el-descriptions direction="vertical" :column="2" border>
               <el-descriptions-item label="题目题干" label-class-name="my-label">
                 {{this.stem}}
@@ -195,22 +203,22 @@ export default {
       ],
       sumData: [
         {
-          stem: 'q1',
-          type: 'choice',
-          answers: ['a1','a2','A3'],
-          counts: [2,4,6]
+          stem: '学号',
+          type: 'filling',
+          answers: ['19230000','19230001','19230002','19230003','19230004','19230005','19230006','19230007','19230008','19230009','19230010','19230011','19230012','19230013'],
+          counts: [1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         },
         {
           stem: 'q2',
           type: 'filling',
-          answers: ['a1','a2','A3'],
+          answers: ['qqqqqqqqqqq','xxxxxxxxxxxxxxx','pppppppppppp'],
           counts: [6,9,9]
         },
         {
           stem: 'q2',
           type: 'grade',
-          answers: ['2','4','5'],
-          counts: [6,9,9],
+          answers: ['1','4','5','6','8','9','11','22'],
+          counts: [6,9,9,10,1,5,6,4],
           avg: '3.5'
         }
       ],
@@ -535,7 +543,7 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-.overview {
+.option-overview {
   display: flex;
   flex-direction: column;
 }
