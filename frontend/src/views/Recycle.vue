@@ -4,7 +4,7 @@
       <div class="search">
         <el-input
         v-model.trim="search"
-        style="width: 320px"
+        style="width: 480px"
         clearable
         placeholder="请输入要搜索的问卷">
           <el-dropdown trigger="click" slot="prepend" placement="bottom">
@@ -32,37 +32,34 @@
           <el-button slot="append" icon="el-icon-search" @click="searchQuest"></el-button>
         </el-input>
       </div>
-      <ButtonGroup size="large">
-        <Button icon="md-menu"></Button>
-        <Button icon="ios-apps"></Button>
-      </ButtonGroup>
+      <div style="font-size: 16px;color: #3E9DFF">删除的问卷30天后自动清理</div>
     </div>
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
         <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
-          <el-table-column fixed prop="title" label="标题" width="220">
+          <el-table-column fixed prop="title" label="标题" width="240">
           </el-table-column>
           <el-table-column
             prop="answerCount"
             label="收集数量"
-            width="120"
+            width="140"
           >
           </el-table-column>
           <el-table-column
             prop="creationTime"
             label="创建时间"
-            width="170"
+            width="180"
           >
           </el-table-column>
           <el-table-column
             prop="releaseTime"
             label="最后发布"
-            width="170"
+            width="180"
           >
           </el-table-column>
-          <el-table-column prop="duration" label="收集时长" width="120">
+          <el-table-column prop="duration" label="收集时长" width="140">
           </el-table-column>
-          <el-table-column label="操作" width="300">
+          <el-table-column label="操作" width="320">
             <template slot-scope="scope">
               <el-button
                 @click="deleteQuest(scope.row)"

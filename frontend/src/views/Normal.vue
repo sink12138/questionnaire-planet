@@ -812,7 +812,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );
@@ -934,7 +934,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );
@@ -1074,7 +1074,7 @@ export default {
                     this.$notify({
                       title: "错误",
                       message: err,
-                      type: "erroe",
+                      type: "error",
                     });
                   }
                 );
@@ -1091,7 +1091,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );
