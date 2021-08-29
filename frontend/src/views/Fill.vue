@@ -522,6 +522,7 @@ export default {
       myChart: null,
       canvas: null,
       points: "",
+      answerId: 0,
     };
   },
   created: function () {
@@ -960,12 +961,15 @@ export default {
                 (response) => {
                   console.log(response);
                   if (response.data.success == true) {
+                    this.answerId = response.data.answerId;
                     this.submitted = true;
                     this.$axios({
                       method: "get",
                       url: "http://139.224.50.146:80/apis/results",
                       params: {
                         code: this.code,
+                        answerId: this.answerId,
+                        shuffleId: this.shuffleId,
                       },
                     }).then((response) => {
                       console.log(response);
