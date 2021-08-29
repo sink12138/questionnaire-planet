@@ -677,7 +677,7 @@ export default {
   height: 100%;
   flex-direction: column;
   align-items: center;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 18px;
   font-weight: bolder;
 }
@@ -690,7 +690,7 @@ export default {
 }
 .web-title {
   margin-left: 15px;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-weight: 800;
   font-size: 26px;
   position: relative;
@@ -706,7 +706,7 @@ a:hover {
   color: rgba(46, 140, 219, 0.94);
 }
 .editor .el-button {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   height: 50px;
   width: 120px;
   color: #000000;
