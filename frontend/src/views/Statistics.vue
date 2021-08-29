@@ -138,7 +138,7 @@
         <div class="cross-over" v-show="this.show === 'xy'">
           <div class="select">
             <div class="info">定义行(需要分析的题目)</div>
-            <el-select v-model="x" placeholder="x">
+            <el-select v-model="x" placeholder="选择行">
               <el-option
               v-for="(item, index) in questionList"
               :key="index"
@@ -147,7 +147,7 @@
               </el-option>
             </el-select>
             <div class="info">定义列(作为样本的属性)</div>
-            <el-select v-model="y" placeholder="y">
+            <el-select v-model="y" placeholder="选择列">
               <el-option
               v-for="(item, index) in questionList"
               :key="index"
@@ -196,13 +196,13 @@ export default {
       avg: null,
       show: "data",
       chartShow: "pie",
-      questionList: [],//问题列表
-      answerList: [],//某问题回答列表
-      countList: [],//下标与回答列表对应的回答人数
+      questionList: [],
+      answerList: [],
+      countList: [],
       answerData: [],
       sumData: [],
-      x: 0,
-      y: 0,
+      x: null,
+      y: null,
       choicesy:[],
       xyData: [],
       canvas: null,
