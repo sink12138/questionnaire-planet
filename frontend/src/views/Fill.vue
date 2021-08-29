@@ -311,7 +311,7 @@
       </div>
       <div class="voted" v-if="submitted == true && isVote == true">
         <div class="result">
-          <el-card style="text-align: center;height: 300px;width: 300px"> 
+          <el-card style="text-align: center;height: 280px;width: 560px"> 
             <canvas id="myChart"></canvas>
           </el-card>
           <el-table :data="results" max-height="300">
@@ -557,6 +557,7 @@ export default {
       points: "",
       answerId: 0,
       remains: [],
+      loaded: false,
     };
   },
   created: function () {
@@ -1214,6 +1215,7 @@ export default {
         });
     },
     loadChart: function () {
+      this.loaded = true;
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
         type: "bar",
@@ -1231,6 +1233,9 @@ export default {
     },
     updateChart: function (item) {
       console.log("update", item);
+      if (this.loaded == false) {
+        this.loadChart();
+      }
       this.myChart.data.labels = item['answers'];
       this.myChart.data.datasets[0].data = item['counts'];
       this.myChart.data.datasets[0].label = item['stem'];

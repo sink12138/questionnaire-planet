@@ -49,7 +49,6 @@
           class="ruleForm"
         >
           <div v-for="(item, index_question) in questions" :key="index_question">
-            <div v-if="mark[index_question] == true">
               <el-divider content-position="left" style="margin-top: 15px">
                 <div v-show="showIndex">第{{ index_question + 1 }}题</div>
                 <div v-if="item.points != undefined">（{{ item.points }}分）</div>
@@ -236,7 +235,6 @@
                   </el-input>
                 </el-form-item>
               </div>
-            </div>
           </div>
         </el-form>
       </div>
