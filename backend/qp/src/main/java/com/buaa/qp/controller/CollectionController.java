@@ -185,7 +185,7 @@ public class CollectionController {
                 if (dsc != null)
                     questionMap.put("description", dsc);
                 if (template.getType().equals("exam")) {
-                    if (isOwner) {
+                    if (isOwner && question.getAnswer() != null) {
                         switch (question.getType()) {
                             case "filling":
                                 questionMap.put("answer", JSON.parseArray(question.getAnswer(), String.class));
