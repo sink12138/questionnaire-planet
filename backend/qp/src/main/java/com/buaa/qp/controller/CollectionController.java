@@ -501,10 +501,11 @@ public class CollectionController {
     AccountService accountService;
 
     @GetMapping("/results")
-    public Map<String, Object> results(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "shuffleId", required = false) Integer shuffleId) {
+    public Map<String, Object> results(@RequestParam(value = "code", required = false) String code,
+                                       @RequestParam(value = "shuffleId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
         try {
-            // param check
+            // Parameter checks
             if (code == null) {
                 throw new ParameterFormatException();
             }
@@ -512,18 +513,28 @@ public class CollectionController {
             if (template == null || template.getDeleted()) {
                 throw new ObjectNotFoundException();
             }
+
             Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (template.getLimited() && accountId == null)
                 throw new LoginVerificationException();
+
             Answer answer = answerService.getOldAnswer(templateId, accountId);
             if (answer == null) {
-                throw new ExtraMessageException("您仍可继续填写问卷或尚未填写此问卷");
+                throw new ExtraMessageException("尚未填写此问卷");
             }
+
             ArrayList<Object> answers = (ArrayList<Object>) JSON.parseArray(answer.getContent(), Object.class);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             if (template.getType().equals("exam")) {
-                if (shuffleId == null)
+                int shuffleId;
+                try {
+                    shuffleId = Integer.parseInt(idStr);
+                }
+                catch (NumberFormatException nfe) {
+                    throw new ParameterFormatException();
+                }
+                if (shuffleId <= 0)
                     throw new ParameterFormatException();
                 if (!accountService.isShuffleIdMatched(shuffleId, accountId, templateId)) {
                     throw new ExtraMessageException("序号不匹配");
@@ -537,7 +548,6 @@ public class CollectionController {
                 map.put("results", voteCalculate(templateId));
             }
 
-            // Collect the conclusion and results after the submission
             if (template.getConclusion() != null)
                 map.put("conclusion", template.getConclusion());
             map.put("success", true);
