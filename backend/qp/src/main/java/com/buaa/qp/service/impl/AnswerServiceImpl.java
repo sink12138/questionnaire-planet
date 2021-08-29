@@ -6,6 +6,8 @@ import com.buaa.qp.dao.AnswerDao;
 import com.buaa.qp.dao.ShuffleDao;
 import com.buaa.qp.entity.Answer;
 import com.buaa.qp.entity.Shuffle;
+import com.buaa.qp.exception.ExtraMessageException;
+import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.AnswerService;
 import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,9 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void submitAnswer(Answer answer) {
+    public Integer submitAnswer(Answer answer) {
         answerDao.insert(answer);
+        return answer.getAnswerId();
     }
 
     @Override
@@ -62,6 +65,11 @@ public class AnswerServiceImpl implements AnswerService {
         answer.setTemplateId(templateId);
         answer.setSubmitter(submitter);
         return answerDao.selectByTidAndSubmitter(answer);
+    }
+
+    @Override
+    public Answer getOldAnswer(Integer answerId) {
+        return answerDao.selectById(answerId);
     }
 
     @Override
@@ -113,7 +121,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public void shuffleAnswer(ArrayList<Object> answers, Integer shuffleId) {
+    public void shuffleAnswer(ArrayList<Object> answers, Integer shuffleId) throws ParameterFormatException {
         Shuffle shuffle = shuffleDao.selectById(shuffleId);
         ClassParser parser = new ClassParser();
         Map<String, ArrayList<Integer>> choicesMap = new HashMap<>();
@@ -128,6 +136,8 @@ public class AnswerServiceImpl implements AnswerService {
                 ArrayList<Integer> choicesList = choicesMap.get(key);
                 if (ansObj instanceof Integer) {
                     int choice = (int) ansObj;
+                    if (choice >= choicesList.size())
+                        throw new ParameterFormatException();
                     if (choice >= 0) {
                         answers.set(i, choicesList.indexOf(choice));
                     }
@@ -136,6 +146,8 @@ public class AnswerServiceImpl implements AnswerService {
                     ArrayList<Integer> choices = parser.toIntegerList(ansObj);
                     for (int j = 0; j < choices.size(); ++j) {
                         int choice = choices.get(j);
+                        if (choice >= choicesList.size())
+                            throw new ParameterFormatException();
                         choices.set(j, choicesList.indexOf(choice));
                     }
                     answers.set(i, choices);
@@ -143,6 +155,8 @@ public class AnswerServiceImpl implements AnswerService {
             }
         }
         ArrayList<Integer> numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
+        if (numbersList.size() != answers.size())
+            throw new ParameterFormatException();
         ArrayList<Object> shuffledAns = new ArrayList<>();
         for (int index : numbersList) {
             shuffledAns.add(answers.get(index));
@@ -151,4 +165,9 @@ public class AnswerServiceImpl implements AnswerService {
         answers.addAll(shuffledAns);
     }
 
+    @Override
+    public void shuffleAnswer(ArrayList<Object> answers, Integer accountId, Integer templateId) throws ParameterFormatException {
+        Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
+        shuffleAnswer(answers, shuffleId);
+    }
 }
