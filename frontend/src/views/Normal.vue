@@ -437,6 +437,28 @@
         </div>
       </el-form>
       <div class="logic" v-if="pageShow == 'logic'">
+        <el-form :inline="true" class="demo-form-inline">
+          <el-form-item label="如果：">
+            <el-select v-model="fromquestion" placeholder="题目">
+              <el-option v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion" :label="'第' + (index_fromquestion + 1) + '题'" :value="index_fromquestion"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="选择了：">
+            <el-select v-model="option" placeholder="选项">
+              <el-option v-for="(option, index_option) in modelForm.questions[fromquestion]['answers']" :key="index_option" :label="option['value']" :value="index_option"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="，将显示题目：">
+            <el-select v-model="toquestion" placeholder="题目">
+              <div v-for="(toquestion, index_toquestion) in modelForm.questions" :key="index_toquestion">
+                <el-option v-if="fromquestion < index_toquestion" :label="'第' + (index_toquestion + 1) + '题'" :value="index_toquestion"></el-option>
+              </div>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="addlogic">添加逻辑</el-button>
+          </el-form-item>
+        </el-form>
       </div>
       <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
@@ -517,6 +539,9 @@ export default {
       rules: {},
       templateId: 0,
       code: "",
+      fromquestion: 0,
+      option: 0,
+      toquestion: 0,
       modelForm: {
         title: "新的问卷",
         description: "",
@@ -527,6 +552,7 @@ export default {
         quota: undefined,
         startTime: "",
         endTime: "",
+        logic: [],
         questions: [
           {
             type: "0",
@@ -654,6 +680,10 @@ export default {
         "/normal/new#question" + (this.modelForm.questions.length - 1)
       );
     },
+    addlogic() {
+      this.modelForm.logic.push([this.fromquestion, this.option, this.toquestion])
+      console.log(this.modelForm.logic)
+    },
     resetForm(formName) {
       // 重置
       this.$refs[formName].resetFields();
@@ -747,6 +777,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "normal",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(

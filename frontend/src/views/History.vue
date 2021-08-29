@@ -51,7 +51,7 @@
           }"
           filter-placement="bottom"
         >
-          <el-table-column fixed prop="title" label="标题" width="150">
+          <el-table-column fixed prop="title" label="标题" width="200">
           </el-table-column>
           <el-table-column
             label="状态"
@@ -72,7 +72,7 @@
           </el-table-column>
           <el-table-column prop="releaseTime" label="最后发布" width="150">
           </el-table-column>
-          <el-table-column prop="duration" label="收集时长" width="150">
+          <el-table-column prop="duration" label="收集时长" width="100">
           </el-table-column>
           <el-table-column label="操作" width="480">
             <template slot-scope="scope">
