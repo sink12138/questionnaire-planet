@@ -12,7 +12,9 @@ import com.buaa.qp.exception.ObjectNotFoundException;
 import com.buaa.qp.exception.ParameterFormatException;
 import com.buaa.qp.service.AccountService;
 import com.buaa.qp.service.AnswerService;
+import com.buaa.qp.service.QuestionService;
 import com.buaa.qp.service.TemplateService;
+import com.buaa.qp.util.ClassParser;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.Number;
@@ -26,9 +28,11 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import static com.buaa.qp.service.AnswerService.quotaLock;
 
 @RestController
 public class DataController {
@@ -43,6 +47,9 @@ public class DataController {
 
     @Autowired
     private HttpServletResponse response;
+
+    @Autowired
+    private QuestionService questionService;
 
     @GetMapping("/data")
     public Map<String, Object> data(@RequestParam(value = "templateId", required = false) String idStr) {
@@ -437,7 +444,43 @@ public class DataController {
                 } else if (!template.getOwner().equals(accountId)) {
                     throw new LoginVerificationException();
                 }
+                if (template.getType().equals("sign-up")) {
+                    synchronized (quotaLock) {
+                        ClassParser parser = new ClassParser();
+                        ArrayList<Question> questions = templateService.getQuestionsByTid(answer.getTemplateId());
+                        ArrayList<Question> signUpQuestions = new ArrayList<>();
+                        ArrayList<Map<String, Object>> argsMaps = new ArrayList<>();
+                        ArrayList<ArrayList<Integer>> remainsList = new ArrayList<>();
+                        ArrayList<ArrayList<Integer>> signUpAnswers = new ArrayList<>();
+                        ArrayList<Object> answers = (ArrayList<Object>) JSON.parseArray(answer.getContent(), Object.class);
+                        // Parsing JSON and args
+                        for (int i = 0; i < questions.size(); ++i) {
+                            Question question = questions.get(i);
+                            if (question.getType().equals("sign-up")) {
+                                signUpQuestions.add(question);
+                                Map<String, Object> argsMap = JSON.parseObject(question.getArgs());
+                                argsMaps.add(argsMap);
+                                remainsList.add(parser.toIntegerList(argsMap.get("remains")));
+                                signUpAnswers.add(parser.toIntegerList(answers.get(i)));
+                            }
+                        }
+                        for (int i = 0; i < signUpQuestions.size(); i++) {
+                            Question question = signUpQuestions.get(i);
+                            Map<String, Object> argsMap = argsMaps.get(i);
+                            ArrayList<Integer> remains = remainsList.get(i);
+                            ArrayList<Integer> choices = signUpAnswers.get(i);
+                            for (Integer ch : choices) {
+                                remains.set(ch, remains.get(ch) + 1);
+                            }
+                            argsMap.put("remains", remains);
+                            question.setArgs(JSON.toJSONString(argsMap));
+                            questionService.updateRemains(question);
+                        }
+                    }
+                }
                 answerService.deleteById(answerId);
+
+
             } else {
                 throw new ParameterFormatException();
             }
