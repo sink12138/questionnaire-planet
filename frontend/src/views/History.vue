@@ -91,7 +91,7 @@
                 >关闭</el-button
               >
               <el-button @click="adjust(scope.row)" icon="el-icon-edit"
-                >微调</el-button
+                >设置</el-button
               >
               <el-button @click="statistics(scope.row)" icon="el-icon-pie-chart"
                 >数据分析</el-button
