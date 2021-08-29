@@ -122,7 +122,7 @@
           <el-row>
             <el-col :span="10">
               <!-- 显示题号 -->
-              <el-form-item label="是否显示题号" v-if="pageShow == 'info'">
+              <el-form-item label="显示题号" v-if="pageShow == 'info'">
                 <el-switch v-model="modelForm.showIndex"> </el-switch>
               </el-form-item>
             </el-col>
@@ -165,7 +165,7 @@
               v-model="modelForm.quota"
               style="width: 258px"
               clearable
-              placeholder="收集指定数量后停止回收"
+              placeholder="收集指定数量后将无法提交"
             />
           </el-form-item>
           <!-- 发布时间 -->
@@ -239,7 +239,7 @@
                     <!-- 是否必填 -->
                     <el-form-item
                       :prop="`questions.${index}.required`"
-                      :label="`是否必填`"
+                      :label="`必填`"
                       :rules="{
                         required: true,
                         message: '请选择是否必填',
@@ -262,16 +262,16 @@
                     />
                   </el-form-item>
                   <el-row>
-                    <!-- 最小选项 -->
+                    <!-- 最少选项数 -->
                     <el-col :span="10">
                       <el-form-item
                         v-if="item.type == 1"
                         :prop="`questions.${index}.min`"
-                        label="最小选项"
+                        label="最少选项数"
                         :rules="[
                           {
                             required: true,
-                            message: '请填写最小选项个数',
+                            message: '请填写最少选项数',
                             trigger: 'blur',
                           },
                           { validator: isNum, trigger: 'blur' },
@@ -281,20 +281,20 @@
                           v-model.trim="item.min"
                           style="width: 125px"
                           clearable
-                          placeholder="请填写最小选项个数"
+                          placeholder="请填写最少选项数"
                         />
                       </el-form-item>
                     </el-col>
-                    <!-- 最大选项 -->
+                    <!-- 最多选项数 -->
                     <el-col :span="10">
                       <el-form-item
                         v-if="item.type == 1"
                         :prop="`questions.${index}.max`"
-                        label="最大选项"
+                        label="最多选项数"
                         :rules="[
                           {
                             required: true,
-                            message: '请填写最大选项个数',
+                            message: '请填写最多选项数',
                             trigger: 'blur',
                           },
                           { validator: isNum, trigger: 'blur' },
@@ -304,7 +304,7 @@
                           v-model="item.max"
                           style="width: 125px"
                           clearable
-                          placeholder="请填写最大选项个数"
+                          placeholder="请填写最多选项数"
                         />
                       </el-form-item>
                     </el-col>
@@ -783,7 +783,7 @@ export default {
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
                   var mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
                     message: mes,
@@ -903,7 +903,7 @@ export default {
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
                   var mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
                     message: mes,
@@ -1024,7 +1024,7 @@ export default {
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
                   var mes =
-                    "第" + (parseInt(i) + 1) + "题最小选项数大于最大选项数！";
+                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
                     message: mes,

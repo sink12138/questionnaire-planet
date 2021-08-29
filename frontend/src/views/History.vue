@@ -37,10 +37,6 @@
           ></el-button>
         </el-input>
       </div>
-      <ButtonGroup size="large">
-        <Button icon="md-menu"></Button>
-        <Button icon="ios-apps"></Button>
-      </ButtonGroup>
     </div>
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">

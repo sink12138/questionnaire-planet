@@ -182,7 +182,6 @@
                   :rules="{
                     required: item.required,
                   }"
-                  
                 >
                   <el-rate
                     style="margin-top: 12px"
@@ -223,7 +222,7 @@
                   }"
                 >
                   <el-checkbox-group
-                    class="multi" 
+                    class="multi"
                     v-model="answers[index_question]"
                     v-for="(i, index) in item.choices"
                     :min="0"
@@ -491,7 +490,7 @@ export default {
       isVote: false,
       locked: false,
       login: false,
-      fillRight: true,//
+      fillRight: true, //
       title: "未找到问卷",
       type: "normal",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
@@ -519,57 +518,44 @@ export default {
       dialogFormVisible2: false,
       formLabelWidth: "100px",
       results: [],
-      questions: [//
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "min": 1,
-                "max": 2,
-                "type": "multi-choice",
-                "choices": [
-                    "21","22"
-                ],
-                "required": true,
-                "stem": "q2"
-            },
-            {
-                "width": "800px",
-                "type": "filling",
-                "required": true,
-                "stem": "q3",
-                "height": 1
-            },
-            {
-                "grades": [
-                    "非常不满意",
-                    "不满意",
-                    "一般",
-                    "满意",
-                    "非常满意"
-                ],
-                "type": "grade",
-                "required": true,
-                "stem": "q4"
-            },
-            {
-                "type": "dropdown",
-                "choices": [
-                    "51",
-                    "52"
-                ],
-                "required": false,
-                "stem": "q5"
-            }
+      questions: [
+        //
+        {
+          type: "choice",
+          choices: ["11", "12"],
+          required: true,
+          stem: "q1",
+        },
+        {
+          min: 1,
+          max: 2,
+          type: "multi-choice",
+          choices: ["21", "22"],
+          required: true,
+          stem: "q2",
+        },
+        {
+          width: "800px",
+          type: "filling",
+          required: true,
+          stem: "q3",
+          height: 1,
+        },
+        {
+          grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+          type: "grade",
+          required: true,
+          stem: "q4",
+        },
+        {
+          type: "dropdown",
+          choices: ["51", "52"],
+          required: false,
+          stem: "q5",
+        },
       ],
       answers: [],
-      mark: [true,true,true,true,true,],//
+      mark: [true, true, true, true, true], //
       logic: [],
       myChart: null,
       canvas: null,
@@ -788,7 +774,99 @@ export default {
           });
         });
     },
-    forceSubmit: function () {},
+    forceSubmit: function () {
+      this.$refs["ruleForm"].validate((valid) => {
+        if (valid) {
+          while (this.answers.length < this.questions.length) {
+            this.answers.push(null);
+          }
+          var i = 0;
+          for (i in this.questions) {
+            if (
+              (this.questions[i].type == "grade" && this.answers[i] == 0) ||
+              (this.questions[i].type == "multi-choice" &&
+                this.answers[i] == [])
+            ) {
+              this.answers[i] = null;
+            }
+          }
+          for (i in this.questions) {
+            if (this.questions[i].type == "grade" && this.answers[i] > 0) {
+              this.answers[i] = this.answers[i] - 1;
+            }
+          }
+          let submitData;
+          if (this.type === "exam") {
+            submitData = JSON.stringify({
+              code: this.code,
+              password: this.password,
+              answers: this.answers,
+              shuffleId: this.shuffleId,
+            });
+          } else {
+            submitData = JSON.stringify({
+              code: this.code,
+              password: this.password,
+              answers: this.answers,
+            });
+          }
+
+          console.log(submitData);
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/answer",
+            data: submitData,
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.answerId = response.data.answerId;
+                this.submitted = true;
+                this.$axios({
+                  method: "get",
+                  url: "http://139.224.50.146:80/apis/results",
+                  params: {
+                    code: this.code,
+                    answerId: this.answerId,
+                    shuffleId: this.shuffleId,
+                  },
+                }).then((response) => {
+                  console.log(response);
+                  if (response.data.success == true) {
+                    if (response.data.conclusion == undefined) {
+                      this.conclusion = "感谢您的提交!";
+                    } else {
+                      this.conclusion = response.data.conclusion;
+                    }
+                    if (response.data.results != undefined) {
+                      this.results = response.data.results;
+                      console.log(this.results);
+                      this.points = response.data.points;
+                    }
+                  }
+                });
+              } else {
+                this.$notify({
+                  title: "提示",
+                  message: response.data.message,
+                  type: "info",
+                });
+              }
+            },
+            (err) => {
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error",
+              });
+            }
+          );
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
     settime: function () {
       if (this.type === "exam") {
         /*获取服务器时间*/
@@ -819,7 +897,7 @@ export default {
                 60 * this.minute;
 
               if (this.lefttime == 0) {
-                this.submit();
+                this.forceSubmit();
                 clearInterval(this.timer);
               }
             }, 1000);
@@ -1137,15 +1215,17 @@ export default {
     loadChart: function () {
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
-        type: 'bar',
+        type: "bar",
         data: {
-            labels: [],
-            datasets: [{
+          labels: [],
+          datasets: [
+            {
               label: "投票结果",
               backgroundColor: "rgb(72, 202, 228)",
-              data: []
-            }]
-        }
+              data: [],
+            },
+          ],
+        },
       });
     },
     updateChart: function (item) {
