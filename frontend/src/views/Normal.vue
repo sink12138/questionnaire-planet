@@ -195,6 +195,7 @@
           </el-form-item>
         </div>
         <div v-if="pageShow == 'edit'">
+          <div style="font-size: 16px">拖动题目可修改顺序</div>
           <el-collapse v-model="activeNames">
             <vuedraggable
               v-model="modelForm.questions"
@@ -442,6 +443,7 @@
         </div>
       </el-form>
       <div class="logic" v-if="pageShow == 'logic'">
+        <div style="font-size: 16px;margin-bottom: 10px">只支持单选题添加逻辑</div>
         <el-form :inline="true" class="demo-form-inline">
           <el-form-item>
             <el-select v-model="fromquestion" placeholder="题目">
@@ -474,9 +476,9 @@
             v-for="(item, index) in modelForm.logic" 
             :key="index">
               {{index+1}}.
-              题目:{{ modelForm.questions[item[0]]['questionName'] }}
-              选择了{{ modelForm.questions[item[0]]['answers'][item[1]].value }},
-              将显示题目:{{ modelForm.questions[item[2]]['questionName'] }}
+              题目:"{{ modelForm.questions[item[0]]['questionName'] }}"
+              选择了"{{ modelForm.questions[item[0]]['answers'][item[1]].value }}",
+              将显示题目:"{{ modelForm.questions[item[2]]['questionName'] }}"
             </div>
           </el-card>
         </div>
