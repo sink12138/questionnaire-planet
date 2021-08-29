@@ -45,13 +45,23 @@ public class DataController {
     private HttpServletResponse response;
 
     @GetMapping("/data")
-    public Map<String, Object> data(@RequestParam("templateId") Integer templateId) {
+    public Map<String, Object> data(@RequestParam(value = "templateId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // check login
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (accountId == null)
                 throw new LoginVerificationException();
+
+            int templateId;
+            if (idStr == null)
+                throw new ParameterFormatException();
+            try {
+                templateId = Integer.parseInt(idStr);
+            }
+            catch (NumberFormatException nfe) {
+                throw new ParameterFormatException();
+            }
 
             Template template = templateService.getTemplate(templateId);
             if (template == null || template.getDeleted()) {
@@ -193,13 +203,24 @@ public class DataController {
     }
 
     @GetMapping("/sum")
-    public Map<String, Object> sum(@RequestParam("templateId") Integer templateId) {
+    public Map<String, Object> sum(@RequestParam(value = "templateId", required = false) String idStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // check login
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (accountId == null)
                 throw new LoginVerificationException();
+
+            int templateId;
+            if (idStr == null)
+                throw new ParameterFormatException();
+            try {
+                templateId = Integer.parseInt(idStr);
+            }
+            catch (NumberFormatException nfe) {
+                throw new ParameterFormatException();
+            }
+
             Template template = templateService.getTemplate(templateId);
             if (template == null || template.getDeleted()) {
                 throw new ObjectNotFoundException();
@@ -432,12 +453,29 @@ public class DataController {
     }
 
     @GetMapping("/cross")
-    public Map<String, Object> analysis(@RequestParam("templateId") Integer templateId, @RequestParam("indexX") Integer indexX, @RequestParam("indexY") Integer indexY) {
+    public Map<String, Object> cross(@RequestParam(value = "templateId", required = false) String idStr,
+                                     @RequestParam(value = "indexX", required = false) String xStr,
+                                     @RequestParam(value = "indexY", required = false) String yStr) {
         Map<String, Object> map = new HashMap<>();
-        try {// check login
+        try {
+            // check login
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             if (accountId == null)
                 throw new LoginVerificationException();
+
+            int templateId;
+            int indexX, indexY;
+            if (idStr == null || xStr == null || yStr == null)
+                throw new ParameterFormatException();
+            try {
+                templateId = Integer.parseInt(idStr);
+                indexX = Integer.parseInt(xStr);
+                indexY = Integer.parseInt(yStr);
+            }
+            catch (NumberFormatException nfe) {
+                throw new ParameterFormatException();
+            }
+
             Template template = templateService.getTemplate(templateId);
             if (template == null || template.getDeleted()) {
                 throw new ObjectNotFoundException();
@@ -448,8 +486,9 @@ public class DataController {
             if (indexX > questions.size() || indexY > questions.size() || indexX < 0 || indexY < 0) {
                 throw new ParameterFormatException();
             }
-            if (indexX.equals(indexY))
+            if (indexX == indexY)
                 throw new ExtraMessageException("不可交叉分析相同题目");
+
             ArrayList<Map<String, Object>> results = new ArrayList<>();
             ArrayList<ArrayList<Integer>> numberResults = new ArrayList<>();
             Question questionX = questions.get(indexX);
