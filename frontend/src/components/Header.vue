@@ -204,6 +204,7 @@ export default {
         message: "退出登录成功",
         type: "success",
       });
+      this.$router.push("/");
     },
     register: function(){
       this.$refs.registerData.validate((valid) => {
