@@ -31,62 +31,64 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Integer shuffleQuestions(ArrayList<Question> questions, Integer shuffleId, Integer accountId) throws ParameterFormatException {
-        Shuffle shuffle;
+    public Integer shuffleQuestions(ArrayList<Question> questions, Integer accountId, Integer templateId) throws ParameterFormatException {
         ArrayList<Integer> numbersList;
         Map<String, ArrayList<Integer>> choicesMap;
         ArrayList<Map<String, Object>> argMaps = new ArrayList<>();
         ClassParser parser = new ClassParser();
-        Integer templateId = questions.get(0).getTemplateId();
-        if (shuffleId == null)
-            shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
-        if (shuffleId == null) {
-            numbersList = new ArrayList<>();
-            choicesMap = new HashMap<>();
-            for (Question question : questions) {
-                numbersList.add(null);
-                argMaps.add(JSON.parseObject(question.getArgs()));
-            }
-            ArrayList<Integer> shuffleNums = new ArrayList<>();
-            for (int i = 0; i < questions.size(); ++i) {
-                Question question = questions.get(i);
-                if (!question.getShuffle()) {
-                    numbersList.set(i, i);
-                }
-                else {
-                    shuffleNums.add(i);
-                    Map<String, Object> args = argMaps.get(i);
-                    if (args.containsKey("choices")) {
-                        ArrayList<Integer> shuffleChs = new ArrayList<>();
-                        for (int j = 0; j < parser.toStringList(args.get("choices")).size(); ++j) {
-                            shuffleChs.add(j);
-                        }
-                        Collections.shuffle(shuffleChs);
-                        choicesMap.put(String.valueOf(i), shuffleChs);
-                    }
-                }
-            }
-            Collections.shuffle(shuffleNums);
-            int index = 0;
-            for (int i = 0; i < numbersList.size(); ++i) {
-                if (numbersList.get(i) == null)
-                    numbersList.set(i, shuffleNums.get(index++));
-            }
-            shuffle = new Shuffle(accountId, templateId, JSON.toJSONString(numbersList), JSON.toJSONString(choicesMap));
-            shuffleDao.insert(shuffle);
-            shuffleId = shuffle.getShuffleId();
+        numbersList = new ArrayList<>();
+        choicesMap = new HashMap<>();
+        for (Question question : questions) {
+            numbersList.add(null);
+            argMaps.add(JSON.parseObject(question.getArgs()));
         }
-        else {
-            shuffle = shuffleDao.selectById(shuffleId);
-            numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
-            choicesMap = new HashMap<>();
-            JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
-            for (String key : choicesJSON.keySet()) {
-                choicesMap.put(key, parser.toIntegerList(choicesJSON.get(key)));
+        ArrayList<Integer> shuffleNums = new ArrayList<>();
+        for (int i = 0; i < questions.size(); ++i) {
+            Question question = questions.get(i);
+            if (!question.getShuffle()) {
+                numbersList.set(i, i);
             }
-            for (Question question : questions) {
-                argMaps.add(JSON.parseObject(question.getArgs()));
+            else {
+                shuffleNums.add(i);
+                Map<String, Object> args = argMaps.get(i);
+                if (args.containsKey("choices")) {
+                    ArrayList<Integer> shuffleChs = new ArrayList<>();
+                    for (int j = 0; j < parser.toStringList(args.get("choices")).size(); ++j) {
+                        shuffleChs.add(j);
+                    }
+                    Collections.shuffle(shuffleChs);
+                    choicesMap.put(String.valueOf(i), shuffleChs);
+                }
             }
+        }
+        Collections.shuffle(shuffleNums);
+        int index = 0;
+        for (int i = 0; i < numbersList.size(); ++i) {
+            if (numbersList.get(i) == null)
+                numbersList.set(i, shuffleNums.get(index++));
+        }
+        Shuffle shuffle = new Shuffle(accountId, templateId, JSON.toJSONString(numbersList), JSON.toJSONString(choicesMap));
+        shuffleDao.insert(shuffle);
+        Integer shuffleId = shuffle.getShuffleId();
+        makeShuffledQuestions(questions, shuffleId);
+        return shuffleId;
+    }
+
+    @Override
+    public void makeShuffledQuestions(ArrayList<Question> questions, Integer shuffleId) throws ParameterFormatException {
+        Shuffle shuffle = shuffleDao.selectById(shuffleId);
+        ArrayList<Integer> numbersList;
+        Map<String, ArrayList<Integer>> choicesMap;
+        ArrayList<Map<String, Object>> argMaps = new ArrayList<>();
+        ClassParser parser = new ClassParser();
+        numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
+        choicesMap = new HashMap<>();
+        JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
+        for (String key : choicesJSON.keySet()) {
+            choicesMap.put(key, parser.toIntegerList(choicesJSON.get(key)));
+        }
+        for (Question question : questions) {
+            argMaps.add(JSON.parseObject(question.getArgs()));
         }
         if (numbersList.size() != questions.size())
             throw new ParameterFormatException();
@@ -124,7 +126,12 @@ public class QuestionServiceImpl implements QuestionService {
         }
         questions.clear();
         questions.addAll(shuffledQues);
-        return shuffleId;
+    }
+
+    @Override
+    public void makeShuffledQuestions(ArrayList<Question> questions, Integer accountId, Integer templateId) throws ParameterFormatException {
+        Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
+        makeShuffledQuestions(questions, shuffleId);
     }
 
 }

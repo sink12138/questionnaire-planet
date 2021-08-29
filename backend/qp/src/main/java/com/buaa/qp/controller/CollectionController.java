@@ -172,7 +172,7 @@ public class CollectionController {
             if (template.getType().equals("exam")) {
                 int shuffleId;
                 if (!isOwner) {
-                    shuffleId = questionService.shuffleQuestions(questions, null, accountId);
+                    shuffleId = questionService.shuffleQuestions(questions, accountId, templateId);
                     map.put("shuffleId", shuffleId);
                 }
             }
@@ -304,7 +304,7 @@ public class CollectionController {
             if (answers.size() < questions.size())
                 throw new ParameterFormatException();
             if (template.getType().equals("exam")) {
-                questionService.shuffleQuestions(questions, shuffleId, null);
+                questionService.makeShuffledQuestions(questions, shuffleId);
             }
             boolean[] checkList = new boolean[questions.size()];
             Arrays.fill(checkList, true);
@@ -428,9 +428,10 @@ public class CollectionController {
             }
 
             // Submit the answer
+            Integer answerId;
             Integer quota = template.getQuota();
             if (quota == null && !template.getType().equals("sign-up"))
-                answerService.submitAnswer(answer);
+                answerId = answerService.submitAnswer(answer);
             else synchronized (quotaLock) {
                 int answerCount = answerService.countAnswers(templateId);
                 if (quota != null && answerCount >= quota)
@@ -479,10 +480,10 @@ public class CollectionController {
                 }
 
                 // Insert the answer into the database
-                answerService.submitAnswer(answer);
+                answerId = answerService.submitAnswer(answer);
             }
-
             map.put("success", true);
+            map.put("answerId", answerId);
         }
         catch (ParameterFormatException | ObjectNotFoundException |
                 ExtraMessageException | LoginVerificationException exc) {
@@ -502,7 +503,8 @@ public class CollectionController {
 
     @GetMapping("/results")
     public Map<String, Object> results(@RequestParam(value = "code", required = false) String code,
-                                       @RequestParam(value = "shuffleId", required = false) String idStr) {
+                                       @RequestParam(value = "shuffleId", required = false) String shuffleStr,
+                                       @RequestParam(value = "answerId", required = false) String answerStr) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Parameter checks
@@ -519,7 +521,22 @@ public class CollectionController {
             if (template.getLimited() && accountId == null)
                 throw new LoginVerificationException();
 
-            Answer answer = answerService.getOldAnswer(templateId, accountId);
+            Answer answer;
+            if (template.getLimited()) {
+                answer = answerService.getOldAnswer(templateId, accountId);
+            }
+            else {
+                if (answerStr == null)
+                    throw new ParameterFormatException();
+                int answerId;
+                try {
+                    answerId = Integer.parseInt(answerStr);
+                }
+                catch (NumberFormatException nfe) {
+                    throw new ParameterFormatException();
+                }
+                answer = answerService.getOldAnswer(answerId);
+            }
             if (answer == null) {
                 throw new ExtraMessageException("尚未填写此问卷");
             }
@@ -527,20 +544,23 @@ public class CollectionController {
             ArrayList<Object> answers = (ArrayList<Object>) JSON.parseArray(answer.getContent(), Object.class);
             ArrayList<Question> questions = templateService.getQuestionsByTid(templateId);
             if (template.getType().equals("exam")) {
+                if (shuffleStr == null)
+                    throw new ParameterFormatException();
                 int shuffleId;
                 try {
-                    shuffleId = Integer.parseInt(idStr);
+                    shuffleId = Integer.parseInt(shuffleStr);
                 }
                 catch (NumberFormatException nfe) {
                     throw new ParameterFormatException();
                 }
-                if (shuffleId <= 0)
-                    throw new ParameterFormatException();
-                if (!accountService.isShuffleIdMatched(shuffleId, accountId, templateId)) {
-                    throw new ExtraMessageException("序号不匹配");
+                if (template.getLimited()) {
+                    answerService.shuffleAnswer(answers, accountId, templateId);
+                    questionService.makeShuffledQuestions(questions, accountId, templateId);
                 }
-                answerService.shuffleAnswer(answers, shuffleId);
-                questionService.shuffleQuestions(questions, shuffleId, accountId);
+                else {
+                    answerService.shuffleAnswer(answers, shuffleId);
+                    questionService.makeShuffledQuestions(questions, shuffleId);
+                }
                 Map<String, Object> calculateResults = examCalculate(answers, questions);
                 map.put("results", calculateResults.get("results"));
                 map.put("points", calculateResults.get("points"));
@@ -686,5 +706,4 @@ public class CollectionController {
         return calculateResult;
     }
 
-    
 }
