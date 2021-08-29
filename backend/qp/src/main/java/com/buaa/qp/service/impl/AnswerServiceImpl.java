@@ -11,10 +11,7 @@ import com.buaa.qp.util.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -117,7 +114,41 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void shuffleAnswer(ArrayList<Object> answers, Integer shuffleId) {
-        return;
+        Shuffle shuffle = shuffleDao.selectById(shuffleId);
+        ClassParser parser = new ClassParser();
+        Map<String, ArrayList<Integer>> choicesMap = new HashMap<>();
+        JSONObject choicesJSON = JSON.parseObject(shuffle.getChoices());
+        for (String key : choicesJSON.keySet()) {
+            choicesMap.put(key, parser.toIntegerList(choicesJSON.get(key)));
+        }
+        for (int i = 0; i < answers.size(); ++i) {
+            String key = Integer.toString(i);
+            if (choicesMap.containsKey(key)) {
+                Object ansObj = answers.get(i);
+                ArrayList<Integer> choicesList = choicesMap.get(key);
+                if (ansObj instanceof Integer) {
+                    int choice = (int) ansObj;
+                    if (choice >= 0) {
+                        answers.set(i, choicesList.indexOf(choice));
+                    }
+                }
+                else if (ansObj instanceof List) {
+                    ArrayList<Integer> choices = parser.toIntegerList(ansObj);
+                    for (int j = 0; j < choices.size(); ++j) {
+                        int choice = choices.get(j);
+                        choices.set(j, choicesList.indexOf(choice));
+                    }
+                    answers.set(i, choices);
+                }
+            }
+        }
+        ArrayList<Integer> numbersList = new ArrayList<>(JSON.parseArray(shuffle.getNumbers(), Integer.class));
+        ArrayList<Object> shuffledAns = new ArrayList<>();
+        for (int index : numbersList) {
+            shuffledAns.add(answers.get(index));
+        }
+        answers.clear();
+        answers.addAll(shuffledAns);
     }
 
 }
