@@ -752,4 +752,7 @@ a:hover {
   justify-content: center;
   align-items: center;
 }
+.option {
+  margin-right: 10px;
+}
 </style>

@@ -1575,4 +1575,7 @@ export default {
 .flip-move {
   transition: transform 1s;
 }
+.option {
+  margin-right: 10px;
+}
 </style>
