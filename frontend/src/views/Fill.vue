@@ -311,10 +311,8 @@
       </div>
       <div class="voted" v-if="submitted == true && isVote == true">
         <div class="result">
-          <el-card>
-            <div class="chart">
-              <canvas id="myChart"></canvas>
-            </div>
+          <el-card style="text-align: center;height: 300px;width: 300px"> 
+            <canvas id="myChart"></canvas>
           </el-card>
           <el-table :data="results" max-height="300">
             <el-table-column fixed type="index" width="80"> </el-table-column>
@@ -1229,9 +1227,10 @@ export default {
     },
     updateChart: function (item) {
       console.log("update", item);
-      this.myChart.data.labels = item["answers"];
-      this.myChart.data.datasets[0].data = item["counts"];
-      this.myChart.data.datasets[0].label = item["stem"];
+      this.myChart.data.labels = item['answers'];
+      this.myChart.data.datasets[0].data = item['counts'];
+      this.myChart.data.datasets[0].label = item['stem'];
+      console.log(this.myChart.data)
       this.myChart.update();
     },
   },
@@ -1306,10 +1305,6 @@ export default {
 }
 .conclusion {
   font-size: 20px;
-}
-.chart {
-  height: 280px;
-  width: 560px;
 }
 .submit .el-button {
   color: #fff;

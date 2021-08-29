@@ -51,7 +51,7 @@
               {{this.avgPoints}}
             </el-descriptions-item>
           </el-descriptions>
-          <el-card style="text-align: center;height: 600px;width: 600px">
+          <el-card style="text-align: center;height: 400px;width: 600px">
             <canvas id="myExamChart"></canvas>
           </el-card>
         </div>
@@ -293,6 +293,18 @@ export default {
         this.updateChart()
       },
       deep: true
+    },
+    allPoints: {
+      handler: function() {
+        this.updateChart()
+      },
+      deep: true
+    },
+    countPoints: {
+      handler: function() {
+        this.updateChart()
+      },
+      deep: true
     }
   },
   mounted() {
@@ -451,6 +463,7 @@ export default {
       this.myLineChart.data.datasets[0].data = this.countList
       this.myLineChart.update()
       if (this.templateType == 'exam') {
+        console.log('exam')
         this.myExamChart.data.labels = this.allPoints
         this.myExamChart.data.datasets[0].data = this.countPoints
         this.myExamChart.update()
