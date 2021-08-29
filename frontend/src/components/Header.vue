@@ -13,7 +13,7 @@
     </router-link>
     <router-link to="/history">
       <div class="router">
-        个人问卷
+        我的问卷
       </div>
     </router-link>
     <div class="butt">

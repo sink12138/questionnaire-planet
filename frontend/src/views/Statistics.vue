@@ -83,6 +83,22 @@
                 <span>{{ scope.row['answerTime'] }}</span>
               </template>
             </el-table-column>
+            <el-table-column label="回答用户名" v-if="username == true">
+              <template slot-scope="scope">
+                <span>{{ scope.row['username'] }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              align="right"
+              width="150">
+              <template slot="header">
+                <el-button @click="handleDelete('ALL')">删除所有回答</el-button>
+              </template>
+              <template slot-scope="scope">
+                <el-button
+                  @click="handleDelete(scope.row['answerId'])">删除该回答</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="data-sum" v-show="this.show === 'sum'">
@@ -214,7 +230,8 @@ export default {
       totalPoints: null,
       allPoints: [],
       countPoints: [],
-      avgPoints: null
+      avgPoints: null,
+      username: false,
     }
   },
   created: function () {
@@ -230,6 +247,9 @@ export default {
       if (response.data.success == true) {
         this.questionList = response.data.stems;
         this.answerData = response.data.answers;
+        if (this.answerData[0]['username']) {
+          this.username = true;
+        }
       } else {
         console.log(response.data.message);
       }
@@ -435,6 +455,83 @@ export default {
         this.myExamChart.data.datasets[0].data = this.countPoints
         this.myExamChart.update()
       }
+    },
+    handleDelete(item) {
+      this.$confirm('此操作将永久删除回答, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        if (item == 'ALL') {
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/clear",
+            data: JSON.stringify({
+              templateId: parseInt(this.templateId),
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.$notify({
+                  title: "提示",
+                  message: "删除成功",
+                  type: "success",
+                });
+              } else {
+                this.$notify({
+                  title: "提示",
+                  message: response.data.message,
+                  type: "info",
+                });
+              }
+          },
+          (err) => {
+            this.$notify({
+              title: "错误",
+              message: err,
+              type: "error",
+            });
+          });
+        } else {
+          this.$axios({
+            method: "post",
+            url: "http://139.224.50.146:80/apis/clear",
+            data: JSON.stringify({
+              answerId: parseInt(item),
+            }),
+          }).then(
+            (response) => {
+              console.log(response);
+              if (response.data.success == true) {
+                this.$notify({
+                  title: "提示",
+                  message: "删除成功",
+                  type: "success",
+                });
+              } else {
+                this.$notify({
+                  title: "提示",
+                  message: response.data.message,
+                  type: "info",
+                });
+              }
+          },
+          (err) => {
+            this.$notify({
+              title: "错误",
+              message: err,
+              type: "error",
+            });
+          });
+        }
+      }).catch(() => {
+        this.$notify({
+          title: '提示',
+          type: 'info',
+          message: '已取消删除'
+        });          
+      });
     },
     handleDownload:function() {
       this.$axios({
