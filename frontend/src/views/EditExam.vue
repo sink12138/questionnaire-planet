@@ -217,6 +217,11 @@
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
+                    <div v-if="item.type == 0">单选题</div>
+                    <div v-if="item.type == 1">多选题</div>
+                    <div v-if="item.type == 2">填空题</div>
+                    <div v-if="item.type == 3">评分题</div>
+                    <div v-if="item.type == 4">下拉题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题题目 -->
@@ -713,7 +718,7 @@ export default {
             max: 2,
             min: 1,
             height: 1,
-            width: 800,
+            width: 600,
             shuffle: false,
             score: false,
             points: 5.0,
@@ -733,7 +738,7 @@ export default {
               max: 2,
               min: 1,
               height: 1,
-              width: 800,
+              width: 600,
               shuffle: false,
               score: false,
               points: 5.0,
@@ -863,7 +868,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         shuffle: false,
         score: false,
         points: 5.0,
@@ -925,7 +930,7 @@ export default {
         max: 2,
         min: 1,
         height: 1,
-        width: 800,
+        width: 600,
         shuffle: false,
         score: false,
         points: 5.0,
