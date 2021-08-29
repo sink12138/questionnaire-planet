@@ -445,7 +445,9 @@
         <el-form :inline="true" class="demo-form-inline">
           <el-form-item label="如果：">
             <el-select v-model="fromquestion" placeholder="题目">
-              <el-option v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion" :label="'第' + (index_fromquestion + 1) + '题'" :value="index_fromquestion"></el-option>
+              <div v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion">
+                <el-option v-if="fromquestion['type'] == '0'" :label="'第' + (index_fromquestion + 1) + '题'" :value="index_fromquestion"></el-option>
+              </div>
             </el-select>
           </el-form-item>
           <el-form-item label="选择了：">
@@ -464,9 +466,10 @@
             <el-button type="primary" @click="addlogic">添加逻辑</el-button>
           </el-form-item>
         </el-form>
-        <div>
+        <div v-if="visiable">
           <p>已添加的关联逻辑：</p>
-          <p v-for="(item, i) in modelForm.logic" :key="i">题目{{ this.modelForm.questions[item[0]]["questionName"] }}选择了{{ this.modelForm.questions[item[0]]["answer"][item[1]]["value"] }}时，将显示题目{{ this.modelForm.questions[item[2]]["questionName"] }}</p>
+          <p>{{ modelForm.logic }}</p>
+          <!---<p v-for="(item, i) in modelForm.logic" :key="i">题目{{ modelForm.questions[item[0]]["questionName"] }}选择了{{ modelForm.questions[item[0]]["answer"][item[1]]["value"] }}时，将显示题目{{ modelForm.questions[item[2]]["questionName"] }}</p>--->
         </div>
       </div>
       <div class="foot" v-if="pageShow == 'edit'">
@@ -551,6 +554,7 @@ export default {
       fromquestion: 0,
       option: 0,
       toquestion: 0,
+      visiable: 0,
       modelForm: {
         title: "新的问卷",
         description: "",
@@ -691,6 +695,7 @@ export default {
     },
     addlogic() {
       this.modelForm.logic.push([this.fromquestion, this.option, this.toquestion])
+      this.visiable = true
       console.log(this.modelForm.logic)
       alert("逻辑添加成功！")
     },
