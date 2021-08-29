@@ -492,7 +492,7 @@
         v-for="(item, index) in modelForm.questions"
         :key="index"
       >
-        <AnchorLink :href="'#question' + index" :title="'题目' + (index + 1)" />
+        <AnchorLink :href="'#question' + index" :title="(index+1)+'.'+item.questionName" />
       </Anchor>
     </div>
   </div>
@@ -688,6 +688,7 @@ export default {
     addlogic() {
       this.modelForm.logic.push([this.fromquestion, this.option, this.toquestion])
       console.log(this.modelForm.logic)
+      alert("逻辑添加成功！")
     },
     resetForm(formName) {
       // 重置
@@ -1025,6 +1026,7 @@ export default {
                   ? 0
                   : parseInt(this.modelForm.quota),
               type: "normal",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
@@ -1186,7 +1188,6 @@ export default {
   text-align: left;
 }
 .editor .el-button {
-  border-radius: 0;
   width: 66%;
   font-size: 17px;
   color: #000000;
@@ -1198,6 +1199,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.editor .el-button:hover {
+  background-color: rgba(168, 216, 255, 0.9);
 }
 .question_name {
   display: flex;

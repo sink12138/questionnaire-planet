@@ -79,12 +79,14 @@
               <el-button
                 @click="release(scope.row)"
                 icon="el-icon-video-play"
+                style="background-color: #CCFFBF;color: #000"
                 v-if="scope.row.released == false"
                 >发布</el-button
               >
               <el-button
                 @click="close(scope.row)"
                 icon="el-icon-video-pause"
+                style="background-color: #FFBFBF;color: #000"
                 v-else
                 >关闭</el-button
               >
