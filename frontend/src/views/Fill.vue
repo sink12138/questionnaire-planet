@@ -522,6 +522,7 @@ export default {
       canvas: null,
       points: "",
       answerId: 0,
+      remains: [],
     };
   },
   created: function () {
@@ -584,6 +585,9 @@ export default {
                     }
                     while (this.answers.length < this.questions.length) {
                       this.answers.push(null);
+                    }
+                    if (this.type == "sign-up") {
+                      this.getRemains();
                     }
                   } else if (response.data.message == "已填过问卷") {
                     this.submitted = true;
@@ -655,6 +659,33 @@ export default {
     });
   },
   methods: {
+    getRemains() {
+      setTimeout(() => {
+        this.$axios({
+          method: "get",
+          url: "http://139.224.50.146/apis/remains",
+          params: {
+            code: this.code,
+            password: this.password,
+            visitor: true,
+          },
+        }).then((response) => {
+          console.log(response);
+          if (response.data.success == true) {
+            this.remains = response.data.detailed;
+            var i = 0;
+            for (i in this.remains) {
+              this.$set(
+                this.questions[this.remains[i].index],
+                "remains",
+                this.remains[i].remains
+              );
+            }
+          }
+        });
+        this.getRemains();
+      }, 5000);
+    },
     getLocation(index) {
       this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
         confirmButtonText: "同意",
