@@ -546,6 +546,7 @@ export default {
       answers: [],
       mark: [],
       logic: [],
+      choice: [],
       myChart: null,
       canvas: null,
       points: "",
@@ -589,6 +590,7 @@ export default {
                     this.logic = response.data.logic;
                     for (var j = 0; j < this.questions.length; j++) {
                       this.mark.push(true);
+                      this.choice.push(-1);
                     }
                     for (j = 0; j < this.logic.length; j++) {
                       this.mark[this.logic[j][2]] = false;
@@ -987,6 +989,7 @@ export default {
               this.logic = response.data.logic;
               for (var j = 0; j < this.questions.length; j++) {
                 this.mark.push(true);
+                this.choice.push(-1);
               }
               for (j = 0; j < this.logic.length; j++) {
                 this.mark[this.logic[j][2]] = false;
@@ -1036,6 +1039,7 @@ export default {
             this.logic = response.data.logic;
             for (j = 0; j < this.questions.length; j++) {
               this.mark.push(true);
+              this.choice.push(-1);
             }
             for (var j = 0; j < this.logic.length; j++) {
               this.mark[this.logic[j][2]] = false;
@@ -1077,17 +1081,14 @@ export default {
     },
     changeValue(val, index_question) {
       console.log(this.answers);
-      for (var j = 0; j < this.logic.length; j++) {
-        if (this.logic[j][0] == index_question) {
-          this.mark[this.logic[j][2]] = false;
-        }
-      }
+      this.choice[index_question] = val;
 
-      for (j = 0; j < this.logic.length; j++) {
-        if (this.logic[j][0] == index_question) {
-          if (this.logic[j][1] == val) {
-            this.mark[this.logic[j][2]] = true;
-          }
+      for (var j = 0; j < this.logic.length; j++) {
+        if (this.mark[this.logic[j][0]] && this.logic[j][1] == this.choice[this.logic[j][0]]) {
+          this.mark[this.logic[j][2]] = true;
+        }
+        else {
+          this.mark[this.logic[j][2]] = false;
         }
       }
       this.$forceUpdate();
