@@ -67,7 +67,7 @@
             create event ${"start"+templateId}
             on schedule at addtime(#{startTime}, '08:00:20') do
             update template
-            set start_time = null, release_time = if(released, release_time, now()), released = true
+            set start_time = null, release_time = if(released, release_time, now()), released = not deleted
             where template_id = #{templateId};
         </if>
         <if test="endTime != null">
@@ -99,12 +99,10 @@
     </update>
     <update id="updateDeleted" parameterType="Template">
         update template
-        set deleted = #{deleted}, start_time = null, end_time = null
+        set deleted = #{deleted}
         where template_id = #{templateId};
         <choose>
             <when test="deleted">
-                drop event if exists ${"start"+templateId};
-                drop event if exists ${"end"+templateId};
                 create event ${"delete"+templateId}
                 on schedule at adddate(now(), 30) do
                 begin
@@ -124,9 +122,6 @@
                 drop event if exists ${"delete"+templateId};
             </otherwise>
         </choose>
-        <if test="deleted">
-
-        </if>
     </update>
     <update id="updateCode" parameterType="Template">
         update template set code = #{code} where template_id = #{templateId}
