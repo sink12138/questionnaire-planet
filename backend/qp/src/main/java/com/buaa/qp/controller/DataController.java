@@ -380,6 +380,8 @@ public class DataController {
                 map.put("counts", counts);
                 map.put("avgPoints", String.format("%.2f", sumDouble / answers.size()));
             }
+            map.put("title", template.getTitle());
+            map.put("type", template.getType());
             map.put("success", true);
         } catch (LoginVerificationException | ObjectNotFoundException exc) {
             map.put("success", false);
