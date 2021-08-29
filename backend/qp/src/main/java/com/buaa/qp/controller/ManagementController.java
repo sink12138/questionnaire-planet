@@ -106,21 +106,22 @@ public class ManagementController {
             }
 
             // Repetition checks
-            if (template.getReleased())
-                throw new RepetitiveOperationException();
+            if (template.getReleased()) {
+                map.put("code", template.getCode());
+                map.put("success", true);
+                return map;
+            }
 
             // Other checks
             if (template.getDeleted())
                 throw new ExtraMessageException("无法操作已删除的问卷");
-            if (template.getQuota() != null && template.getQuota() < answerService.countAnswers(templateId))
-                throw new ExtraMessageException("该问卷收集量已到最大限额");
 
             templateService.releaseTemplate(templateId, true);
             map.put("code", template.getCode());
             map.put("success", true);
         }
-        catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException |
-                RepetitiveOperationException | ExtraMessageException exc) {
+        catch (LoginVerificationException | ParameterFormatException |
+                ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         }
@@ -161,8 +162,10 @@ public class ManagementController {
             }
 
             // Other checks
-            if (!template.getReleased())
-                throw new ExtraMessageException("问卷已处于关闭状态");
+            if (!template.getReleased()) {
+                map.put("success", true);
+                return map;
+            }
             if (template.getDeleted())
                 throw new ExtraMessageException("无法操作已删除的问卷");
 
@@ -251,18 +254,20 @@ public class ManagementController {
             Template template = templateService.getTemplate(templateId);
             if (template == null) {
                 throw new ObjectNotFoundException();
-            } else if (!Objects.equals(template.getOwner(), accountId)) {
+            }
+            if (!Objects.equals(template.getOwner(), accountId)) {
                 throw new ParameterFormatException();
-            } else if (template.getDeleted()) {
-                throw new RepetitiveOperationException();
+            }
+            if (template.getDeleted()) {
+                map.put("success", true);
+                return map;
             }
 
             if (template.getReleased())
                 templateService.releaseTemplate(templateId, false);
             templateService.removeTemplate(templateId, true);
             map.put("success", true);
-
-        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException | RepetitiveOperationException exc) {
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
@@ -278,7 +283,7 @@ public class ManagementController {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks
-            Integer accountId = accountService.getAccountBySession(request.getSession()).getAccountId();
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             Integer templateId;
 
             // Parameter checks
@@ -290,20 +295,22 @@ public class ManagementController {
             if (templateId == null || templateId < 0) {
                 throw new ParameterFormatException();
             }
+
             Template template = templateService.getTemplate(templateId);
             if (template == null) {
                 throw new ObjectNotFoundException();
-            } else if (!Objects.equals(template.getOwner(), accountId)) {
-                throw new ParameterFormatException();
-            } else if (!template.getDeleted()) {
+            }
+            if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new LoginVerificationException();
+            }
+            if (!template.getDeleted()) {
                 throw new ExtraMessageException("无法删除不在回收站的问卷");
             }
 
             templateService.deleteTemplate(templateId);
             map.put("success", true);
 
-        } catch (LoginVerificationException | ParameterFormatException |
-                ObjectNotFoundException | ExtraMessageException exc) {
+        } catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
@@ -319,7 +326,7 @@ public class ManagementController {
         Map<String, Object> map = new HashMap<>();
         try {
             // Login checks
-            Integer accountId = accountService.getAccountBySession(request.getSession()).getAccountId();
+            Integer accountId = (Integer) request.getSession().getAttribute("accountId");
             Integer templateId;
 
             // Parameter checks
@@ -331,20 +338,22 @@ public class ManagementController {
             if (templateId == null || templateId < 0) {
                 throw new ParameterFormatException();
             }
+
             Template template = templateService.getTemplate(templateId);
             if (template == null) {
                 throw new ObjectNotFoundException();
-            } else if (!Objects.equals(template.getOwner(), accountId)) {
-                throw new ParameterFormatException();
-            } else if (!template.getDeleted()) {
-                throw new ExtraMessageException("无法回收未删除的问卷");
+            }
+            if (!Objects.equals(template.getOwner(), accountId)) {
+                throw new LoginVerificationException();
+            }
+            if (!template.getDeleted()) {
+                map.put("success", true);
+                return map;
             }
 
             templateService.removeTemplate(templateId, false);
             map.put("success", true);
-
-        } catch (LoginVerificationException | ParameterFormatException |
-                ObjectNotFoundException | ExtraMessageException exc) {
+        } catch (LoginVerificationException | ParameterFormatException | ObjectNotFoundException exc) {
             map.put("success", false);
             map.put("message", exc.toString());
         } catch (Exception exception) {
