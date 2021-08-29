@@ -488,9 +488,9 @@ public class CollectionController {
 
             // Create answer entity
             Answer answer;
-            if (template.getType().equals("normal"))
-                answer = new Answer(templateId, JSON.toJSONString(answers));
-            else if (template.getType().equals("exam")) {
+            if (!template.getLimited())
+                accountId = null;
+            if (template.getType().equals("exam")) {
                 answer = new Answer(templateId, JSON.toJSONString(answerService.reorderAnswer(answers, shuffleId)), accountId);
             }
             else
