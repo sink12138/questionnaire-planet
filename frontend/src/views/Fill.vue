@@ -1087,6 +1087,9 @@ export default {
         if (this.mark[this.logic[j][0]] && this.logic[j][1] == this.choice[this.logic[j][0]]) {
           this.mark[this.logic[j][2]] = true;
         }
+        else {
+          this.mark[this.logic[j][2]] = false;
+        }
       }
       this.$forceUpdate();
     },
