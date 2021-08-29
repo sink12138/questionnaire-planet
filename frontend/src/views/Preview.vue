@@ -8,7 +8,7 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div class="info">填写问卷的用户将看到右侧的界面</div>
+        <div class="info">填写问卷的用户将看到右侧界面</div>
         <div class="export">
           <el-button
             type="primary"
@@ -21,36 +21,44 @@
       </div>
     </el-aside>
     <el-main>
-      <div id="quest" ref="quest">
-        <div class="head">
-          <h1>
-            {{ title }}
-          </h1>
-          <h3>
-            {{ description }}
-          </h3>
+      <div class="head">
+        <div
+          v-if="(type === 'exam')&&(deadlline != '')&&(deadlline != undefined)"
+          class="timer"
+          style="font-size: 15px"
+        >
+          <p style="color: red">{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+          <p>截止时间：{{ deadlline }}</p>
         </div>
-        <div class="question">
-          <el-form
-            :model="answers"
-            :rules="rules"
-            ref="ruleForm"
-            label-width="100px"
-            class="ruleForm"
-          >
-            <div
-              v-for="(item, index_question) in questions"
-              :key="index_question"
-            >
-              <el-divider content-position="left" style="margin-top: 15px"
-                ><div v-show="showIndex">
-                  第{{ index_question + 1 }}题
-                </div></el-divider
-              >
+        <div style="font-size: 28px;padding-top:20px;margin-bottom: 5px">
+          {{ title }}
+        </div>
+        <div style="font-size: 15px;margin: 10px">
+          {{ description }}
+        </div>
+        <div style="font-size: 18px;margin: 5px">
+          问卷剩余{{ remain }}份
+        </div>
+      </div>
+      <div class="question">
+        <el-form
+          :model="answers"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="ruleForm"
+        >
+          <div v-for="(item, index_question) in questions" :key="index_question">
+            <div v-if="mark[index_question] == true">
+              <el-divider content-position="left" style="margin-top: 15px">
+                <div v-show="showIndex">第{{ index_question + 1 }}题</div>
+                <div v-if="item.points != undefined">（{{ item.points }}分）</div>
+              </el-divider>
               <div class="question-title">
                 <div class="stem">{{ item.stem }}</div>
                 <div class="description">{{ item.description }}</div>
               </div>
+
               <div class="question-content">
                 <div v-if="item.type == 'choice'">
                   <el-form-item
@@ -63,13 +71,17 @@
                       v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :key="index"
-                      @change="changeValue"
+                      @change="
+                        (val) => {
+                          changeValue(val, index_question);
+                        }
+                      "
                     >
                       <el-radio class="option" :label="index">{{ i }}</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
+                    </el-radio-group></el-form-item
+                  >
                 </div>
-                <div class="multi" v-if="item.type == 'multi-choice'">
+                <div v-if="item.type == 'multi-choice'">
                   至少选择{{ item.min }}项
                   <el-form-item
                     label="选项"
@@ -78,7 +90,8 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi"
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
@@ -88,12 +101,12 @@
                       <el-checkbox class="option" :label="index" border>{{
                         i
                       }}</el-checkbox>
-                    </el-checkbox-group>
-                  </el-form-item>
+                    </el-checkbox-group></el-form-item
+                  >
                 </div>
                 <div v-if="item.type == 'filling'">
                   <el-form-item
-                    label="答案"
+                    label="请输入"
                     :rules="{
                       required: item.required,
                     }"
@@ -106,8 +119,8 @@
                       placeholder="请输入内容"
                       v-model="answers[index_question]"
                     >
-                    </el-input>
-                  </el-form-item>
+                    </el-input
+                  ></el-form-item>
                 </div>
                 <div v-if="item.type == 'grade'">
                   <el-form-item
@@ -115,8 +128,10 @@
                     :rules="{
                       required: item.required,
                     }"
+                    
                   >
                     <el-rate
+                      style="margin-top: 12px"
                       v-model="answers[index_question]"
                       show-text
                       :texts="item.grades"
@@ -146,7 +161,7 @@
                     </el-select>
                   </el-form-item>
                 </div>
-                <div class="multi" v-if="item.type == 'vote'">
+                <div v-if="item.type == 'vote'">
                   <el-form-item
                     label="选项"
                     :rules="{
@@ -154,7 +169,8 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi" 
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
@@ -167,7 +183,7 @@
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
-                <div class="multi" v-if="item.type == 'sign-up'">
+                <div v-if="item.type == 'sign-up'">
                   至少选择{{ item.min }}项
                   <el-form-item
                     label="选项"
@@ -176,48 +192,53 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi"
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
                       :key="index"
                       @change="multiChangeValue(index_question)"
                     >
-                      <el-checkbox class="option" :label="index" border
-                        >{{ i }} 共{{ item.quotas[index] }},剩余{{
+                      <el-checkbox
+                        class="option"
+                        :label="index"
+                        border
+                        :disabled="item.remains[index] == 0 ? true : false"
+                        >{{ i }}共{{ item.quotas[index] }},剩余{{
                           item.remains[index]
-                        }}</el-checkbox
-                      >
+                        }}
+                      </el-checkbox>
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
-                <div v-if="item.type == 'location'">
-                  <el-form-item
-                    label="定位"
-                    :rules="{
-                      required: item.required,
-                    }"
+              </div>
+              <div v-if="item.type == 'location'">
+                <el-form-item
+                  label="定位"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-location-information"
+                    @click="getLocation(index_question)"
+                    >点击获取定位</el-button
                   >
-                    <el-button
-                      type="primary"
-                      icon="el-icon-location-information"
-                      @click="getLocation(index_question)"
-                      >点击获取定位</el-button
-                    >
-                    <el-input
-                      disabled
-                      type="text"
-                      class="input"
-                      placeholder="您的位置"
-                      v-model="answers[index_question]"
-                    >
-                    </el-input>
-                  </el-form-item>
-                </div>
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="您的位置"
+                    v-model="answers[index_question]"
+                  >
+                  </el-input>
+                </el-form-item>
               </div>
             </div>
-          </el-form>
-        </div>
+          </div>
+        </el-form>
       </div>
     </el-main>
   </el-container>
@@ -299,6 +320,7 @@ export default {
           required: true,
         },
       ],
+      mark: [],
       multi: [],
       answers: [],
     };
@@ -391,8 +413,22 @@ export default {
     exportQuest() {
       this.$PDFSave(this.$refs.quest, this.title);
     },
-    changeValue() {
+    changeValue(val, index_question) {
       console.log(this.answers);
+      for (var j = 0; j < this.logic.length; j++) {
+        if (this.logic[j][0] == index_question) {
+          this.mark[this.logic[j][2]] = false;
+        }
+      }
+
+      for (j = 0; j < this.logic.length; j++) {
+        if (this.logic[j][0] == index_question) {
+          if (this.logic[j][1] == val) {
+            this.mark[this.logic[j][2]] = true;
+          }
+        }
+      }
+      this.$forceUpdate();
     },
     multiChangeValue(index) {
       this.answers[index] = this.multi;

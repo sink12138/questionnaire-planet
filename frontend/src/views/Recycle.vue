@@ -40,7 +40,7 @@
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
         <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
-          <el-table-column fixed prop="title" label="标题" width="150">
+          <el-table-column fixed prop="title" label="标题" width="200">
           </el-table-column>
           <el-table-column
             prop="answerCount"
@@ -60,7 +60,7 @@
             width="150"
           >
           </el-table-column>
-          <el-table-column prop="duration" label="收集时长" width="150">
+          <el-table-column prop="duration" label="收集时长" width="100">
           </el-table-column>
           <el-table-column label="操作" width="280">
             <template slot-scope="scope">
