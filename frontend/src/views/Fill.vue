@@ -771,7 +771,38 @@ export default {
             type: "success",
           });
           this.dialogFormVisible1 = false;
-          this.isLogin();
+          this.$axios({
+            method: "get",
+            url: "http://139.224.50.146:80/apis/attempt",
+            params: { code: this.code },
+          }).then((response) => {
+            if (response.data.answered == true) {
+              this.submitted = true;
+              this.$axios({
+                method: "get",
+                url: "http://139.224.50.146:80/apis/results",
+                params: {
+                  code: this.code,
+                },
+              }).then((response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  if (response.data.conclusion == undefined) {
+                    this.conclusion = "感谢您的提交!";
+                  } else {
+                    this.conclusion = response.data.conclusion;
+                  }
+                  if (response.data.results != undefined) {
+                    this.results = response.data.results;
+                    console.log(this.results);
+                    this.points = response.data.points;
+                  }
+                }
+              });
+            } else {
+              this.isLogin();
+            }
+          });
         } else {
           this.$notify({
             title: "提示",
