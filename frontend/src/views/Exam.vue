@@ -8,11 +8,31 @@
             ><i class="el-icon-edit-outline"></i>编辑</span
           >
           <div class="editor_1">
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(0)">单选题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(1)">多选题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(2)">填空题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(3)">评分题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(4)">下拉题</el-button>
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(0)"
+              >单选题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(1)"
+              >多选题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(2)"
+              >填空题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(3)"
+              >评分题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(4)"
+              >下拉题</el-button
+            >
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -67,22 +87,25 @@
     </div>
     <div class="main">
       <ButtonGroup vertical class="button_group">
-        <Button 
-        :style="{'background-color': setColor('edit')}" 
-        icon="ios-create-outline" 
-        @click="pageChange('edit')">
+        <Button
+          :style="{ 'background-color': setColor('edit') }"
+          icon="ios-create-outline"
+          @click="pageChange('edit')"
+        >
           题目编辑
         </Button>
-        <Button 
-        :style="{'background-color': setColor('logic')}" 
-        icon="ios-link-outline" 
-        @click="pageChange('logic')">
+        <Button
+          :style="{ 'background-color': setColor('logic') }"
+          icon="ios-link-outline"
+          @click="pageChange('logic')"
+        >
           逻辑关联
         </Button>
-        <Button 
-        :style="{'background-color': setColor('info')}" 
-        icon="ios-settings-outline" 
-        @click="pageChange('info')">
+        <Button
+          :style="{ 'background-color': setColor('info') }"
+          icon="ios-settings-outline"
+          @click="pageChange('info')"
+        >
           问卷设置
         </Button>
       </ButtonGroup>
@@ -95,7 +118,8 @@
       >
         <div class="basic">
           <!-- 问卷题目 -->
-          <el-form-item v-if="pageShow != 'logic'"
+          <el-form-item
+            v-if="pageShow != 'logic'"
             label="问卷题目"
             :rules="{
               required: true,
@@ -152,7 +176,8 @@
             />
           </el-form-item>
           <!-- 问卷限额 -->
-          <el-form-item v-if="pageShow == 'info'"
+          <el-form-item
+            v-if="pageShow == 'info'"
             label="问卷限额"
             :rules="{
               type: 'number',
@@ -213,14 +238,14 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
+                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
+                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
+                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
+                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
+                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
-                    <div v-if="item.type == 0">单选题</div>
-                    <div v-if="item.type == 1">多选题</div>
-                    <div v-if="item.type == 2">填空题</div>
-                    <div v-if="item.type == 3">评分题</div>
-                    <div v-if="item.type == 4">下拉题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题题目 -->
@@ -250,10 +275,7 @@
                         trigger: 'change',
                       }"
                     >
-                      <el-switch
-                        v-model="item.required"
-                      >
-                      </el-switch>
+                      <el-switch v-model="item.required"> </el-switch>
                     </el-form-item>
                   </div>
                   <!-- 问题描述 -->
@@ -285,10 +307,7 @@
                           trigger: 'change',
                         }"
                       >
-                        <el-switch
-                          v-model="item.shuffle"
-                        >
-                        </el-switch>
+                        <el-switch v-model="item.shuffle"> </el-switch>
                       </el-form-item>
                     </el-col>
                     <!-- 自动评分 -->
@@ -307,10 +326,7 @@
                           trigger: 'change',
                         }"
                       >
-                        <el-switch
-                          v-model="item.score"
-                        >
-                        </el-switch>
+                        <el-switch v-model="item.score"> </el-switch>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -330,6 +346,7 @@
                       :precision="1"
                       :step="0.5"
                       :max="20"
+                      :min="0.5"
                       step-strictly
                     ></el-input-number>
                   </el-form-item>
@@ -575,8 +592,7 @@
           </el-collapse>
         </div>
       </el-form>
-      <div class="logic" v-if="pageShow == 'logic'">
-      </div>
+      <div class="logic" v-if="pageShow == 'logic'"></div>
       <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
           <el-button-group>
@@ -706,7 +722,7 @@ export default {
       },
       exportLink: "",
       downloadFilename: "",
-      pageShow: 'edit',
+      pageShow: "edit",
       dialogVisible: false,
       popVisible: false,
     };
@@ -718,11 +734,11 @@ export default {
       return "question" + i;
     },
     setColor(key) {
-      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
-      else return '#fff'
+      if (key == this.pageShow) return "rgba(168, 216, 255, 0.9)";
+      else return "#fff";
     },
     pageChange(key) {
-      this.pageShow = key
+      this.pageShow = key;
     },
     changeValue(index) {
       console.log(this.modelForm.questions[index].answer);
@@ -878,10 +894,11 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
-                quest.answer == [] ||
-                quest.answer == undefined ||
-                quest.answer == ""
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1026,10 +1043,11 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
-                quest.answer == [] ||
-                quest.answer == undefined ||
-                quest.answer == ""
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1176,10 +1194,11 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
-                quest.answer == [] ||
-                quest.answer == undefined ||
-                quest.answer == ""
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({

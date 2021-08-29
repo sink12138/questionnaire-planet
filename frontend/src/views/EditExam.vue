@@ -214,14 +214,14 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
+                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
+                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
+                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
+                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
+                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
                     <div class="question-title">
                       题目:{{ item.questionName }}
                     </div>
-                    <div v-if="item.type == 0">单选题</div>
-                    <div v-if="item.type == 1">多选题</div>
-                    <div v-if="item.type == 2">填空题</div>
-                    <div v-if="item.type == 3">评分题</div>
-                    <div v-if="item.type == 4">下拉题</div>
                   </template>
                   <div class="question_name">
                     <!-- 问题题目 -->
@@ -335,6 +335,7 @@
                       :precision="1"
                       :step="0.5"
                       :max="20"
+                      :min="0.5"
                       step-strictly
                     ></el-input-number>
                   </el-form-item>
@@ -970,10 +971,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1118,10 +1119,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1268,10 +1269,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({

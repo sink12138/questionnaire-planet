@@ -40,29 +40,29 @@
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
         <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
-          <el-table-column fixed prop="title" label="标题" width="200">
+          <el-table-column fixed prop="title" label="标题" width="220">
           </el-table-column>
           <el-table-column
             prop="answerCount"
             label="收集数量"
-            width="100"
+            width="120"
           >
           </el-table-column>
           <el-table-column
             prop="creationTime"
             label="创建时间"
-            width="150"
+            width="170"
           >
           </el-table-column>
           <el-table-column
             prop="releaseTime"
             label="最后发布"
-            width="150"
+            width="170"
           >
           </el-table-column>
-          <el-table-column prop="duration" label="收集时长" width="100">
+          <el-table-column prop="duration" label="收集时长" width="120">
           </el-table-column>
-          <el-table-column label="操作" width="280">
+          <el-table-column label="操作" width="300">
             <template slot-scope="scope">
               <el-button
                 @click="deleteQuest(scope.row)"
