@@ -1106,31 +1106,18 @@ export default {
     loadChart: function () {
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
-        type: "bar",
+        type: 'bar',
         data: {
-          labels: [],
-          datasets: [
-            {
-              data: [],
-              backgroundColor: [
-                "rgba(2, 62, 138, 1)",
-                "rgba(0, 150, 199, 1)",
-                "rgba(72, 202, 228, 1)",
-                "rgba(144, 224, 239, 1)",
-                "rgba(173, 232, 244, 1)",
-                "rgba(202, 240, 248, 1)",
-                "rgba(68, 108, 179, 1)",
-                "rgba(52, 152, 219, 1)",
-                "rgba(89, 171, 227, 1)",
-                "rgba(137, 196, 244, 1)",
-              ],
-            },
-          ],
-        },
+            labels: [],
+            datasets: [{
+              label: "投票结果",
+              backgroundColor: "rgb(72, 202, 228)",
+              data: []
+            }]
+        }
       });
     },
     updateChart: function (item) {
-      this.loadChart();
       console.log("update", item);
       this.myChart.data.labels = item["answers"];
       this.myChart.data.datasets[0].data = item["counts"];
