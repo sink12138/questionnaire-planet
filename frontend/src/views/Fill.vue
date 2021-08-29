@@ -78,6 +78,14 @@
     <div class="fill-header"></div>
     <div class="fill-page">
       <div class="head" v-if="submitted == false">
+        <div
+          v-if="(type === 'exam')&&(deadlline != '')&&(deadlline != undefined)"
+          class="timer"
+          style="font-size: 15px"
+        >
+          <p style="color: red">{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+          <p>截止时间：{{ deadlline }}</p>
+        </div>
         <div style="font-size: 28px;padding-top:20px;margin-bottom: 5px">
           {{ title }}
         </div>
@@ -86,14 +94,6 @@
         </div>
         <div style="font-size: 18px;margin: 5px">
           问卷剩余{{ remain }}份
-        </div>
-        <div
-          v-if="type === 'exam'"
-          class="timer"
-          style="position: absolute; float: right; right: 10px"
-        >
-          <p>截止时间：{{ deadlline }}</p>
-          <p>剩余时间：{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
         </div>
       </div>
       <div class="question" v-if="submitted == false">
@@ -500,7 +500,7 @@ export default {
       isVote: true,
       locked: false,
       login: false,
-      fillRight: true,//
+      fillRight: false,
       title: "未找到问卷",
       type: "exam",
       description: "问卷未找到/该问卷已停止发布/已填过该问卷，请确认问卷链接",
@@ -527,105 +527,10 @@ export default {
       dialogFormVisible1: false,
       dialogFormVisible2: false,
       formLabelWidth: "100px",
-      results: [
-        {
-          stem: 'ddd',
-          answers: ['1','2'],
-          counts: [4,6]
-        },
-        {
-          stem: 'fff',
-          answers: ['2','4'],
-          counts: [4,5]
-        }
-      ],
-      questions: [//
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "min": 1,
-                "max": 2,
-                "type": "multi-choice",
-                "choices": [
-                    "21","22"
-                ],
-                "required": true,
-                "stem": "q2"
-            },
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "type": "choice",
-                "choices": [
-                    "11",
-                    "12"
-                ],
-                "required": true,
-                "stem": "q1"
-            },
-            {
-                "width": "200px",
-                "type": "filling",
-                "required": true,
-                "stem": "q3",
-                "height": 1
-            },
-            {
-                "grades": [
-                    "非常不满意",
-                    "不满意",
-                    "一般",
-                    "满意",
-                    "非常满意"
-                ],
-                "type": "grade",
-                "required": true,
-                "stem": "q4"
-            },
-            {
-                "type": "dropdown",
-                "choices": [
-                    "51",
-                    "52"
-                ],
-                "required": false,
-                "stem": "q5"
-            }
-      ],
+      results: [],
+      questions: [],
       answers: [],
-      mark: [true,true,true,true,true,true,true,true,true,true],//
+      mark: [],
       logic: [],
       myChart: null,
       canvas: null,

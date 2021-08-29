@@ -63,19 +63,6 @@
                 </div>
             </div>
         </div>
-        <!--
-        <vue-seamless-scroll
-        :data="listData"
-        :class-option="classOption"
-        class="warp"
-        >
-            <ul class="ul-item">
-            <li class="li-item" v-for="(item, index) in listData" :key="index">
-                {{ item }}
-            </li>
-            </ul>
-        </vue-seamless-scroll>
-        -->
         <router-view></router-view>
     </div>
 </template>
@@ -83,21 +70,10 @@
 <script>
 import Header from "../components/Header.vue"
 import svg from "../components/svg_questionnaire.vue"
-//import vueSeamlessScroll from 'vue-seamless-scroll'
 export default {
     components: {
         Header: Header,
         'question-pic': svg,
-        //vueSeamlessScroll
-    },
-    data () {
-      return {
-        listData: [1, 2, 3, 4, 5, 6],
-        classOption: {
-          limitMoveNum: 2,
-          direction: 3,
-        }
-      }
     },
 }
 </script>

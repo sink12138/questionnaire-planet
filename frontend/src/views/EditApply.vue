@@ -8,12 +8,12 @@
             ><i class="el-icon-edit-outline"></i>编辑</span
           >
           <div class="editor_1">
-            <el-button @click="addQuestion(0)">单选题</el-button>
-            <el-button @click="addQuestion(1)">多选题</el-button>
-            <el-button @click="addQuestion(2)">填空题</el-button>
-            <el-button @click="addQuestion(3)">评分题</el-button>
-            <el-button @click="addQuestion(4)">下拉题</el-button>
-            <el-button @click="addQuestion(5)">报名题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(0)">单选题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(1)">多选题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(2)">填空题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(3)">评分题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(4)">下拉题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(5)">报名题</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -1384,12 +1384,12 @@ export default {
   display: flex;
 }
 .question-index {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 20px;
   font-weight: bolder;
 }
 .question-title {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 20px;
   font-weight: bolder;
 }
@@ -1413,6 +1413,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 20px;
 }
 #addButton {
   margin-top: 15px;
