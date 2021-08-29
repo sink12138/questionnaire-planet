@@ -2,10 +2,10 @@
   <div class="normal">
     <Header class="header"></Header>
     <div class="editor">
-      <el-tabs style="width: 200px" stretch="true">
+      <el-tabs type="card" style="width: 200px" stretch="true">
         <el-tab-pane>
           <span slot="label" style="font-size: 15px"
-            ><i class="el-icon-edit-outline"></i>编辑题目</span
+            ><i class="el-icon-edit-outline"></i>编辑</span
           >
           <div class="editor_1">
             <el-button @click="addQuestion(0)">单选题</el-button>
@@ -18,7 +18,7 @@
         </el-tab-pane>
         <el-tab-pane>
           <span slot="label" style="font-size: 15px"
-            ><i class="el-icon-set-up"></i>问卷操作</span
+            ><i class="el-icon-set-up"></i>操作</span
           >
           <div class="editor_2">
             <el-button @click="resetForm('modelForm')">重置</el-button>
@@ -67,14 +67,26 @@
       </el-tabs>
     </div>
     <div class="main">
-      <el-button-group class="button_group">
-        <el-button icon="el-icon-tickets" @click="editing()"
-          >问卷信息</el-button
-        >
-        <el-button icon="el-icon-setting" @click="notEditing()"
-          >问卷设置</el-button
-        >
-      </el-button-group>
+      <ButtonGroup vertical class="button_group">
+        <Button 
+        :style="{'background-color': setColor('edit')}" 
+        icon="ios-create-outline" 
+        @click="pageChange('edit')">
+          题目编辑
+        </Button>
+        <Button 
+        :style="{'background-color': setColor('logic')}" 
+        icon="ios-link-outline" 
+        @click="pageChange('logic')">
+          题目逻辑
+        </Button>
+        <Button 
+        :style="{'background-color': setColor('info')}" 
+        icon="ios-settings-outline" 
+        @click="pageChange('info')">
+          问卷设置
+        </Button>
+      </ButtonGroup>
       <el-form
         ref="modelForm"
         :rule="rules"
@@ -84,7 +96,7 @@
       >
         <div class="basic">
           <!-- 问卷题目 -->
-          <el-form-item
+          <el-form-item v-if="pageShow != 'logic'"
             label="问卷题目"
             :rules="{
               required: true,
@@ -99,7 +111,7 @@
             />
           </el-form-item>
           <!-- 问卷描述 -->
-          <el-form-item label="问卷描述">
+          <el-form-item label="问卷描述" v-if="pageShow != 'logic'">
             <el-input
               v-model="modelForm.description"
               style="width: 258px"
@@ -111,19 +123,19 @@
           <el-row>
             <el-col :span="10">
               <!-- 显示题号 -->
-              <el-form-item label="是否显示题号" v-if="isEditing == false">
+              <el-form-item label="是否显示题号" v-if="pageShow == 'info'">
                 <el-switch v-model="modelForm.showIndex"> </el-switch>
               </el-form-item>
             </el-col>
             <el-col :span="10">
               <!-- 限填一次 -->
-              <el-form-item label="每人限填一次" v-if="isEditing == false">
+              <el-form-item label="每人限填一次" v-if="pageShow == 'info'">
                 <el-switch v-model="modelForm.limited"> </el-switch>
               </el-form-item>
             </el-col>
           </el-row>
           <!-- 结束语 -->
-          <el-form-item label="结束语" v-if="isEditing == false">
+          <el-form-item label="结束语" v-if="pageShow == 'info'">
             <el-input
               v-model="modelForm.conclusion"
               style="width: 258px"
@@ -132,7 +144,7 @@
             />
           </el-form-item>
           <!-- 问卷密码 -->
-          <el-form-item label="问卷密码" v-if="isEditing == false">
+          <el-form-item label="问卷密码" v-if="pageShow == 'info'">
             <el-input
               v-model="modelForm.password"
               style="width: 258px"
@@ -142,7 +154,7 @@
           </el-form-item>
           <!-- 问卷限额 -->
           <el-form-item
-            v-if="isEditing == false"
+            v-if="pageShow == 'info'"
             label="问卷限额"
             :rules="{
               type: 'number',
@@ -158,7 +170,7 @@
             />
           </el-form-item>
           <!-- 发布时间 -->
-          <el-form-item label="自动发布时间" v-if="isEditing == false">
+          <el-form-item label="自动发布时间" v-if="pageShow == 'info'">
             <el-date-picker
               v-model="modelForm.startTime"
               value-format="yyyy-MM-dd HH:mm:00"
@@ -171,7 +183,7 @@
             </el-date-picker>
           </el-form-item>
           <!-- 回收时间 -->
-          <el-form-item label="自动回收时间" v-if="isEditing == false">
+          <el-form-item label="自动回收时间" v-if="pageShow == 'info'">
             <el-date-picker
               v-model="modelForm.endTime"
               value-format="yyyy-MM-dd HH:mm:00"
@@ -184,7 +196,7 @@
             </el-date-picker>
           </el-form-item>
         </div>
-        <div v-if="isEditing">
+        <div v-if="pageShow == 'edit'">
           <el-collapse v-model="activeNames">
             <vuedraggable
               v-model="modelForm.questions"
@@ -207,40 +219,40 @@
                       题目:{{ item.questionName }}
                     </div>
                   </template>
-                  <!-- 是否必填 -->
-                  <el-form-item
-                    :prop="`questions.${index}.required`"
-                    :label="`是否必填`"
-                    :rules="{
-                      required: true,
-                      message: '请选择是否必填',
-                      trigger: 'change',
-                    }"
-                  >
-                    <el-switch
-                      v-model="item.required"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949"
+                  <div class="question_name">
+                    <!-- 问题题目 -->
+                    <el-form-item
+                      :prop="`questions.${index}.questionName`"
+                      label="问题"
+                      :rules="{
+                        required: true,
+                        message: '请填写问题',
+                        trigger: 'change',
+                      }"
                     >
-                    </el-switch>
-                  </el-form-item>
-                  <!-- 问题题目 -->
-                  <el-form-item
-                    :prop="`questions.${index}.questionName`"
-                    label="问题"
-                    :rules="{
-                      required: true,
-                      message: '请填写问题',
-                      trigger: 'change',
-                    }"
-                  >
-                    <el-input
-                      v-model="item.questionName"
-                      style="width: 258px"
-                      clearable
-                      placeholder="请填写问题"
-                    />
-                  </el-form-item>
+                      <el-input
+                        v-model="item.questionName"
+                        style="width: 258px"
+                        clearable
+                        placeholder="请填写问题"
+                      />
+                    </el-form-item>
+                    <!-- 是否必填 -->
+                    <el-form-item
+                      :prop="`questions.${index}.required`"
+                      :label="`是否必填`"
+                      :rules="{
+                        required: true,
+                        message: '请选择是否必填',
+                        trigger: 'change',
+                      }"
+                    >
+                      <el-switch
+                        v-model="item.required"
+                      >
+                      </el-switch>
+                    </el-form-item>
+                  </div>
                   <!-- 问题描述 -->
                   <el-form-item
                     :prop="`questions.${index}.questionSummary`"
@@ -429,7 +441,7 @@
           </el-collapse>
         </div>
       </el-form>
-      <div class="foot" v-if="isEditing">
+      <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
           <el-button-group>
             <el-button @click="addQuestion(0)">单选题</el-button>
@@ -526,7 +538,7 @@ export default {
       },
       exportLink: "",
       downloadFilename: "",
-      isEditing: true,
+      pageShow: 'edit',
       dialogVisible: false,
       popVisible: false,
     };
@@ -647,11 +659,12 @@ export default {
     setid(i) {
       return "question" + i;
     },
-    editing() {
-      this.isEditing = true;
+    setColor(key) {
+      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
+      else return '#fff'
     },
-    notEditing() {
-      this.isEditing = false;
+    pageChange(key) {
+      this.pageShow = key
     },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
@@ -1225,8 +1238,8 @@ export default {
   grid-row-end: 3;
   width: 200px;
   height: 100%;
-  background-color: #f0f0f0;
-  opacity: 0.9;
+  background-color: #ffffff;
+  opacity: 1;
 }
 .main {
   grid-column-start: 2;
@@ -1253,10 +1266,8 @@ export default {
 .button_group {
   position: fixed;
 }
-.button_group .el-button {
-  border-radius: 0;
-  border: white;
-  border-bottom: #000000;
+.button_group .ivu-btn {
+  color: #000;
   font-size: 15px;
 }
 .basic {
@@ -1269,15 +1280,17 @@ export default {
 }
 .editor .el-button {
   border-radius: 0;
-  font-size: 18px;
+  width: 66%;
+  font-size: 17px;
   color: #000000;
-  background-color: #f0f0f0;
-  margin: 0;
+  background-color: #ffffff;
+  margin: 5px;
 }
 .editor_1,
 .editor_2 {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 .question_name {
   display: flex;

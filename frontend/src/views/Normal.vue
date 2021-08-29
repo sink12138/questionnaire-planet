@@ -69,19 +69,19 @@
       <ButtonGroup vertical class="button_group">
         <Button 
         :style="{'background-color': setColor('edit')}" 
-        icon="el-icon-tickets" 
+        icon="ios-create-outline" 
         @click="pageChange('edit')">
           题目编辑
         </Button>
         <Button 
         :style="{'background-color': setColor('logic')}" 
-        icon="el-icon-setting" 
+        icon="ios-link-outline" 
         @click="pageChange('logic')">
           题目逻辑
         </Button>
         <Button 
         :style="{'background-color': setColor('info')}" 
-        icon="el-icon-setting" 
+        icon="ios-settings-outline" 
         @click="pageChange('info')">
           问卷设置
         </Button>
@@ -95,8 +95,7 @@
       >
         <div class="basic">
           <!-- 问卷题目 -->
-          <el-form-item
-            v-if="pageShow != 'logic'"
+          <el-form-item v-if="pageShow != 'logic'"
             label="问卷题目"
             :rules="{
               required: true,
