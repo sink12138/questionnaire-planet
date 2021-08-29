@@ -422,9 +422,9 @@ public class TemplateController {
                     }
                     if (height == null || height <= 0) height = 1;
                     else if (height > 10) height = 10;
-                    if (width == null) width = 500;
-                    else if (width < 300) width = 300;
-                    else if (width > 800) width = 800;
+                    if (width == null) width = 400;
+                    else if (width < 200) width = 200;
+                    else if (width > 650) width = 650;
                     argsMap.put("height", height);
                     argsMap.put("width", width + "px");
                     if (questionPoints != null && answerTexts == null)
