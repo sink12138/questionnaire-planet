@@ -985,6 +985,7 @@ export default {
               endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
@@ -1126,6 +1127,7 @@ export default {
               endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
@@ -1268,6 +1270,7 @@ export default {
               endTime: this.modelForm.endTime,
               quota: parseInt(this.modelForm.quota),
               type: "sign-up",
+              logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
           }).then(
