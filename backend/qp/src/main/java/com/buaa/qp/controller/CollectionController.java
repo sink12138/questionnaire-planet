@@ -37,7 +37,7 @@ public class CollectionController {
     private static final Object quotaLock = new Object();
 
     @GetMapping("/attempt")
-    public Map<String, Object> locked(@RequestParam(value = "code", required = false) String code) {
+    public Map<String, Object> attempt(@RequestParam(value = "code", required = false) String code) {
         Map<String, Object> map = new HashMap<>();
         try {
             // Parameter checks
@@ -52,13 +52,15 @@ public class CollectionController {
                 throw new ExtraMessageException("问卷尚未发布或已关闭");
             Integer templateId = template.getTemplateId();
             Integer accountId = (Integer) request.getSession().getAttribute("accountId");
+
+            boolean answered = false;
             if (template.getLimited()) {
                 Answer oldAnswer = answerService.getOldAnswer(templateId, accountId);
                 if (oldAnswer != null)
-                    throw new ExtraMessageException("已填过问卷");
+                    answered = true;
             }
             Integer quota = template.getQuota();
-            if (quota != null && quota <= answerService.countAnswers(templateId))
+            if (quota != null && quota <= answerService.countAnswers(templateId) && !answered)
                 throw new ExtraMessageException("问卷名额已满");
 
             Boolean locked = template.getPassword() != null;
@@ -66,6 +68,7 @@ public class CollectionController {
             map.put("success", true);
             map.put("locked", locked);
             map.put("login", login);
+            map.put("answered", answered);
         } catch (ParameterFormatException | ObjectNotFoundException | ExtraMessageException exc) {
             map.put("success", false);
             map.put("message", exc.toString());

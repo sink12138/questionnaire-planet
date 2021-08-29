@@ -147,7 +147,7 @@ public class AccountServiceImpl implements AccountService {
         return simpleDateFormat.format(new Date());
     }
 
-    public class CheckEmailThread implements Runnable {
+    private class CheckEmailThread implements Runnable {
         Integer accountId;
         String email;
 
