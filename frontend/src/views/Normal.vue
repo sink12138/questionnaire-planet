@@ -219,17 +219,17 @@
                     <div v-if="item.type == 3" class="question-index">(评分题)</div>
                     <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
                     <div class="question-title">
-                      题目:{{ item.questionName }}
+                      :{{ item.questionName }}
                     </div>
                   </template>
                   <div class="question_name">
-                    <!-- 问题 -->
+                    <!-- 题干 -->
                     <el-form-item
                       :prop="`questions.${index}.questionName`"
-                      label="问题"
+                      label="题干"
                       :rules="{
                         required: true,
-                        message: '请填写问题',
+                        message: '请填写题干',
                         trigger: 'change',
                       }"
                     >
@@ -237,7 +237,7 @@
                         v-model="item.questionName"
                         style="width: 258px"
                         clearable
-                        placeholder="请填写问题"
+                        placeholder="请填写题干"
                       />
                     </el-form-item>
                     <!-- 是否必填 -->
@@ -817,7 +817,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );
@@ -939,7 +939,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );
@@ -1079,7 +1079,7 @@ export default {
                     this.$notify({
                       title: "错误",
                       message: err,
-                      type: "erroe",
+                      type: "error",
                     });
                   }
                 );
@@ -1096,7 +1096,7 @@ export default {
               this.$notify({
                 title: "错误",
                 message: err,
-                type: "erroe",
+                type: "error",
               });
             }
           );

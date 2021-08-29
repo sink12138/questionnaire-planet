@@ -131,13 +131,13 @@ export default {
     background-color: rgba(71, 157, 230, 0.75);
 }
 .create_by_apply {
-    background-color: rgba(144, 214, 126, 0.75);
+    background-color: rgba(46, 219, 219, 0.75);
 }
 .create_by_exam {
     background-color: rgba(46, 219, 161, 0.75);
 }
 .create_by_epide {
-    background-color: rgba(46, 219, 219, 0.75);
+    background-color: rgba(144, 214, 126, 0.75);
 }
 </style>
 
