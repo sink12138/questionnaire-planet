@@ -868,7 +868,9 @@ export default {
     changeValue(val, index_question) {
       console.log(this.answers);
       for (var j = 0; j < this.logic.length; j++) {
-        this.mark[this.logic[j][2]] = false;
+        if (this.logic[j][0] == index_question) {
+          this.mark[this.logic[j][2]] = false;
+        }
       }
 
       for (j = 0; j < this.logic.length; j++) {
