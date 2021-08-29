@@ -22,4 +22,6 @@ public interface AnswerService {
     ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer shuffleId);
 
     ArrayList<Object> reorderAnswer(ArrayList<Object> answers, Integer accountId, Integer templateId);
+
+    void shuffleAnswer(ArrayList<Object> answers, Integer shuffleId);
 }

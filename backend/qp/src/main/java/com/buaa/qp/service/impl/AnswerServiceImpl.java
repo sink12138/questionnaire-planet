@@ -114,4 +114,10 @@ public class AnswerServiceImpl implements AnswerService {
         Integer shuffleId = shuffleDao.selectIdByAccountTemplateId(accountId, templateId);
         return reorderAnswer(answers, shuffleId);
     }
+
+    @Override
+    public void shuffleAnswer(ArrayList<Object> answers, Integer shuffleId) {
+        return;
+    }
+
 }
