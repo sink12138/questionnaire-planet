@@ -66,14 +66,26 @@
       </el-tabs>
     </div>
     <div class="main">
-      <el-button-group class="button_group">
-        <el-button icon="el-icon-tickets" @click="editing()"
-          >问卷信息</el-button
-        >
-        <el-button icon="el-icon-setting" @click="notEditing()"
-          >问卷设置</el-button
-        >
-      </el-button-group>
+      <ButtonGroup vertical class="button_group">
+        <Button 
+        :style="{'background-color': setColor('edit')}" 
+        icon="el-icon-tickets" 
+        @click="pageChange('edit')">
+          题目编辑
+        </Button>
+        <Button 
+        :style="{'background-color': setColor('logic')}" 
+        icon="el-icon-setting" 
+        @click="pageChange('logic')">
+          题目逻辑
+        </Button>
+        <Button 
+        :style="{'background-color': setColor('info')}" 
+        icon="el-icon-setting" 
+        @click="pageChange('info')">
+          问卷设置
+        </Button>
+      </ButtonGroup>
       <el-form
         ref="modelForm"
         :rule="rules"
@@ -84,6 +96,7 @@
         <div class="basic">
           <!-- 问卷题目 -->
           <el-form-item
+            v-if="pageShow != 'logic'"
             label="问卷题目"
             :rules="{
               required: true,
@@ -98,7 +111,7 @@
             />
           </el-form-item>
           <!-- 问卷描述 -->
-          <el-form-item label="问卷描述">
+          <el-form-item label="问卷描述" v-if="pageShow != 'logic'">
             <el-input
               v-model="modelForm.description"
               style="width: 258px"
@@ -107,22 +120,22 @@
               placeholder="请填写问卷描述"
             />
           </el-form-item>
-          <el-row>
+          <el-row v-if="pageShow == 'info'">
             <el-col :span="10">
               <!-- 显示题号 -->
-              <el-form-item label="是否显示题号" v-if="isEditing == false">
+              <el-form-item label="是否显示题号">
                 <el-switch v-model="modelForm.showIndex"> </el-switch>
               </el-form-item>
             </el-col>
             <el-col :span="10">
               <!-- 限填一次 -->
-              <el-form-item label="每人限填一次" v-if="isEditing == false">
+              <el-form-item label="每人限填一次">
                 <el-switch v-model="modelForm.limited"> </el-switch>
               </el-form-item>
             </el-col>
           </el-row>
           <!-- 结束语 -->
-          <el-form-item label="结束语" v-if="isEditing == false">
+          <el-form-item label="结束语" v-if="pageShow == 'info'">
             <el-input
               v-model="modelForm.conclusion"
               style="width: 258px"
@@ -131,7 +144,7 @@
             />
           </el-form-item>
           <!-- 问卷密码 -->
-          <el-form-item label="问卷密码" v-if="isEditing == false">
+          <el-form-item label="问卷密码" v-if="pageShow == 'info'">
             <el-input
               v-model="modelForm.password"
               style="width: 258px"
@@ -140,8 +153,7 @@
             />
           </el-form-item>
           <!-- 问卷限额 -->
-          <el-form-item
-            v-if="isEditing == false"
+          <el-form-item v-if="pageShow == 'info'"
             label="问卷限额"
             :rules="{
               type: 'number',
@@ -157,7 +169,7 @@
             />
           </el-form-item>
           <!-- 发布时间 -->
-          <el-form-item label="自动发布时间" v-if="isEditing == false">
+          <el-form-item label="自动发布时间" v-if="pageShow == 'info'">
             <el-date-picker
               v-model="modelForm.startTime"
               value-format="yyyy-MM-dd HH:mm:00"
@@ -170,7 +182,7 @@
             </el-date-picker>
           </el-form-item>
           <!-- 回收时间 -->
-          <el-form-item label="自动回收时间" v-if="isEditing == false">
+          <el-form-item label="自动回收时间" v-if="pageShow == 'info'">
             <el-date-picker
               v-model="modelForm.endTime"
               value-format="yyyy-MM-dd HH:mm:00"
@@ -183,7 +195,7 @@
             </el-date-picker>
           </el-form-item>
         </div>
-        <div v-if="isEditing">
+        <div v-if="pageShow == 'edit'">
           <el-collapse v-model="activeNames">
             <vuedraggable
               v-model="modelForm.questions"
@@ -425,9 +437,9 @@
           </el-collapse>
         </div>
       </el-form>
-      <div class="logic">
+      <div class="logic" v-if="pageShow == 'logic'">
       </div>
-      <div class="foot" v-if="isEditing">
+      <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
           <el-button-group>
             <el-button @click="addQuestion(0)">单选题</el-button>
@@ -537,7 +549,7 @@ export default {
       },
       exportLink: "",
       downloadFilename: "",
-      isEditing: true,
+      pageShow: 'edit',
       dialogVisible: false,
       popVisible: false,
     };
@@ -558,14 +570,11 @@ export default {
       this.$refs.modelForm.clearValidate();
     },
     setColor(key) {
-      if (key == this.isEditing) return '#ddd'
+      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
       else return '#fff'
     },
-    editing() {
-      this.isEditing = true;
-    },
-    notEditing() {
-      this.isEditing = false;
+    pageChange(key) {
+      this.pageShow = key
     },
     removeDomain(index, idx) {
       // 删除选项
@@ -1124,12 +1133,13 @@ export default {
   grid-row-start: 2;
   grid-row-end: 3;
   background-color: #f0f0f0;
-  opacity: 1;
+  opacity: 0.9;
 }
 .button_group {
   position: fixed;
 }
-.button_group .el-button {
+.button_group .ivu-btn {
+  color: #000;
   font-size: 15px;
 }
 .basic {
