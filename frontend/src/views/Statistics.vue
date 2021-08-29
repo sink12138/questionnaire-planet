@@ -2,7 +2,9 @@
   <div class="statistics">
     <Header class="header"></Header>
     <div class="editor">
-      <Button class="new" icon="md-arrow-round-back">所有问卷</Button>
+      <router-link to="/history">
+        <Button class="new" icon="md-arrow-round-back">所有问卷</Button>
+      </router-link>
       <el-button 
       v-if="this.templateType == 'exam'"
       :style="{'background-color': setColor('exam')}" 
@@ -29,6 +31,7 @@
         交叉分析
       </el-button>
       <el-button 
+      style="background-color: #fff"
       icon="el-icon-download" 
       @click="handleDownload()">
         下载数据
