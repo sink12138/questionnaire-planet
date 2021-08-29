@@ -92,7 +92,7 @@
         <div style="font-size: 15px;margin: 10px">
           {{ description }}
         </div>
-        <div style="font-size: 18px;margin: 5px">
+        <div style="font-size: 18px;margin: 5px" v-if="remain != '∞'">
           问卷剩余{{ remain }}份
         </div>
       </div>
