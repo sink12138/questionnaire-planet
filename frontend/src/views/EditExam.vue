@@ -970,10 +970,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1118,10 +1118,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
@@ -1268,10 +1268,10 @@ export default {
             if (question.score == true) {
               quest.points = question.points;
               if (
-                quest.answer == null ||
+                (quest.answer == null ||
                 quest.answer == [] ||
                 quest.answer == undefined ||
-                quest.answer == ""
+                quest.answer == "") && quest.answer != 0
               ) {
                 var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
                 this.$notify({
