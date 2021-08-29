@@ -238,14 +238,22 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
-                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
-                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
-                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
-                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
-                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
-                    <div class="question-title">
-                      :{{ item.questionName }}
+                    <div v-if="item.type == 0" class="question-index">
+                      (单选题)
                     </div>
+                    <div v-if="item.type == 1" class="question-index">
+                      (多选题)
+                    </div>
+                    <div v-if="item.type == 2" class="question-index">
+                      (填空题)
+                    </div>
+                    <div v-if="item.type == 3" class="question-index">
+                      (评分题)
+                    </div>
+                    <div v-if="item.type == 4" class="question-index">
+                      (下拉题)
+                    </div>
+                    <div class="question-title">:{{ item.questionName }}</div>
                   </template>
                   <div class="question_name">
                     <!-- 题干 -->
@@ -514,8 +522,14 @@
                         <el-radio class="option" :label="idx2">{{
                           j.value
                         }}</el-radio>
-                      </el-radio-group></el-form-item
-                    >
+                      </el-radio-group>
+                      <el-button
+                        icon="el-icon-refresh-right"
+                        v-show="item.type == 0"
+                        @click="resetAnswer(item)"
+                        >重置答案</el-button
+                      >
+                    </el-form-item>
                   </div>
                   <div class="multi" v-if="item.type == '1'">
                     <el-form-item label="答案">
@@ -730,6 +744,9 @@ export default {
   created: function () {},
   mounted: function () {},
   methods: {
+    resetAnswer(item) {
+      item.answer = undefined;
+    },
     setid(i) {
       return "question" + i;
     },
