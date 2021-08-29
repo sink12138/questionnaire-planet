@@ -238,14 +238,22 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
-                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
-                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
-                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
-                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
-                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>                    
-                    <div class="question-title">
-                      :{{ item.questionName }}
+                    <div v-if="item.type == 0" class="question-index">
+                      (单选题)
                     </div>
+                    <div v-if="item.type == 1" class="question-index">
+                      (多选题)
+                    </div>
+                    <div v-if="item.type == 2" class="question-index">
+                      (填空题)
+                    </div>
+                    <div v-if="item.type == 3" class="question-index">
+                      (评分题)
+                    </div>
+                    <div v-if="item.type == 4" class="question-index">
+                      (下拉题)
+                    </div>
+                    <div class="question-title">:{{ item.questionName }}</div>
                   </template>
                   <div class="question_name">
                     <!-- 题干 -->
@@ -514,8 +522,14 @@
                         <el-radio class="option" :label="idx2">{{
                           j.value
                         }}</el-radio>
-                      </el-radio-group></el-form-item
-                    >
+                      </el-radio-group>
+                      <el-button
+                        icon="el-icon-refresh-right"
+                        v-show="item.type == 0"
+                        @click="resetAnswer(item)"
+                        >重置答案</el-button
+                      >
+                    </el-form-item>
                   </div>
                   <div class="multi" v-if="item.type == '1'">
                     <el-form-item label="答案">
@@ -592,7 +606,47 @@
           </el-collapse>
         </div>
       </el-form>
-      <div class="logic" v-if="pageShow == 'logic'"></div>
+      <div class="logic" v-if="pageShow == 'logic'">
+        <div style="font-size: 16px;margin-bottom: 10px">只支持单选题添加逻辑</div>
+        <el-form :inline="true" class="demo-form-inline">
+          <el-form-item>
+            <el-select v-model="fromquestion" placeholder="题目">
+              <div v-for="(fromquestion, index_fromquestion) in modelForm.questions" :key="index_fromquestion">
+                <el-option v-if="fromquestion['type'] == '0'" :label="(index_fromquestion + 1)+'.'+fromquestion['questionName']" :value="index_fromquestion"></el-option>
+              </div>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="选择">
+            <el-select v-model="option" placeholder="选项">
+              <el-option v-for="(option, index_option) in modelForm.questions[fromquestion]['answers']" :key="index_option" :label="option['value']" :value="index_option"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="将显示">
+            <el-select v-model="toquestion" placeholder="题目">
+              <div v-for="(toquestion, index_toquestion) in modelForm.questions" :key="index_toquestion">
+                <el-option v-if="fromquestion < index_toquestion" :label="(index_toquestion + 1)+'.'+toquestion['questionName']" :value="index_toquestion"></el-option>
+              </div>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <el-button type="primary" @click="addlogic">添加逻辑</el-button>
+        <div v-if="logicVisiable == true" style="logic-show">
+          <el-card style="width: 600px;margin-top: 40px">
+            <div slot="header">
+              <span style="font-size: 20px">已有逻辑</span>
+            </div>
+            <div
+            style="font-size: 16px"
+            v-for="(item, index) in modelForm.logic" 
+            :key="index">
+              {{index+1}}.
+              题目:"{{ modelForm.questions[item[0]]['questionName'] }}"
+              选择了"{{ modelForm.questions[item[0]]['answers'][item[1]].value }}",
+              将显示题目:"{{ modelForm.questions[item[2]]['questionName'] }}"
+            </div>
+          </el-card>
+        </div>
+      </div>
       <div class="foot" v-if="pageShow == 'edit'">
         <el-popover placement="top" width="1200px" v-model="popVisible">
           <el-button-group>
@@ -671,6 +725,10 @@ export default {
       rules: {},
       templateId: 0,
       code: "",
+      fromquestion: 0,
+      option: 0,
+      toquestion: 0,
+      logicVisiable: false,
       modelForm: {
         title: "新的问卷",
         description: "",
@@ -681,6 +739,7 @@ export default {
         quota: undefined,
         startTime: "",
         endTime: "",
+        logic: [],
         questions: [
           {
             type: "2",
@@ -730,6 +789,9 @@ export default {
   created: function () {},
   mounted: function () {},
   methods: {
+    resetAnswer(item) {
+      item.answer = undefined;
+    },
     setid(i) {
       return "question" + i;
     },
@@ -866,6 +928,16 @@ export default {
       this.$router.push(
         "/exam/new#question" + (this.modelForm.questions.length - 1)
       );
+    },
+    addlogic() {
+      this.modelForm.logic.push([this.fromquestion, this.option, this.toquestion])
+      this.logicVisiable = true
+      console.log(this.modelForm.logic)
+      this.$notify({
+        title: '提示',
+        message: '逻辑添加成功',
+        type: 'success'
+      })
     },
     resetForm(formName) {
       // 重置
@@ -1508,6 +1580,16 @@ export default {
 }
 .flip-move {
   transition: transform 1s;
+}
+.logic {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.logic-show {
+  text-align: center;
+  width: 600px;
 }
 .option {
   margin-right: 10px;
