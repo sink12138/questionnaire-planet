@@ -101,9 +101,31 @@
         update template
         set deleted = #{deleted}, start_time = null, end_time = null
         where template_id = #{templateId};
+        <choose>
+            <when test="deleted">
+                drop event if exists ${"start"+templateId};
+                drop event if exists ${"end"+templateId};
+                create event ${"delete"+templateId}
+                on schedule at adddate(now(), 30) do
+                begin
+                delete from shuffle
+                where template_id = #{templateId};
+                delete from answer
+                where template_id = #{templateId};
+                delete from logic
+                where template_id = #{templateId};
+                delete from question
+                where template_id = #{templateId};
+                delete from template
+                where template_id = #{templateId};
+                end;
+            </when>
+            <otherwise>
+                drop event if exists ${"delete"+templateId};
+            </otherwise>
+        </choose>
         <if test="deleted">
-            drop event if exists ${"start"+templateId};
-            drop event if exists ${"end"+templateId}
+
         </if>
     </update>
     <update id="updateCode" parameterType="Template">
@@ -113,6 +135,7 @@
         delete from template
         where template_id = #{templateId};
         drop event if exists ${"start"+templateId};
-        drop event if exists ${"end"+templateId}
+        drop event if exists ${"end"+templateId};
+        drop event if exists ${"delete"+templateId};
     </delete>
 </mapper>
