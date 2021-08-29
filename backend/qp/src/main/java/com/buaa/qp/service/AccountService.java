@@ -51,4 +51,7 @@ public interface AccountService {
     void sendCheckEmail(Integer accountId, String email) throws MailException;
 
     Account getAccountBySession(HttpSession session) throws LoginVerificationException;
+
+    boolean isShuffleIdMatched(Integer shuffleId, Integer accountId, Integer templateId);
+
 }

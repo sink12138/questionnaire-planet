@@ -2,6 +2,7 @@ package com.buaa.qp.service.impl;
 
 import com.buaa.qp.dao.AccountDao;
 import com.buaa.qp.dao.CheckDao;
+import com.buaa.qp.dao.ShuffleDao;
 import com.buaa.qp.entity.Account;
 import com.buaa.qp.entity.Check;
 import com.buaa.qp.exception.LoginVerificationException;
@@ -28,16 +29,19 @@ import java.util.Random;
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
-    AccountDao accountDao;
+    private AccountDao accountDao;
 
     @Autowired
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
 
     @Autowired
-    TemplateEngine templateEngine;
+    private TemplateEngine templateEngine;
 
     @Autowired
-    CheckDao checkDao;
+    private CheckDao checkDao;
+
+    @Autowired
+    private ShuffleDao shuffleDao;
 
     @Override
     public Account getAccountById(Integer accountId) {
@@ -171,4 +175,12 @@ public class AccountServiceImpl implements AccountService {
             javaMailSender.send(mimeMessage);
         }
     }
+
+    @Override
+    public boolean isShuffleIdMatched(Integer shuffleId, Integer accountId, Integer templateId) {
+        if (shuffleId == null)
+            return false;
+        return shuffleId.equals(shuffleDao.selectIdByAccountTemplateId(accountId, templateId));
+    }
+
 }
