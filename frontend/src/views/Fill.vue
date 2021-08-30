@@ -1232,7 +1232,6 @@ export default {
       });
     },
     updateChart: function (item) {
-      console.log("update", item);
       if (this.loaded == false) {
         this.loadChart();
       }
@@ -1241,6 +1240,7 @@ export default {
       this.myChart.data.datasets[0].label = item['stem'];
       console.log(this.myChart.data)
       this.myChart.update();
+      console.log('update success')
     },
   },
   directives: {
