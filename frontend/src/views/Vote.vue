@@ -608,6 +608,7 @@ export default {
       pageShow: 'edit',
       dialogVisible: false,
       popVisible: false,
+      logicVisiable: false,
     };
   },
   methods: {
