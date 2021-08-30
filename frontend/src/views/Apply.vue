@@ -197,6 +197,7 @@
           </el-form-item>
         </div>
         <div v-if="pageShow == 'edit'">
+          <div style="font-size: 16px">拖动题目可修改顺序</div>
           <el-collapse v-model="activeNames">
             <vuedraggable
               v-model="modelForm.questions"
