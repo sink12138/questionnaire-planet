@@ -1215,6 +1215,8 @@ export default {
         });
     },
     loadChart: function () {
+      var el = document.getElementById("myChart");
+      this.canvas = el;
       this.loaded = true;
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
