@@ -1215,8 +1215,6 @@ export default {
         });
     },
     loadChart: function () {
-      var el = document.getElementById("myChart");
-      this.canvas = el;
       this.loaded = true;
       var ctx1 = document.getElementById("myChart");
       this.myChart = new Chart(ctx1, {
@@ -1241,6 +1239,10 @@ export default {
       this.myChart.data.datasets[0].data = item['counts'];
       this.myChart.data.datasets[0].label = item['stem'];
       console.log(this.myChart.data)
+      if (this.canvas != null) {
+        var el = document.getElementById("myChart");
+        this.canvas = el;
+      }
       this.myChart.update();
       console.log('update success')
     },
