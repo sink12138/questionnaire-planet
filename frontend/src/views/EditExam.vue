@@ -785,6 +785,7 @@ export default {
           this.modelForm.showIndex = response.data.showIndex;
           this.modelForm.limited = response.data.limited;
           this.modelForm.password = response.data.password;
+          this.modelForm.logic = response.data.logic;
           response.data.quota == undefined
             ? (this.modelForm.quota = 0)
             : (this.modelForm.quota = response.data.quota);
