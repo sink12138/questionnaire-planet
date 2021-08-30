@@ -643,6 +643,7 @@
               题目:"{{ modelForm.questions[item[0]]['questionName'] }}"
               选择了"{{ modelForm.questions[item[0]]['answers'][item[1]].value }}",
               将显示题目:"{{ modelForm.questions[item[2]]['questionName'] }}"
+              <el-button size="small" @click="removeLogic(index)">删除逻辑</el-button>
             </div>
           </el-card>
         </div>
@@ -789,6 +790,9 @@ export default {
   created: function () {},
   mounted: function () {},
   methods: {
+    removeLogic(index){
+      this.modelForm.logic.splice(index,1);
+    },
     resetAnswer(item) {
       item.answer = undefined;
     },
