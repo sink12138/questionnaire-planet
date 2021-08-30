@@ -36,8 +36,14 @@
       @click="handleDownload()">
         下载数据
       </el-button>
+      <el-button 
+      style="background-color: #fff"
+      icon="el-icon-download" 
+      @click="exportQuest()">
+        导出图表
+      </el-button>
     </div>
-    <div class="fill">
+    <div class="fill" id="quest" ref="quest">
       <div class="main">
         <div class="exam-result" v-show="(this.show === 'exam')&&(this.templateType == 'exam')">
           <el-descriptions direction="vertical" :column="2" border style="height: 300px;width: 400px">
@@ -313,6 +319,9 @@ export default {
     this.loadData(this.sumData[0])
   },
   methods: {
+    exportQuest() {
+      this.$PDFSave(this.$refs.quest, this.title);
+    },
     changeShow(key) {
       this.show = key
     },
