@@ -142,7 +142,10 @@ public class TemplateController {
                         throw new ExtraMessageException("只有带选项的题目才可作为逻辑条件");
                     if (c < 0 || c >= parser.toObjectList(questionMaps.get(m).get("choices")).size())
                         throw new ParameterFormatException();
-                    if (m >= n)
+                    if (m == n) {
+                        throw new ExtraMessageException("题目本身不能作为自己的出现条件");
+                    }
+                    if (m > n)
                         throw new ExtraMessageException("后面题目不能作为前面题目的出现条件");
                     if (questions.get(m).getShuffle() || questions.get(n).getShuffle())
                         throw new ExtraMessageException("参与乱序的题目不能设置逻辑关联");
