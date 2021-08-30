@@ -36,7 +36,7 @@
     </div>
     <div class="questionnaire">
       <div class="table" style="margin-left: 1%; margin-right: 1%">
-        <el-table :data="searchQue" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
+        <el-table :data="searchQue" max-height="600" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
           <el-table-column fixed prop="title" label="标题" width="240">
           </el-table-column>
           <el-table-column

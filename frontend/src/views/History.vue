@@ -43,6 +43,7 @@
         <el-table
           :data="searchQue"
           border
+          max-height="600"
           style="width: 100%"
           :header-cell-style="{
             'text-align': 'center',
