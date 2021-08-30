@@ -1239,10 +1239,8 @@ export default {
       this.myChart.data.datasets[0].data = item['counts'];
       this.myChart.data.datasets[0].label = item['stem'];
       console.log(this.myChart.data)
-      if (this.canvas != null) {
-        var el = document.getElementById("myChart");
-        this.canvas = el;
-      }
+      var el = document.getElementById("myChart");
+      this.canvas = el;
       this.myChart.update();
       console.log('update success')
     },

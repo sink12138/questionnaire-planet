@@ -137,7 +137,7 @@ const router = new VueRouter({
 })
 router.beforeEach((to, from, next) => {
   var regx = /^\/fill.*?$/;
-  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx) || to.path != "/") {
+  if(sessionStorage.getItem("isLogin") == "true" || to.path == "/" || to.path.match(regx)) {
     next();
   }
   else {
