@@ -8,7 +8,7 @@
             <div class="web-title">问卷星球</div>
           </div>
         </router-link>
-        <div class="info">填写问卷的用户将看到右侧的界面</div>
+        <div class="info">填写问卷的用户将看到右侧界面</div>
         <div class="export">
           <el-button
             type="primary"
@@ -21,34 +21,43 @@
       </div>
     </el-aside>
     <el-main>
-      <div id="quest" ref="quest">
-        <div class="head">
-          <h1>
-            {{ title }}
-          </h1>
-          <h3>
-            {{ description }}
-          </h3>
+      <div class="head">
+        <div
+          v-if="(type === 'exam')&&(deadlline != '')&&(deadlline != undefined)"
+          class="timer"
+          style="font-size: 15px"
+        >
+          <p style="color: red">{{ day }}天{{ hour }}时{{ minute }}分{{ second }}秒</p>
+          <p>截止时间：{{ deadlline }}</p>
         </div>
-        <div class="question">
-          <el-form
-            :model="answers"
-            :rules="rules"
-            ref="ruleForm"
-            label-width="100px"
-            class="ruleForm"
-          >
-            <div
-              v-for="(item, index_question) in questions"
-              :key="index_question"
-            >
-              <el-divider content-position="left" style="margin-top: 15px"
-                >第{{ index_question + 1 }}题</el-divider
-              >
+        <div style="font-size: 28px;padding-top:20px;margin-bottom: 5px">
+          {{ title }}
+        </div>
+        <div style="font-size: 15px;margin: 10px">
+          {{ description }}
+        </div>
+        <div style="font-size: 18px;margin: 5px">
+          问卷剩余{{ remain }}份
+        </div>
+      </div>
+      <div class="question">
+        <el-form
+          :model="answers"
+          :rules="rules"
+          ref="ruleForm"
+          label-width="100px"
+          class="ruleForm"
+        >
+          <div v-for="(item, index_question) in questions" :key="index_question">
+              <el-divider content-position="left" style="margin-top: 15px">
+                <div v-show="showIndex">第{{ index_question + 1 }}题</div>
+                <div v-if="item.points != undefined">（{{ item.points }}分）</div>
+              </el-divider>
               <div class="question-title">
                 <div class="stem">{{ item.stem }}</div>
                 <div class="description">{{ item.description }}</div>
               </div>
+
               <div class="question-content">
                 <div v-if="item.type == 'choice'">
                   <el-form-item
@@ -61,13 +70,17 @@
                       v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :key="index"
-                      @change="changeValue"
+                      @change="
+                        (val) => {
+                          changeValue(val, index_question);
+                        }
+                      "
                     >
                       <el-radio class="option" :label="index">{{ i }}</el-radio>
-                    </el-radio-group>
-                  </el-form-item>
+                    </el-radio-group></el-form-item
+                  >
                 </div>
-                <div class="multi" v-if="item.type == 'multi-choice'">
+                <div v-if="item.type == 'multi-choice'">
                   至少选择{{ item.min }}项
                   <el-form-item
                     label="选项"
@@ -76,7 +89,8 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi"
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
@@ -86,12 +100,12 @@
                       <el-checkbox class="option" :label="index" border>{{
                         i
                       }}</el-checkbox>
-                    </el-checkbox-group>
-                  </el-form-item>
+                    </el-checkbox-group></el-form-item
+                  >
                 </div>
                 <div v-if="item.type == 'filling'">
                   <el-form-item
-                    label="选项"
+                    label="请输入"
                     :rules="{
                       required: item.required,
                     }"
@@ -104,26 +118,24 @@
                       placeholder="请输入内容"
                       v-model="answers[index_question]"
                     >
-                    </el-input>
-                  </el-form-item>
+                    </el-input
+                  ></el-form-item>
                 </div>
                 <div v-if="item.type == 'grade'">
                   <el-form-item
-                    label="选项"
+                    label="评分"
                     :rules="{
                       required: item.required,
                     }"
+                    
                   >
-                    <el-radio-group
+                    <el-rate
+                      style="margin-top: 12px"
                       v-model="answers[index_question]"
-                      v-for="(i, index) in item.choices"
-                      :key="index"
-                      @change="changeValue"
+                      show-text
+                      :texts="item.grades"
                     >
-                      <el-radio class="option" :label="index"
-                        >{{ i }}({{ item.scores[index] }})</el-radio
-                      >
-                    </el-radio-group>
+                    </el-rate>
                   </el-form-item>
                 </div>
                 <div v-if="item.type == 'dropdown'">
@@ -148,8 +160,7 @@
                     </el-select>
                   </el-form-item>
                 </div>
-                <div class="multi" v-if="item.type == 'vote'">
-                  至少选择{{ item.min }}项
+                <div v-if="item.type == 'vote'">
                   <el-form-item
                     label="选项"
                     :rules="{
@@ -157,7 +168,8 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi" 
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
@@ -170,7 +182,7 @@
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
-                <div class="multi" v-if="item.type == 'sign-up'">
+                <div v-if="item.type == 'sign-up'">
                   至少选择{{ item.min }}项
                   <el-form-item
                     label="选项"
@@ -179,32 +191,60 @@
                     }"
                   >
                     <el-checkbox-group
-                      v-model="multi"
+                      class="multi"
+                      v-model="answers[index_question]"
                       v-for="(i, index) in item.choices"
                       :min="0"
                       :max="item.max"
                       :key="index"
                       @change="multiChangeValue(index_question)"
                     >
-                      <el-checkbox class="option" :label="index" border
-                        >{{ i }} 共{{ item.quotas[index] }},剩余{{
+                      <el-checkbox
+                        class="option"
+                        :label="index"
+                        border
+                        :disabled="item.remains[index] == 0 ? true : false"
+                        >{{ i }}共{{ item.quotas[index] }},剩余{{
                           item.remains[index]
-                        }}</el-checkbox
-                      >
+                        }}
+                      </el-checkbox>
                     </el-checkbox-group>
                   </el-form-item>
                 </div>
               </div>
-            </div>
-          </el-form>
-        </div>
+              <div v-if="item.type == 'location'">
+                <el-form-item
+                  label="定位"
+                  :rules="{
+                    required: item.required,
+                  }"
+                >
+                  <el-button
+                    type="primary"
+                    icon="el-icon-location-information"
+                    @click="getLocation(index_question)"
+                    >点击获取定位</el-button
+                  >
+                  <el-input
+                    disabled
+                    type="text"
+                    class="input"
+                    placeholder="您的位置"
+                    v-model="answers[index_question]"
+                  >
+                  </el-input>
+                </el-form-item>
+              </div>
+          </div>
+        </el-form>
       </div>
     </el-main>
   </el-container>
 </template>
 
 <script>
-import logo from "../components/svg-logo.vue";
+import AMapJS from "amap-js";
+import logo from "../components/svg_logo.vue";
 export default {
   components: {
     Logo: logo,
@@ -212,10 +252,12 @@ export default {
   data() {
     return {
       templateId: 0,
+      code: "",
       locked: false,
       title: "问卷标题",
       type: "normal",
       description: "问卷描述",
+      showIndex: true,
       password: "",
       questions: [
         {
@@ -254,8 +296,13 @@ export default {
           stem: "瓜店老板态度怎样？",
           description: "给态度打分",
           required: true,
-          choices: ["good", "very good", "very very good"],
-          scores: [10, 50, 100],
+          grades: [
+            "非常不满意",
+            "不满意",
+            "一般",
+            "very good",
+            "very very good",
+          ],
         },
         {
           type: "dropdown",
@@ -264,33 +311,27 @@ export default {
           required: true,
           choices: ["(C2H5O)n", "Au", "Fe"],
         },
+        {
+          type: "location",
+          stem: "瓜从哪吃?",
+          description: "",
+          required: true,
+        },
       ],
+      mark: [],
       multi: [],
       answers: [],
     };
   },
   created: function () {
     this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
-      url: "http://139.224.50.146:80/apis/attempt",
-      params: { templateId: this.templateId },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.data.success == true) {
-          this.locked = response.data.locked;
-        } else {
-          console.log(response.data.message);
-        }
-      })
-      .catch((err) => console.log(err));
-    this.$axios({
-      method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { templateId: this.templateId, password: "" },
+      params: { code: this.code, password: "" },
     })
       .then((response) => {
         console.log(response);
@@ -298,20 +339,94 @@ export default {
           this.title = response.data.title;
           this.type = response.data.type;
           this.description = response.data.description;
+          this.showIndex = response.data.showIndex;
           this.password = response.data.password;
           this.questions = response.data.questions;
         } else {
           console.log(response.data.message);
         }
+        while (this.answers.length < this.questions.length) {
+          this.answers.push(null);
+        }
       })
       .catch((err) => console.log(err));
   },
+  mounted() {
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.Geolocation", "AMap.CitySearch"], //需要加载的插件
+    });
+  },
   methods: {
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          var answertmp = this.answers;
+          var tmp = this;
+          this.gaodeMap.load().then(({ AMap }) => {
+            var citysearch = new AMap.CitySearch();
+            //自动获取用户IP，返回当前城市
+            citysearch.getLocalCity(function (status, result) {
+              if (status === "complete" && result.info === "OK") {
+                if (result && result.city && result.bounds) {
+                  var cityinfo = result.city;
+                  console.log("您当前所在城市：", cityinfo);
+                  tmp.$set(answertmp, index, cityinfo);
+                  console.log("您当前所在城市：", answertmp[index]);
+                  //地图显示当前城市
+                }
+              } else {
+                console.log(result.info);
+              }
+            });
+            // new AMap.Geolocation({
+            //   enableHighAccuracy: false, //是否使用高精度定位，默认:true
+            //   timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            // }).getCurrentPosition((status, result) => {
+            //   console.log("状态", status);
+            //   this.$set(
+            //     this.answers,
+            //     index,
+            //     result.addressComponent.province +
+            //       result.addressComponent.city +
+            //       result.addressComponent.district
+            //   );
+            //   console.log("位置", this.answers[index]);
+            // });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
+    },
     exportQuest() {
       this.$PDFSave(this.$refs.quest, this.title);
     },
-    changeValue() {
+    changeValue(val, index_question) {
       console.log(this.answers);
+      for (var j = 0; j < this.logic.length; j++) {
+        if (this.logic[j][0] == index_question) {
+          this.mark[this.logic[j][2]] = false;
+        }
+      }
+
+      for (j = 0; j < this.logic.length; j++) {
+        if (this.logic[j][0] == index_question) {
+          if (this.logic[j][1] == val) {
+            this.mark[this.logic[j][2]] = true;
+          }
+        }
+      }
+      this.$forceUpdate();
     },
     multiChangeValue(index) {
       this.answers[index] = this.multi;
@@ -332,7 +447,7 @@ export default {
   height: 100%;
   flex-direction: column;
   align-items: center;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 18px;
   font-weight: bolder;
 }
@@ -345,7 +460,7 @@ export default {
 }
 .web-title {
   margin-left: 15px;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-weight: 800;
   font-size: 26px;
   position: relative;
@@ -365,7 +480,7 @@ a:hover {
   color: rgba(46, 140, 219, 0.94);
 }
 .editor .el-button {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   height: 50px;
   width: 120px;
   color: #000000;
