@@ -1,5 +1,6 @@
 <template>
-  <div id="Questionnaire">
+    <div class="questionnaire">
+        <Header></Header>
         <div class="banner">
             <div class="type create_by_normal">
                 <div class="inner">
@@ -49,55 +50,51 @@
                         </router-link>
                 </div>
             </div>
+            <div class="type create_by_epide">
+                <div class="inner">
+                        <div class="type_show">
+                            <question-pic></question-pic>
+                        </div>
+                        <h2 class="title">创建疫情打卡问卷</h2>
+                        <h3 class="subtitle">搜集学生身体情况，同时能定位其所处位置</h3>
+                        <router-link to="/epidemic/new">
+                            <el-button>开始</el-button>
+                        </router-link>
+                </div>
+            </div>
         </div>
-        <!--
-        <vue-seamless-scroll
-        :data="listData"
-        :class-option="classOption"
-        class="warp"
-        >
-            <ul class="ul-item">
-            <li class="li-item" v-for="(item, index) in listData" :key="index">
-                {{ item }}
-            </li>
-            </ul>
-        </vue-seamless-scroll>
-        -->
-    <router-view></router-view>
-  </div>
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
-import svg from "../components/svg-questionnaire.vue"
-//import vueSeamlessScroll from 'vue-seamless-scroll'
+import Header from "../components/Header.vue"
+import svg from "../components/svg_questionnaire.vue"
 export default {
     components: {
+        Header: Header,
         'question-pic': svg,
-        //vueSeamlessScroll
-    },
-    data () {
-      return {
-        listData: [1, 2, 3, 4, 5, 6],
-        classOption: {
-          limitMoveNum: 2,
-          direction: 3,
-        }
-      }
     },
 }
 </script>
 
 <style scoped>
+.questionnaire {
+    background-image: url("../assets/Main_bg.jpg");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    height: 100%;
+}
 .banner {
     position: relative;
-    height: 400px;
+    height: 420px;
     overflow: hidden;
     zoom: 1;
 }
 .type {
     float: left;
     height: 100%;
-    width: 25%;
+    width: 20%;
     position: relative;
     text-align: center;
     display: flex;
@@ -118,28 +115,29 @@ export default {
 .el-button {
     height: 50px;
     width: 120px;
-    color: #ffffffdd;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.66);
+    color: rgba(255, 255, 255, 0.66);
     font-size: 20px;
 }
 .el-button:hover {
-    border-color: #000000;
-    color: #000000;
+    background: rgba(184, 184, 184, 0.3);
+    color: #ffffff;
 }
-.create_by_normal,
-.create_by_normal .el-button {
-    background-color: rgba(46, 140, 219, 0.94);
+.create_by_normal {
+    background-color: rgba(46, 140, 219, 0.75);
 }
-.create_by_vote,
-.create_by_vote .el-button {
-    background-color: rgba(71, 157, 230, 0.94);
+.create_by_vote {
+    background-color: rgba(71, 157, 230, 0.75);
 }
-.create_by_apply,
-.create_by_apply .el-button {
-    background-color: rgba(144, 214, 126, 0.94);
+.create_by_apply {
+    background-color: rgba(46, 219, 219, 0.75);
 }
-.create_by_exam,
-.create_by_exam .el-button {
-    background-color: rgba(46, 219, 161, 0.94);
+.create_by_exam {
+    background-color: rgba(46, 219, 161, 0.75);
+}
+.create_by_epide {
+    background-color: rgba(144, 214, 126, 0.75);
 }
 </style>
 

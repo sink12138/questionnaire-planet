@@ -1,211 +1,214 @@
 <template>
-  <div class="reviewer">
+  <div class="history">
     <div class="top">
       <div class="search">
-        <el-dropdown trigger="click">
-          <span class="el-dropdown-link">
-            <el-button><i class="el-icon-s-operation"></i></el-button>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="creationTime()"
-                >创建时间</el-button
-              ></el-dropdown-item
-            >
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="releaseTime()"
-                >发布时间</el-button
-              ></el-dropdown-item
-            >
-            <el-dropdown-item
-              ><el-button type="text" class="button" @click="duration()"
-                >持续时间</el-button
-              ></el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </el-dropdown>
         <el-input
           v-model.trim="search"
-          style="width: 250px"
+          style="width: 320px"
           clearable
           placeholder="请输入要搜索的问卷"
-        />
-        <el-button icon="el-icon-search" @click="searchQuest"></el-button>
+        >
+          <el-dropdown trigger="click" slot="prepend" placement="bottom">
+            <span class="el-dropdown-link">
+              <el-button><i class="el-icon-s-operation"></i></el-button>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="creationTime()"
+                  >创建时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="releaseTime()"
+                  >发布时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="duration()"
+                  >持续时间</el-button
+                ></el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+          <el-button
+            slot="append"
+            icon="el-icon-search"
+            @click="searchQuest"
+          ></el-button>
+        </el-input>
       </div>
     </div>
     <div class="questionnaire">
-      <div class="list" style="margin-left: 1%; margin-right: 1%">
-        <div
-        class="cards"
-        v-for="item in searchQue"
-        :key="item.templateId">
-          <el-card shadow="hover">
-            <div class="card">
-              <div class="banner">
-                <div class="title">
-                  <div v-if="item.released == true">
-                    {{ item.title }}(已发布)
-                  </div>
-                  <div v-else>{{ item.title }}(未发布)</div>
-                </div>
-                <div class="type_show">
-                  <question-pic></question-pic>
-                </div>
-              </div>
-              <div class="time">
-                <time> 创建时间:{{ item.creationTime }} </time>
-              </div>
-              <div class="time" v-if="item.releaseTime != undefined">
-                <time> 最后发布:{{ item.releaseTime }} </time>
-              </div>
-              <div class="time" v-else>
-                <time> 最后发布:未曾发布 </time>
-              </div>
-              <div class="time">
-                <time> 收集时长:{{ item.duration }} </time>
-              </div>
-              <div class="time">
-                <strong>收集数量:</strong>{{ item.answerCount }}
-              </div>
-              <div class="bottom clearfix">
-                <el-button-group>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="adjust(item)"
-                    icon="el-icon-edit"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="statistics(item)"
-                    icon="el-icon-pie-chart"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="release(item)"
-                    icon="el-icon-video-play"
-                    v-if="item.released == false"
-                  ></el-button>
-                  <el-button
-                    type="text"
-                    class="button"
-                    @click="close(item)"
-                    icon="el-icon-video-pause"
-                    v-else
-                  ></el-button>
-                  <el-dropdown>
+      <div class="table" style="margin-left: 1%; margin-right: 1%">
+        <el-table
+          :data="searchQue"
+          border
+          max-height="600"
+          style="width: 100%"
+          :header-cell-style="{
+            'text-align': 'center',
+            background: '#eee',
+            color: '#606266',
+          }"
+          filter-placement="bottom"
+        >
+          <el-table-column fixed prop="title" label="标题" width="200">
+          </el-table-column>
+          <el-table-column
+            label="状态"
+            width="100"
+            :filters="[
+              { text: '回收中', value: true },
+              { text: '未发布', value: false },
+            ]"
+            :filter-method="filterHandler"
+          >
+            <template slot-scope="scope">
+              <p>{{ scope.row.released == true ? "正在回收" : "未发布" }}</p>
+            </template>
+          </el-table-column>
+          <el-table-column prop="answerCount" label="收集数量" width="100">
+          </el-table-column>
+          <el-table-column prop="creationTime" label="创建时间" width="150">
+          </el-table-column>
+          <el-table-column prop="releaseTime" label="最后发布" width="150">
+          </el-table-column>
+          <el-table-column prop="duration" label="收集时长" width="100">
+          </el-table-column>
+          <el-table-column label="操作" width="480">
+            <template slot-scope="scope">
+              <el-button
+                @click="release(scope.row)"
+                icon="el-icon-video-play"
+                style="background-color: #CCFFBF;color: #000"
+                v-if="scope.row.released == false"
+                >发布</el-button
+              >
+              <el-button
+                @click="close(scope.row)"
+                icon="el-icon-video-pause"
+                style="background-color: #FFBFBF;color: #000"
+                v-else
+                >关闭</el-button
+              >
+              <el-button @click="adjust(scope.row)" icon="el-icon-edit"
+                >设置</el-button
+              >
+              <el-button @click="statistics(scope.row)" icon="el-icon-pie-chart"
+                >数据分析</el-button
+              >
+              <el-dropdown placement="bottom" style="margin-left: 10px">
+                <el-button icon="el-icon-more-outline" style="color: black"
+                  >更多操作</el-button
+                >
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item>
                     <el-button
                       type="text"
-                      icon="el-icon-more"
-                      style="color: black"
-                    ></el-button>
-                    <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item>
-                        <el-button
-                          type="text"
-                          class="button"
-                          @click="edit(item)"
-                          icon="el-icon-edit-outline"
-                          >编辑</el-button
-                        >
-                      </el-dropdown-item>
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="remove(item)"
-                          icon="el-icon-delete"
-                          >删除</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="clone(item)"
-                          icon="el-icon-document-copy"
-                          >复制</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item
-                        ><el-button
-                          type="text"
-                          class="button"
-                          @click="preview(item)"
-                          icon="el-icon-view"
-                          >预览</el-button
-                        ></el-dropdown-item
-                      >
-                      <el-dropdown-item>
-                        <el-button 
-                        type="text"
-                        class="button"
-                        @click="qr(item)"
-                        icon="el-icon-share">分享
-                        </el-button>
-                        <el-dialog
-                          :append-to-body="true"
-                          title="分享问卷"
-                          :visible.sync="dialogVisible"
-                          width="30%"
-                          :before-close="handleClose"
-                          center
-                        >
-                          <div class="share">
-                            <div>
-                              <vue-qr
-                                ref="Qrcode"
-                                :text="qrData.text"
-                                :logoSrc="qrData.logo"
-                              >
-                              </vue-qr>
-                            </div>
-                            <div>
-                              <el-button
-                                style="margin: 10px"
-                                class="tag-copy"
-                                @click="copyShareLink"
-                                :data-clipboard-text="qrData.text"
-                              >
-                                复制链接
-                              </el-button>
-                              <a
-                                style="margin: 10px"
-                                :href="exportLink"
-                                @click="downloadImg"
-                                :download="downloadFilename"
-                              >
-                                <el-button>下载二维码</el-button>
-                              </a>
-                            </div>
-                          </div>
-                        </el-dialog>
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </el-dropdown>
-                </el-button-group>
-              </div>
+                      class="btn"
+                      @click="edit(scope.row)"
+                      icon="el-icon-edit-outline"
+                      >编辑问卷</el-button
+                    >
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="remove(scope.row)"
+                      icon="el-icon-delete"
+                      >删除问卷</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="clone(scope.row)"
+                      icon="el-icon-document-copy"
+                      >复制问卷</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="preview(scope.row)"
+                      icon="el-icon-view"
+                      >预览问卷</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item
+                    ><el-button
+                      type="text"
+                      class="btn"
+                      @click="updateCode(scope.row)"
+                      icon="el-icon-refresh"
+                      >更新链接</el-button
+                    ></el-dropdown-item
+                  >
+                  <el-dropdown-item>
+                    <el-button
+                      type="text"
+                      class="btn"
+                      @click="qr(scope.row)"
+                      icon="el-icon-share"
+                      >分享问卷
+                    </el-button>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-dialog
+          :append-to-body="true"
+          title="分享问卷"
+          :visible.sync="dialogVisible"
+          width="30%"
+          :before-close="handleClose"
+          center
+        >
+          <div class="share">
+            <div>
+              <vue-qr ref="Qrcode" :text="qrData.text" :logoSrc="qrData.logo">
+              </vue-qr>
             </div>
-          </el-card>
-        </div>
+            <div>
+              <el-button
+                style="margin: 10px"
+                class="tag-copy"
+                @click="copyShareLink"
+                :data-clipboard-text="qrData.text"
+              >
+                复制链接
+              </el-button>
+              <a
+                style="margin: 10px"
+                :href="exportLink"
+                @click="downloadImg"
+                :download="downloadFilename"
+              >
+                <el-button>下载二维码</el-button>
+              </a>
+            </div>
+          </div>
+        </el-dialog>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import svg from "../components/svg-history.vue";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";
 export default {
   components: {
-    "question-pic": svg,
     VueQr,
   },
   data() {
     return {
+      code: "",
       search: "",
       quest: 0,
       total: 0,
@@ -240,6 +243,12 @@ export default {
         } else {
           this.allQuest = [];
         }
+        var i = 0;
+        for (i in this.allQuest) {
+          if (this.allQuest[i].releaseTime == undefined) {
+            this.allQuest[i].releaseTime = "未曾发布";
+          }
+        }
         console.log(this.allQuest);
         this.searchQue = this.allQuest;
         console.log(this.searchQue);
@@ -248,7 +257,7 @@ export default {
     },
     creationTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.creationTime < b.creationTime) {
+        if (a.creationTime > b.creationTime) {
           return -1;
         } else if (a.creationTime == b.creationTime) {
           return 0;
@@ -259,7 +268,7 @@ export default {
     },
     releaseTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.releaseTime < b.releaseTime) {
+        if (a.releaseTime > b.releaseTime) {
           return -1;
         } else if (a.releaseTime == b.releaseTime) {
           return 0;
@@ -270,10 +279,24 @@ export default {
     },
     duration() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.duration < b.duration) {
+        var time1 = a.duration.split(":");
+        var time2 = b.duration.split(":");
+        if (parseInt(time1[0]) < parseInt(time2[0])) {
           return -1;
-        } else if (a.duration == b.duration) {
-          return 0;
+        } else if (parseInt(time1[0]) == parseInt(time2[0])) {
+          if (parseInt(time1[1]) < parseInt(time2[1])) {
+            return -1;
+          } else if (parseInt(time1[1]) == parseInt(time2[1])) {
+            if (parseInt(time1[2]) < parseInt(time2[2])) {
+              return -1;
+            } else if (parseInt(time1[2]) == parseInt(time2[2])) {
+              return 0;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
         } else {
           return 1;
         }
@@ -300,130 +323,263 @@ export default {
       }
       this.total = this.searchQue.length;
     },
-    adjust(item) {
-      if (item.released == false) {
-        this.quest = item.templateId;
-        console.log(this.quest);
-        this.$router.push("/adjust?templateId=" + this.quest);
+    adjust(row) {
+      this.code = row.code;
+      this.quest = row.templateId;
+      console.log(this.quest);
+      this.$router.push(
+        "/adjust?templateId=" + this.quest + "&code=" + this.code
+      );
+    },
+    edit(row) {
+      if (row.type == "normal") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/normal/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "已发布的问卷不能编辑！",
+            type: "warning",
+          });
+        }
+      } else if (row.type == "vote") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/vote/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "已发布的问卷不能编辑！",
+            type: "warning",
+          });
+        }
+      } else if (row.type == "sign-up") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/apply/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "已发布的问卷不能编辑！",
+            type: "warning",
+          });
+        }
+      } else if (row.type == "exam") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/exam/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "已发布的问卷不能编辑！",
+            type: "warning",
+          });
+        }
+      } else if (row.type == "epidemic") {
+        if (row.released == false) {
+          this.code = row.code;
+          this.quest = row.templateId;
+          console.log(this.quest);
+          this.$router.push(
+            "/epidemic/edit?templateId=" + this.quest + "&code=" + this.code
+          );
+        } else {
+          this.$notify({
+            title: "提示",
+            message: "已发布的问卷不能编辑！",
+            type: "warning",
+          });
+        }
+      }
+    },
+    release(row) {
+      if (row.scheduled == true) {
+        this.$confirm("此操作将取消该问卷自动发布, 是否继续?", "提示", {
+          confirmButtonText: "发布",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then(() => {
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146:80/apis/release",
+              data: JSON.stringify({
+                templateId: row.templateId,
+              }),
+            }).then(
+              (response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.$notify({
+                    title: "提示",
+                    message: "问卷发布成功",
+                    type: "success",
+                  });
+                  this.code = response.data.code;
+                  this.qrData.text =
+                    window.location.host + "/fill?code=" + this.code;
+                  this.dialogVisible = true;
+                  row.released = true;
+                }
+              },
+              (err) => {
+                this.$notify({
+                  title: "错误",
+                  message: err,
+                  type: "error",
+                });
+              }
+            );
+          })
+          .catch(() => {
+            this.$notify({
+              title: "提示",
+              message: "已取消发布",
+              type: "info",
+            });
+          });
       } else {
-        this.$message({
-          message: "问卷已发布！",
-        });
+        this.$axios({
+          method: "post",
+          url: "http://139.224.50.146:80/apis/release",
+          data: JSON.stringify({
+            templateId: row.templateId,
+          }),
+        }).then(
+          (response) => {
+            console.log(response);
+            if (response.data.success == true) {
+              this.$notify({
+                title: "提示",
+                message: "问卷发布成功",
+                type: "success",
+              });
+              this.code = response.data.code;
+              this.qrData.text =
+                window.location.host + "/fill?code=" + this.code;
+              this.dialogVisible = true;
+              row.released = true;
+            }
+          },
+          (err) => {
+            this.$notify({
+              title: "错误",
+              message: err,
+              type: "error",
+            });
+          }
+        );
       }
     },
-    edit(item) {
-      if (item.type == "normal") {
-        if (item.released == false) {
-          this.quest = item.templateId;
-          console.log(this.quest);
-          this.$router.push("/normal/edit?templateId=" + this.quest);
-        } else {
-          this.$message({
-            message: "问卷已发布！",
-          });
-        }
-      } else if (item.type == "vote") {
-        if (item.released == false) {
-          this.quest = item.templateId;
-          console.log(this.quest);
-          this.$router.push("/vote/edit?templateId=" + this.quest);
-        } else {
-          this.$message({
-            message: "问卷已发布！",
-          });
-        }
-      } else if (item.type == "sign-up") {
-        if (item.released == false) {
-          this.quest = item.templateId;
-          console.log(this.quest);
-          this.$router.push("/apply/edit?templateId=" + this.quest);
-        } else {
-          this.$message({
-            message: "问卷已发布！",
-          });
-        }
-      }
-    },
-    release(item) {
+    updateCode(row) {
       this.$axios({
         method: "post",
-        url: "http://139.224.50.146:80/apis/release",
+        url: "http://139.224.50.146:80/apis/code",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷发布成功！",
+            this.$notify({
+              title: "提示",
+              message: "更新链接成功",
               type: "success",
             });
-            this.templateId = item.templateId;
-            this.qrData.text =
-              window.location.host + "/fill?templateId=" + this.templateId;
+            row.code = response.data.code;
+            this.qrData.text = window.location.host + "/fill?code=" + row.code;
             this.dialogVisible = true;
-            item.released = true;
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error",
+          });
         }
       );
     },
-    qr(item) {
-      this.templateId = item.templateId;
-      this.qrData.text =
-        window.location.host + "/fill?templateId=" + this.templateId;
+    qr(row) {
+      this.code = row.code;
+      this.qrData.text = window.location.host + "/fill?code=" + this.code;
       this.dialogVisible = true;
     },
-    close(item) {
+    close(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/close",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷关闭成功！",
+            this.$notify({
+              title: "提示",
+              message: "问卷关闭成功",
               type: "success",
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error",
+          });
         }
       );
     },
-    clone(item) {
+    clone(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/clone",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷复制成功！",
+            this.$notify({
+              title: "提示",
+              message: "问卷复制成功",
               type: "success",
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error",
+          });
         }
       );
     },
-    remove(item) {
+    remove(row) {
       this.$confirm("此操作将删除该问卷, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -434,45 +590,62 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/remove",
             data: JSON.stringify({
-              templateId: item.templateId,
+              templateId: row.templateId,
             }),
           }).then(
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已删除。",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷删除成功",
                   type: "success",
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error",
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info",
           });
         });
     },
-    preview(item) {
-      this.quest = item.templateId;
+    preview(row) {
+      this.quest = row.templateId;
+      this.code = row.code;
       console.log(this.quest);
-      this.$router.push("/preview?templateId=" + this.quest);
+      this.$router.push(
+        "/preview?templateId=" + this.quest + "&code=" + this.code
+      );
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success",
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制发生错误",
+          type: "error",
+        });
         clipboard.destroy();
       });
     },
@@ -481,33 +654,34 @@ export default {
       this.exportLink = Qrcode.$el.currentSrc;
       this.downloadFilename = "Questionnaire";
     },
-    statistics(item) {
-      this.quest = item.templateId;
+    statistics(row) {
+      this.quest = row.templateId;
       console.log(this.quest);
       this.$router.push("/statistics?templateId=" + this.quest);
-    }
+    },
+    filterHandler(value, row) {
+      return row["released"] === value;
+    },
   },
 };
 </script>
 
 <style scoped>
+.history {
+  margin-left: 60px;
+}
 .top {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  margin: 15px;
 }
 .list {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   flex-flow: row wrap;
-}
-.cards {
-  width: 16%;
-  margin-right: 5px;
-  margin-bottom: 5px;
 }
 .card {
   display: flex;
@@ -533,14 +707,8 @@ export default {
   margin: 0;
   margin-top: 5px;
 }
-.type_show {
-  margin-top: 0px;
-}
 .title {
   margin-bottom: 10px;
-}
-.button {
-  color: black;
 }
 .share {
   display: flex;
@@ -548,7 +716,7 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.clearfix .el-button {
-  width: 45px;
+.btn {
+  color: #000;
 }
 </style>

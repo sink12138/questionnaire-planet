@@ -8,12 +8,31 @@
             ><i class="el-icon-edit-outline"></i>编辑</span
           >
           <div class="editor_1">
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(0)">单选题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(1)">多选题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(2)">填空题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(3)">评分题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(4)">下拉题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(5)">报名题</el-button>
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(0)"
+              >单选题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(1)"
+              >多选题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(2)"
+              >填空题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(3)"
+              >评分题</el-button
+            >
+            <el-button
+              icon="el-icon-circle-plus-outline"
+              @click="addQuestion(4)"
+              >下拉题</el-button
+            >
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -68,22 +87,25 @@
     </div>
     <div class="main">
       <ButtonGroup vertical class="button_group">
-        <Button 
-        :style="{'background-color': setColor('edit')}" 
-        icon="ios-create-outline" 
-        @click="pageChange('edit')">
+        <Button
+          :style="{ 'background-color': setColor('edit') }"
+          icon="ios-create-outline"
+          @click="pageChange('edit')"
+        >
           题目编辑
         </Button>
-        <Button 
-        :style="{'background-color': setColor('logic')}" 
-        icon="ios-link-outline" 
-        @click="pageChange('logic')">
+        <Button
+          :style="{ 'background-color': setColor('logic') }"
+          icon="ios-link-outline"
+          @click="pageChange('logic')"
+        >
           逻辑关联
         </Button>
-        <Button 
-        :style="{'background-color': setColor('info')}" 
-        icon="ios-settings-outline" 
-        @click="pageChange('info')">
+        <Button
+          :style="{ 'background-color': setColor('info') }"
+          icon="ios-settings-outline"
+          @click="pageChange('info')"
+        >
           问卷设置
         </Button>
       </ButtonGroup>
@@ -96,7 +118,8 @@
       >
         <div class="basic">
           <!-- 问卷题目 -->
-          <el-form-item v-if="pageShow != 'logic'"
+          <el-form-item
+            v-if="pageShow != 'logic'"
             label="问卷题目"
             :rules="{
               required: true,
@@ -216,15 +239,22 @@
                     <div class="question-index" v-show="modelForm.showIndex">
                       第{{ index + 1 }}题
                     </div>
-                    <div v-if="item.type == 0" class="question-index">(单选题)</div>
-                    <div v-if="item.type == 1" class="question-index">(多选题)</div>
-                    <div v-if="item.type == 2" class="question-index">(填空题)</div>
-                    <div v-if="item.type == 3" class="question-index">(评分题)</div>
-                    <div v-if="item.type == 4" class="question-index">(下拉题)</div>
-                    <div v-if="item.type == 5" class="question-index">(报名题)</div>
-                    <div class="question-title">
-                      :{{ item.questionName }}
+                    <div v-if="item.type == 0" class="question-index">
+                      (单选题)
                     </div>
+                    <div v-if="item.type == 1" class="question-index">
+                      (多选题)
+                    </div>
+                    <div v-if="item.type == 2" class="question-index">
+                      (填空题)
+                    </div>
+                    <div v-if="item.type == 3" class="question-index">
+                      (评分题)
+                    </div>
+                    <div v-if="item.type == 4" class="question-index">
+                      (下拉题)
+                    </div>
+                    <div class="question-title">:{{ item.questionName }}</div>
                   </template>
                   <div class="question_name">
                     <!-- 题干 -->
@@ -254,10 +284,7 @@
                         trigger: 'change',
                       }"
                     >
-                      <el-switch
-                        v-model="item.required"
-                      >
-                      </el-switch>
+                      <el-switch v-model="item.required"> </el-switch>
                     </el-form-item>
                   </div>
                   <!-- 问题描述 -->
@@ -273,10 +300,80 @@
                     />
                   </el-form-item>
                   <el-row>
+                    <!-- 是否乱序 -->
+                    <el-col :span="10">
+                      <el-form-item
+                        v-if="
+                          item.type == '0' ||
+                          item.type == '1' ||
+                          item.type == '2'
+                        "
+                        :prop="`questions.${index}.shuffle`"
+                        :label="`随机排序此题`"
+                        :rules="{
+                          required: true,
+                          message: '请选择是否随机排序此题',
+                          trigger: 'change',
+                        }"
+                      >
+                        <el-switch
+                          v-model="item.shuffle"
+                          active-color="#13ce66"
+                          inactive-color="#ff4949"
+                        >
+                        </el-switch>
+                      </el-form-item>
+                    </el-col>
+                    <!-- 自动评分 -->
+                    <el-col :span="10">
+                      <el-form-item
+                        v-if="
+                          item.type == '0' ||
+                          item.type == '1' ||
+                          item.type == '2'
+                        "
+                        :prop="`questions.${index}.score`"
+                        :label="`自动评分`"
+                        :rules="{
+                          required: true,
+                          message: '请选择是否自动评分',
+                          trigger: 'change',
+                        }"
+                      >
+                        <el-switch
+                          v-model="item.score"
+                          active-color="#13ce66"
+                          inactive-color="#ff4949"
+                        >
+                        </el-switch>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <!-- 分值 -->
+                  <el-form-item
+                    v-if="item.score == true"
+                    :prop="`questions.${index}.points`"
+                    label="分值"
+                    :rules="{
+                      required: true,
+                      message: '请填写此题分值',
+                      trigger: 'change',
+                    }"
+                  >
+                    <el-input-number
+                      v-model="item.points"
+                      :precision="1"
+                      :step="0.5"
+                      :max="20"
+                      :min="0.5"
+                      step-strictly
+                    ></el-input-number>
+                  </el-form-item>
+                  <el-row>
                     <!-- 最少选项数 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
+                        v-if="item.type == 1"
                         :prop="`questions.${index}.min`"
                         label="最少选项数"
                         :rules="[
@@ -289,7 +386,7 @@
                         ]"
                       >
                         <el-input
-                          v-model="item.min"
+                          v-model.trim="item.min"
                           style="width: 125px"
                           clearable
                           placeholder="请填写最少选项数"
@@ -299,7 +396,7 @@
                     <!-- 最多选项数 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
+                        v-if="item.type == 1"
                         :prop="`questions.${index}.max`"
                         label="最多选项数"
                         :rules="[
@@ -368,7 +465,7 @@
                       </el-form-item>
                     </el-col>
                   </el-row>
-                  <!-- 答案 -->
+                  <!-- 选项 -->
                   <el-row v-if="item.type != 2 && item.type != 3">
                     <el-form-item
                       v-for="(opt, idx) in item.answers"
@@ -424,49 +521,95 @@
                       </div>
                     </el-form-item>
                   </el-row>
-                  <el-row v-if="item.type == 5">
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`第${idx + 1}项名额`"
-                      :prop="`questions.${index}.answers.${idx}.number`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入名额',
-                          trigger: 'blur',
-                        },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
-                      ]"
-                    >
-                      <el-input
-                        v-model="opt.number"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入名额"
-                      />
+                  <!-- 答案 -->
+                  <div v-if="item.type == '0'">
+                    <el-form-item label="答案">
+                      <el-radio-group
+                        v-model="item.answer"
+                        v-for="(j, idx2) in item.answers"
+                        :key="idx2"
+                        @change="changeValue(index)"
+                      >
+                        <el-radio class="option" :label="idx2">{{
+                          j.value
+                        }}</el-radio>
+                      </el-radio-group>
+                      <el-button
+                        icon="el-icon-refresh-right"
+                        v-show="item.type == 0"
+                        @click="resetAnswer(item)"
+                        >重置答案</el-button
+                      >
                     </el-form-item>
-                  </el-row>
+                  </div>
+                  <div class="multi" v-if="item.type == '1'">
+                    <el-form-item label="答案">
+                      <el-checkbox-group
+                        v-model="item.answer"
+                        v-for="(j, idx2) in item.answers"
+                        :min="0"
+                        :max="item.max"
+                        :key="idx2"
+                        @change="changeValue(index)"
+                      >
+                        <el-checkbox class="option" :label="idx2" border>{{
+                          j.value
+                        }}</el-checkbox>
+                      </el-checkbox-group></el-form-item
+                    >
+                  </div>
+                  <div v-if="item.type == '2'">
+                    <el-row v-if="item.type == 2">
+                      <el-form-item
+                        v-for="(opt, idx) in item.answer"
+                        :key="idx"
+                        :label="`备选答案${idx + 1}`"
+                        :prop="`questions.${index}.answer.${idx}`"
+                        :rules="[
+                          {
+                            required: true,
+                            message: '请输入参考答案',
+                            trigger: 'blur',
+                          },
+                        ]"
+                      >
+                        <el-input
+                          v-model="item.answer[idx]"
+                          style="width: 200px"
+                          clearable
+                          placeholder="请输入参考答案"
+                        />
+                        <el-button
+                          style="margin-left: 20px"
+                          @click.prevent="removeAnswer(index, idx)"
+                          >删除</el-button
+                        >
+                      </el-form-item>
+                    </el-row>
+                  </div>
                   <el-form-item label="编辑题目">
                     <el-button
                       icon="el-icon-circle-plus"
                       v-show="item.type != 2 && item.type != 3"
                       @click="addDomain(index)"
-                      >新增选项</el-button
-                    >
+                      >新增选项
+                    </el-button>
+                    <el-button
+                      icon="el-icon-circle-plus"
+                      v-show="item.type == 2"
+                      @click="addAnswer(index)"
+                      >新增答案
+                    </el-button>
                     <el-button
                       icon="el-icon-s-order"
                       @click="copyQuestion(index)"
-                      >复制题目</el-button
-                    >
+                      >复制题目
+                    </el-button>
                     <el-button
                       icon="el-icon-delete-solid"
                       @click="removeQuestion(index)"
-                      >删除题目</el-button
-                    >
+                      >删除题目
+                    </el-button>
                   </el-form-item>
                 </el-collapse-item>
               </transition-group>
@@ -524,7 +667,6 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
-            <el-button @click="addQuestion(5)">报名题</el-button>
           </el-button-group>
           <el-button
             id="addButton"
@@ -549,7 +691,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import Header from "../components/Header.vue";
@@ -608,7 +749,9 @@ export default {
         showIndex: true,
         limited: true,
         password: "",
-        quota: 0,
+        quota: undefined,
+        startTime: "",
+        endTime: "",
         logic: [],
         questions: [],
       },
@@ -618,14 +761,14 @@ export default {
       },
       exportLink: "",
       downloadFilename: "",
-      pageShow: 'edit',
+      pageShow: "edit",
       dialogVisible: false,
       popVisible: false,
     };
   },
   created: function () {
-    this.code = this.$route.query.code;
     this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
@@ -662,6 +805,10 @@ export default {
             min: 1,
             height: 1,
             width: 600,
+            shuffle: false,
+            score: false,
+            points: 5.0,
+            answer: [],
             grades: [],
             answers: [],
           };
@@ -678,6 +825,10 @@ export default {
               min: 1,
               height: 1,
               width: 600,
+              shuffle: false,
+              score: false,
+              points: 5.0,
+              answer: [],
               grades: [],
               answers: [],
             };
@@ -685,16 +836,20 @@ export default {
             question.questionName = item.stem;
             question.questionSummary = item.description;
             question.required = item.required;
-            question.answers = [];
+            question.shuffle = item.shuffle;
+            question.points = item.points;
+            if (question.points != undefined) {
+              question.score = true;
+            }
+            question.answer = item.answer;
+            if (question.answer == undefined) {
+              question.answer = [];
+            }
             switch (item.type) {
               case "choice":
                 question.type = "0";
                 for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
+                  question.answers.push({ value: item.choices[j] });
                 }
                 break;
               case "multi-choice":
@@ -702,22 +857,15 @@ export default {
                 question.max = item.max;
                 question.min = item.min;
                 for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
+                  question.answers.push({ value: item.choices[j] });
                 }
                 break;
               case "filling":
                 question.type = "2";
-                question.height = item.height;
+                question.height = parseInt(item.height);
                 question.width = parseInt(item.width);
-                question.answers.push({
-                  value: "",
-                  scores: 0,
-                  number: 0,
-                });
+                question.answers.push({ value: "" });
+                question.answers.push({ value: "" });
                 break;
               case "grade":
                 question.type = "3";
@@ -728,23 +876,7 @@ export default {
               case "dropdown":
                 question.type = "4";
                 for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
-                }
-                break;
-              case "sign-up":
-                question.type = "5";
-                question.max = item.max;
-                question.min = item.min;
-                for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: item.quotas[j],
-                  });
+                  question.answers.push({ value: item.choices[j] });
                 }
                 break;
             }
@@ -752,6 +884,7 @@ export default {
             this.modelForm.questions.push(question);
             this.activeNames.push(this.modelForm.questions.length - 1);
           }
+          console.log(this.modelForm.questions);
         } else {
           console.log(response.data.message);
         }
@@ -762,22 +895,33 @@ export default {
     removeLogic(index){
       this.modelForm.logic.splice(index,1);
     },
+    resetAnswer(item) {
+      item.answer = undefined;
+    },
     setid(i) {
       return "question" + i;
     },
     setColor(key) {
-      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
-      else return '#fff'
+      if (key == this.pageShow) return "rgba(168, 216, 255, 0.9)";
+      else return "#fff";
     },
     pageChange(key) {
-      this.pageShow = key
+      this.pageShow = key;
+    },
+    changeValue(index) {
+      console.log(this.modelForm.questions[index].answer);
+    },
+    handleType(index) {
+      if (this.modelForm.questions[index].type == "1") {
+        this.modelForm.questions[index].answer = [];
+      } else {
+        this.modelForm.questions[index].answer = null;
+      }
     },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
         callback(new Error("请输入数字"));
-      } else if (parseInt(value) < 1) {
-        callback(new Error("请输入大于等于一的数字"));
       } else {
         callback();
       }
@@ -797,6 +941,10 @@ export default {
         });
       }
     },
+    removeAnswer(index, idx) {
+      // 删除答案
+      this.modelForm.questions[index].answer.splice(idx, 1);
+    },
     removeQuestion(index) {
       //删除题目
       this.modelForm.questions.splice(index, 1);
@@ -813,6 +961,10 @@ export default {
         min: 1,
         height: 1,
         width: 600,
+        shuffle: false,
+        score: false,
+        points: 5.0,
+        answer: null,
         grades: [],
         answers: [],
       };
@@ -825,6 +977,9 @@ export default {
       this.template.min = this.modelForm.questions[index].min;
       this.template.height = this.modelForm.questions[index].height;
       this.template.width = this.modelForm.questions[index].width;
+      this.template.shuffle = this.modelForm.questions[index].shuffle;
+      this.template.score = this.modelForm.questions[index].score;
+      this.template.points = this.modelForm.questions[index].points;
       var i = 0;
       for (i in this.modelForm.questions[index].answers) {
         this.template.answers.push({
@@ -836,16 +991,26 @@ export default {
       for (i in this.modelForm.questions[index].grades) {
         this.template.grades.push(this.modelForm.questions[index].grades[i]);
       }
+      if (this.template.type == "2") {
+        i = 0;
+        this.template.answer = [];
+        for (i in this.modelForm.questions[index].answer) {
+          this.template.answer.push(this.modelForm.questions[index].answer[i]);
+        }
+      } else {
+        this.template.answer = this.modelForm.questions[index].answer;
+      }
       this.modelForm.questions.splice(index + 1, 0, this.template);
       this.activeNames.push(this.modelForm.questions.length - 1);
       console.log(this.modelForm.questions);
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({
-        value: "",
-        number: 0,
-      });
+      this.modelForm.questions[index].answers.push({ value: "" });
+    },
+    addAnswer(index) {
+      // 新增答案
+      this.modelForm.questions[index].answer.push("");
     },
     addQuestion(index) {
       // 新增题目
@@ -858,15 +1023,16 @@ export default {
         min: 1,
         height: 1,
         width: 600,
+        shuffle: false,
+        score: false,
+        points: 5.0,
+        answer: [],
         grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-        answers: [
-          { value: "", number: 0 },
-          { value: "", number: 0 },
-        ],
+        answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/apply/edit#question" + (this.modelForm.questions.length - 1)
+        "/exam/edit#question" + (this.modelForm.questions.length - 1)
       );
     },
     addlogic() {
@@ -901,6 +1067,35 @@ export default {
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
             quest.required = question.required;
+            quest.shuffle = question.shuffle;
+            quest.answer = question.answer;
+            if (question.score == true) {
+              quest.points = question.points;
+              if (
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
+              ) {
+                var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
+                this.$notify({
+                  title: "提示",
+                  message: mes,
+                  type: "warning",
+                });
+                return;
+              }
+            } else {
+              quest.points = null;
+            }
+            if (
+              quest.answer == [] ||
+              quest.answer == undefined ||
+              quest.answer == ""
+            ) {
+              quest.answer = null;
+            }
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -915,7 +1110,7 @@ export default {
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
-                  var mes =
+                  mes =
                     "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
@@ -948,34 +1143,10 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
-              case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
-                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
-          }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
           }
           this.$axios({
             method: "post",
@@ -990,8 +1161,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "exam",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
@@ -1003,7 +1177,7 @@ export default {
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
-                  type: "success",
+                  type: "succes",
                 });
               } else {
                 this.$notify({
@@ -1043,6 +1217,35 @@ export default {
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
             quest.required = question.required;
+            quest.shuffle = question.shuffle;
+            quest.answer = question.answer;
+            if (question.score == true) {
+              quest.points = question.points;
+              if (
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
+              ) {
+                var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
+                this.$notify({
+                  title: "提示",
+                  message: mes,
+                  type: "warning",
+                });
+                return;
+              }
+            } else {
+              quest.points = null;
+            }
+            if (
+              quest.answer == [] ||
+              quest.answer == undefined ||
+              quest.answer == ""
+            ) {
+              quest.answer = null;
+            }
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -1057,7 +1260,7 @@ export default {
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
-                  var mes =
+                  mes =
                     "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
@@ -1090,34 +1293,10 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
-              case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
-                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
-          }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
           }
           this.$axios({
             method: "post",
@@ -1132,8 +1311,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "exam",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
@@ -1142,12 +1324,13 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
+                this.code = response.data.code;
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
                   type: "success",
                 });
-                this.$router.push("/preview?templateId=" + this.templateId);
+                this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$notify({
                   title: "提示",
@@ -1186,6 +1369,35 @@ export default {
             quest.stem = question.questionName;
             quest.description = question.questionSummary;
             quest.required = question.required;
+            quest.shuffle = question.shuffle;
+            quest.answer = question.answer;
+            if (question.score == true) {
+              quest.points = question.points;
+              if (
+                (quest.answer == null ||
+                  quest.answer == [] ||
+                  quest.answer == undefined ||
+                  quest.answer == "") &&
+                quest.answer != 0
+              ) {
+                var mes = "第" + (parseInt(i) + 1) + "题未设定答案！";
+                this.$notify({
+                  title: "提示",
+                  message: mes,
+                  type: "warning",
+                });
+                return;
+              }
+            } else {
+              quest.points = null;
+            }
+            if (
+              quest.answer == [] ||
+              quest.answer == undefined ||
+              quest.answer == ""
+            ) {
+              quest.answer = null;
+            }
             quest.choices = [];
             switch (question.type) {
               case "0":
@@ -1200,7 +1412,7 @@ export default {
                 quest.max = parseInt(question.max);
                 quest.min = parseInt(question.min);
                 if (quest.max < quest.min) {
-                  var mes =
+                  mes =
                     "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
                   this.$notify({
                     title: "提示",
@@ -1233,34 +1445,10 @@ export default {
                   quest.choices.push(x.value);
                 }
                 break;
-              case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
-                break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
-          }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
           }
           this.$axios({
             method: "post",
@@ -1275,8 +1463,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "exam",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
@@ -1284,6 +1475,7 @@ export default {
             (response) => {
               console.log(response);
               if (response.data.success == true) {
+                this.code = response.data.code;
                 this.templateId = response.data.templateId;
                 this.$notify({
                   title: "提示",
@@ -1507,5 +1699,8 @@ export default {
 .logic-show {
   text-align: center;
   width: 600px;
+}
+.option {
+  margin-right: 10px;
 }
 </style>

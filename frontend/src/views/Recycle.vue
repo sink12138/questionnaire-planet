@@ -1,101 +1,86 @@
 <template>
-  <div class="reviewer">
-    <div class="search">
-      <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <el-button><i class="el-icon-s-operation"></i></el-button>
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="creationTime()"
-              >创建时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="releaseTime()"
-              >发布时间</el-button
-            ></el-dropdown-item
-          >
-          <el-dropdown-item
-            ><el-button type="text" class="button" @click="duration()"
-              >持续时间</el-button
-            ></el-dropdown-item
-          >
-        </el-dropdown-menu>
-      </el-dropdown>
-      <el-input
+  <div class="recycle">
+    <div class="top">
+      <div class="search">
+        <el-input
         v-model.trim="search"
-        style="width: 250px"
+        style="width: 480px"
         clearable
-        placeholder="请输入要搜索的问卷"
-      />
-      <el-button icon="el-icon-search" @click="searchQuest"></el-button>
+        placeholder="请输入要搜索的问卷">
+          <el-dropdown trigger="click" slot="prepend" placement="bottom">
+            <span class="el-dropdown-link">
+              <el-button><i class="el-icon-s-operation"></i></el-button>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="creationTime()"
+                  >创建时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="releaseTime()"
+                  >发布时间</el-button
+                ></el-dropdown-item
+              >
+              <el-dropdown-item
+                ><el-button type="text" class="button" @click="duration()"
+                  >持续时间</el-button
+                ></el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </el-dropdown>
+          <el-button slot="append" icon="el-icon-search" @click="searchQuest"></el-button>
+        </el-input>
+      </div>
+      <div style="font-size: 16px;color: #3E9DFF">删除的问卷30天后自动清理</div>
     </div>
     <div class="questionnaire">
-      <div class="list" style="margin-left: 1%; margin-right: 1%">
-        <div
-        class="cards"
-        v-for="item in allQuest"
-        :key="item.templateId"
-        :offset="1">
-          <el-card shadow="hover">
-            <div class="card">
-              <div class="banner">
-                <div class="title">
-                  <div v-if="item.released == true">
-                    {{ item.title }}(已发布)
-                  </div>
-                  <div v-else>{{ item.title }}(未发布)</div>
-                </div>
-                <div class="type_show">
-                  <question-pic></question-pic>
-                </div>
-              </div>
-              <div class="time">
-                <time> 创建时间:{{ item.creationTime }} </time>
-              </div>
-              <div class="time" v-if="item.releaseTime != undefined">
-                <time> 最后发布:{{ item.releaseTime }} </time>
-              </div>
-              <div class="time" v-else>
-                <time> 最后发布:未曾发布 </time>
-              </div>
-              <div class="time">
-                <time> 收集时长:{{ item.duration }} </time>
-              </div>
-              <div class="time">
-                <strong>收集数量:</strong>{{ item.answerCount }}
-              </div>
-              <div class="bottom clearfix">
-                <div v-if="item.released == true">已发布</div>
-                <div v-else>未发布</div>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="deleteQuest(item)"
-                  icon="el-icon-delete-solid"
-                ></el-button>
-                <el-button
-                  type="text"
-                  class="button"
-                  @click="recover(item)"
-                  icon="el-icon-refresh"
-                ></el-button>
-              </div>
-            </div>
-          </el-card>
-        </div>
+      <div class="table" style="margin-left: 1%; margin-right: 1%">
+        <el-table :data="searchQue" max-height="600" border :header-cell-style="{'text-align':'center',background:'#eee',color:'#606266','height':'58px'}">
+          <el-table-column fixed prop="title" label="标题" width="240">
+          </el-table-column>
+          <el-table-column
+            prop="answerCount"
+            label="收集数量"
+            width="140"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="creationTime"
+            label="创建时间"
+            width="180"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="releaseTime"
+            label="最后发布"
+            width="180"
+          >
+          </el-table-column>
+          <el-table-column prop="duration" label="收集时长" width="140">
+          </el-table-column>
+          <el-table-column label="操作" width="320">
+            <template slot-scope="scope">
+              <el-button
+                @click="deleteQuest(scope.row)"
+                icon="el-icon-delete"
+                >彻底删除</el-button
+              >
+              <el-button
+                @click="recover(scope.row)"
+                icon="el-icon-refresh"
+                >恢复问卷</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import svg from "../components/svg-questionnaire.vue";
 export default {
-  components: {
-    "question-pic": svg,
-  },
   data() {
     return {
       search: "",
@@ -123,6 +108,12 @@ export default {
         } else {
           this.allQuest = [];
         }
+        var i = 0;
+        for (i in this.allQuest) {
+          if (this.allQuest[i].releaseTime == undefined) {
+            this.allQuest[i].releaseTime = "未曾发布";
+          }
+        }
         console.log(this.allQuest);
         this.searchQue = this.allQuest;
         console.log(this.searchQue);
@@ -135,7 +126,7 @@ export default {
     handleCurrentChange: function (currentPage) {
       this.current_page = currentPage;
     },
-    deleteQuest(item) {
+    deleteQuest(row) {
       this.$confirm("此操作将永久删除该问卷, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -146,57 +137,68 @@ export default {
             method: "post",
             url: "http://139.224.50.146:80/apis/delete",
             data: JSON.stringify({
-              templateId: item.templateId,
+              templateId: row.templateId,
             }),
           }).then(
             (response) => {
               console.log(response);
               if (response.data.success == true) {
-                this.$message({
-                  message: "问卷已彻底删除。",
-                  type: "success",
+                this.$notify({
+                  title: "提示",
+                  message: "问卷彻底删除成功",
+                  type: "success"
                 });
                 location.reload();
               }
             },
             (err) => {
-              alert(err);
+              this.$notify({
+                title: "错误",
+                message: err,
+                type: "error"
+              });
             }
           );
         })
         .catch(() => {
-          this.$message({
-            type: "info",
+          this.$notify({
+            title: "提示",
             message: "已取消删除",
+            type: "info"
           });
         });
     },
-    recover(item) {
+    recover(row) {
       this.$axios({
         method: "post",
         url: "http://139.224.50.146:80/apis/recover",
         data: JSON.stringify({
-          templateId: item.templateId,
+          templateId: row.templateId,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷已恢复。",
-              type: "success",
+            this.$notify({
+              title: "提示",
+              message: "问卷恢复成功",
+              type: "success"
             });
             location.reload();
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error"
+          });
         }
       );
     },
     creationTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.creationTime < b.creationTime) {
+        if (a.creationTime > b.creationTime) {
           return -1;
         } else if (a.creationTime == b.creationTime) {
           return 0;
@@ -207,7 +209,7 @@ export default {
     },
     releaseTime() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.releaseTime < b.releaseTime) {
+        if (a.releaseTime > b.releaseTime) {
           return -1;
         } else if (a.releaseTime == b.releaseTime) {
           return 0;
@@ -218,10 +220,24 @@ export default {
     },
     duration() {
       this.searchQue = this.searchQue.sort(function (a, b) {
-        if (a.duration < b.duration) {
+        var time1 = a.duration.split(":");
+        var time2 = b.duration.split(":");
+        if (parseInt(time1[0]) < parseInt(time2[0])) {
           return -1;
-        } else if (a.duration == b.duration) {
-          return 0;
+        } else if (parseInt(time1[0]) == parseInt(time2[0])) {
+          if (parseInt(time1[1]) < parseInt(time2[1])) {
+            return -1;
+          } else if (parseInt(time1[1]) == parseInt(time2[1])) {
+            if (parseInt(time1[2]) < parseInt(time2[2])) {
+              return -1;
+            } else if (parseInt(time1[2]) == parseInt(time2[2])) {
+              return 0;
+            } else {
+              return 1;
+            }
+          } else {
+            return 1;
+          }
         } else {
           return 1;
         }
@@ -253,11 +269,15 @@ export default {
 </script>
 
 <style scoped>
-.list {
+.recycle {
+  margin-left: 60px;
+}
+.top {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  margin: 15px;
 }
 .cards {
   width: 16%;
@@ -294,10 +314,7 @@ export default {
 .title {
   margin-bottom: 10px;
 }
-.button {
-  color: black;
-}
-.clearfix .el-button {
-  width: 45px;
+.el-table__column-filter-trigger {
+  height: 20px;
 }
 </style>

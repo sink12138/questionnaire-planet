@@ -83,9 +83,7 @@
                     />
                   </el-form-item>
                   <!-- 问卷描述 -->
-                  <el-form-item
-                    label="问卷描述"
-                  >
+                  <el-form-item label="问卷描述">
                     <el-input
                       v-model="modelForm.description"
                       style="width: 258px"
@@ -94,6 +92,20 @@
                       placeholder="请填写问卷描述"
                     />
                   </el-form-item>
+                  <el-row>
+                    <el-col :span="10">
+                      <!-- 显示题号 -->
+                      <el-form-item label="显示题号">
+                        <el-switch v-model="modelForm.showIndex"> </el-switch>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="10">
+                      <!-- 限填一次 -->
+                      <el-form-item label="每人限填一次">
+                        <el-switch v-model="modelForm.limited"> </el-switch>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
                   <!-- 结束语 -->
                   <el-form-item label="结束语">
                     <el-input
@@ -109,7 +121,7 @@
                       v-model="modelForm.password"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="设置后需要密码才可回答"
                     />
                   </el-form-item>
                   <!-- 问卷限额 -->
@@ -125,8 +137,34 @@
                       v-model="modelForm.quota"
                       style="width: 258px"
                       clearable
-                      placeholder="可为空"
+                      placeholder="收集指定数量后将无法提交"
                     />
+                  </el-form-item>
+                  <!-- 发布时间 -->
+                  <el-form-item label="自动发布时间">
+                    <el-date-picker
+                      v-model="modelForm.startTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
+                  </el-form-item>
+                  <!-- 回收时间 -->
+                  <el-form-item label="自动回收时间">
+                    <el-date-picker
+                      v-model="modelForm.endTime"
+                      value-format="yyyy-MM-dd HH:mm:00"
+                      format="yyyy-MM-dd HH:mm"
+                      type="datetime"
+                      placeholder="选择日期时间"
+                      align="right"
+                      :picker-options="pickerOptions"
+                    >
+                    </el-date-picker>
                   </el-form-item>
                 </div>
                 <div class="question">
@@ -135,7 +173,9 @@
                     :key="index_question"
                   >
                     <el-divider content-position="left" style="margin-top: 15px"
-                      >第{{ index_question + 1 }}题</el-divider
+                      ><div v-show="modelForm.showIndex">
+                        第{{ index_question + 1 }}题
+                      </div></el-divider
                     >
                     <div class="question-title">
                       <div class="stem">{{ item.stem }}</div>
@@ -155,7 +195,9 @@
                             :key="index"
                             @change="changeValue"
                           >
-                            <el-radio class="option" :label="index">{{ i }}</el-radio>
+                            <el-radio class="option" :label="index">{{
+                              i
+                            }}</el-radio>
                           </el-radio-group>
                         </el-form-item>
                       </div>
@@ -183,7 +225,7 @@
                       </div>
                       <div v-if="item.type == 'filling'">
                         <el-form-item
-                          label="选项"
+                          label="答案"
                           :rules="{
                             required: item.required,
                           }"
@@ -201,21 +243,17 @@
                       </div>
                       <div v-if="item.type == 'grade'">
                         <el-form-item
-                          label="选项"
+                          label="评分"
                           :rules="{
                             required: item.required,
                           }"
                         >
-                          <el-radio-group
+                          <el-rate
                             v-model="answers[index_question]"
-                            v-for="(i, index) in item.choices"
-                            :key="index"
-                            @change="changeValue"
+                            show-text
+                            :texts="item.grades"
                           >
-                            <el-radio class="option" :label="index"
-                              >{{ i }}({{ item.scores[index] }})</el-radio
-                            >
-                          </el-radio-group>
+                          </el-rate>
                         </el-form-item>
                       </div>
                       <div v-if="item.type == 'dropdown'">
@@ -241,7 +279,6 @@
                         </el-form-item>
                       </div>
                       <div class="multi" v-if="item.type == 'vote'">
-                        至少选择{{ item.min }}项
                         <el-form-item
                           label="选项"
                           :rules="{
@@ -286,6 +323,29 @@
                           </el-checkbox-group>
                         </el-form-item>
                       </div>
+                      <div v-if="item.type == 'location'">
+                        <el-form-item
+                          label="定位"
+                          :rules="{
+                            required: item.required,
+                          }"
+                        >
+                          <el-button
+                            type="primary"
+                            icon="el-icon-location-information"
+                            @click="getLocation(index_question)"
+                            >点击获取定位</el-button
+                          >
+                          <el-input
+                            disabled
+                            type="text"
+                            class="input"
+                            placeholder="您的位置"
+                            v-model="answers[index_question]"
+                          >
+                          </el-input>
+                        </el-form-item>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -297,9 +357,9 @@
     </div>
   </div>
 </template>
-
 <script>
-import logo from "../components/svg-logo.vue";
+import AMapJS from "amap-js";
+import logo from "../components/svg_logo.vue";
 import VueQr from "vue-qr";
 import Clipboard from "clipboard";
 export default {
@@ -311,6 +371,7 @@ export default {
   data() {
     return {
       templateId: 0,
+      code: "",
       questions: [],
       multi: [],
       answers: [],
@@ -321,6 +382,8 @@ export default {
         title: "新的问卷",
         description: "",
         conclusion: "",
+        showIndex: true,
+        limited: true,
         password: "",
         quota: undefined,
         questions: [],
@@ -332,16 +395,18 @@ export default {
       exportLink: "",
       downloadFilename: "",
       dialogVisible: false,
+      gaodeMap: {},
     };
   },
   created: function () {
     this.templateId = this.$route.query.templateId;
+    this.code = this.$route.query.code;
     if (this.templateId == undefined) this.templateId = 0;
     console.log(this.templateId);
     this.$axios({
       method: "get",
       url: "http://139.224.50.146:80/apis/details",
-      params: { templateId: this.templateId, password: "" },
+      params: { password: "", code: this.code },
     })
       .then((response) => {
         console.log(response);
@@ -350,25 +415,94 @@ export default {
           this.type = response.data.type;
           this.modelForm.description = response.data.description;
           this.modelForm.conclusion = response.data.conclusion;
+          this.modelForm.showIndex = response.data.showIndex;
+          this.modelForm.limited = response.data.limited;
           this.modelForm.password = response.data.password;
           this.modelForm.quota = response.data.quota;
+          if (response.data.startTime != undefined) {
+            this.modelForm.startTime = response.data.startTime;
+          }
+          if (response.data.endTime != undefined) {
+            this.modelForm.endTime = response.data.endTime;
+          }
           this.questions = response.data.questions;
         } else {
           console.log(response.data.message);
         }
+        while (this.answers.length < this.questions.length) {
+          this.answers.push(null);
+        }
       })
       .catch((err) => console.log(err));
+    var i = 0;
+    for (i in this.questions) {
+      this.answers[i] = [];
+    }
+    console.log(this.answers);
+  },
+  mounted() {
+    this.gaodeMap = new AMapJS.AMapLoader({
+      key: "20f6820df07b227d816cb3a065241c7a",
+      version: "1.4.15",
+      plugins: ["AMap.Geolocation", "AMap.CitySearch"], //需要加载的插件
+    });
   },
   methods: {
+    getLocation(index) {
+      this.$confirm("此操作将获取您当前的位置, 是否同意?", "提示", {
+        confirmButtonText: "同意",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          var answertmp = this.answers;
+          var tmp = this;
+          this.gaodeMap.load().then(({ AMap }) => {
+            var citysearch = new AMap.CitySearch();
+            //自动获取用户IP，返回当前城市
+            citysearch.getLocalCity(function (status, result) {
+              if (status === "complete" && result.info === "OK") {
+                if (result && result.city && result.bounds) {
+                  var cityinfo = result.city;
+                  console.log("您当前所在城市：", cityinfo);
+                  tmp.$set(answertmp, index, cityinfo);
+                  console.log("您当前所在城市：", answertmp[index]);
+                  //地图显示当前城市
+                }
+              } else {
+                console.log(result.info);
+              }
+            });
+            // new AMap.Geolocation({
+            //   enableHighAccuracy: false, //是否使用高精度定位，默认:true
+            //   timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            // }).getCurrentPosition((status, result) => {
+            //   console.log("状态", status);
+            //   this.$set(
+            //     this.answers,
+            //     index,
+            //     result.addressComponent.province +
+            //       result.addressComponent.city +
+            //       result.addressComponent.district
+            //   );
+            //   console.log("位置", this.answers[index]);
+            // });
+          });
+        })
+        .catch(() => {
+          this.$notify({
+            title: "提示",
+            message: "已取消定位",
+            type: "info",
+          });
+        });
+    },
     save() {
       if (this.modelForm.password == undefined) {
         this.modelForm.password = "";
       }
       if (this.modelForm.conclusion == undefined) {
         this.modelForm.conclusion = "";
-      }
-      if (this.modelForm.quota == undefined) {
-        this.modelForm.quota = 0;
       }
       console.log(this.modelForm.password);
       this.$axios({
@@ -379,65 +513,140 @@ export default {
           title: this.modelForm.title,
           description: this.modelForm.description,
           conclusion: this.modelForm.conclusion,
+          showIndex: this.modelForm.showIndex,
+          limited: this.modelForm.limited,
           password: this.modelForm.password,
-          quota: this.modelForm.quota==undefined?0:parseInt(this.modelForm.quota),
+          startTime: this.modelForm.startTime,
+          endTime: this.modelForm.endTime,
+          quota: parseInt(this.modelForm.quota),
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷修改成功！",
+            this.$notify({
+              title: "提示",
+              message: "问卷修改成功",
               type: "success",
             });
           } else {
-            this.$message({
+            this.$notify({
+              title: "提示",
               message: response.data.message,
+              type: "info",
             });
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error",
+          });
         }
       );
     },
     publishQuestion() {
+      if (this.modelForm.password == undefined) {
+        this.modelForm.password = "";
+      }
+      if (this.modelForm.conclusion == undefined) {
+        this.modelForm.conclusion = "";
+      }
+      console.log(this.modelForm.password);
       this.$axios({
         method: "post",
-        url: "http://139.224.50.146:80/apis/release",
+        url: "http://139.224.50.146:80/apis/adjust",
         data: JSON.stringify({
-          templateId: this.templateId,
+          templateId: parseInt(this.templateId),
+          title: this.modelForm.title,
+          description: this.modelForm.description,
+          conclusion: this.modelForm.conclusion,
+          showIndex: this.modelForm.showIndex,
+          password: this.modelForm.password,
+          startTime: this.modelForm.startTime,
+          endTime: this.modelForm.endTime,
+          quota: this.modelForm.quota,
         }),
       }).then(
         (response) => {
           console.log(response);
           if (response.data.success == true) {
-            this.$message({
-              message: "问卷发布成功！",
+            this.$notify({
+              title: "提示",
+              message: "问卷修改成功",
               type: "success",
             });
-            this.dialogVisible = true;
+            this.$axios({
+              method: "post",
+              url: "http://139.224.50.146:80/apis/release",
+              data: JSON.stringify({
+                templateId: parseInt(this.templateId),
+              }),
+            }).then(
+              (response) => {
+                console.log(response);
+                if (response.data.success == true) {
+                  this.$notify({
+                    title: "提示",
+                    message: "问卷发布成功",
+                    type: "success",
+                  });
+                  this.code = response.data.code;
+                  this.qrData.text =
+                    window.location.host + "/fill?code=" + this.code;
+                  this.dialogVisible = true;
+                } else {
+                  this.$notify({
+                    title: "提示",
+                    message: response.data.message,
+                    type: "info",
+                  });
+                }
+              },
+              (err) => {
+                this.$notify({
+                  title: "错误",
+                  message: err,
+                  type: "error",
+                });
+              }
+            );
+            console.log("发布成功!");
           } else {
-            this.$message({
+            this.$notify({
+              title: "提示",
               message: response.data.message,
+              type: "info",
             });
           }
         },
         (err) => {
-          alert(err);
+          this.$notify({
+            title: "错误",
+            message: err,
+            type: "error",
+          });
         }
       );
-      console.log("发布成功!");
     },
     async copyShareLink() {
       let clipboard = new Clipboard(".tag-copy");
       console.log(clipboard);
       await clipboard.on("success", () => {
-        alert("Copy Success");
+        this.$notify({
+          title: "提示",
+          message: "已复制链接到剪贴板",
+          type: "success",
+        });
         clipboard.destroy();
       });
       clipboard.on("error", () => {
-        alert("Copy error");
+        this.$notify({
+          title: "错误",
+          message: "复制出现错误",
+          type: "error",
+        });
         clipboard.destroy();
       });
     },
@@ -468,7 +677,7 @@ export default {
   height: 100%;
   flex-direction: column;
   align-items: center;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-size: 18px;
   font-weight: bolder;
 }
@@ -481,7 +690,7 @@ export default {
 }
 .web-title {
   margin-left: 15px;
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   font-weight: 800;
   font-size: 26px;
   position: relative;
@@ -497,7 +706,7 @@ a:hover {
   color: rgba(46, 140, 219, 0.94);
 }
 .editor .el-button {
-  font-family: 仿宋;
+  font-family: 微软雅黑;
   height: 50px;
   width: 120px;
   color: #000000;
@@ -542,5 +751,8 @@ a:hover {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+.option {
+  margin-right: 10px;
 }
 </style>

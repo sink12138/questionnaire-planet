@@ -13,7 +13,7 @@
             <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(2)">填空题</el-button>
             <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(3)">评分题</el-button>
             <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(4)">下拉题</el-button>
-            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(5)">报名题</el-button>
+            <el-button icon="el-icon-circle-plus-outline" @click="addQuestion(5)">定位题</el-button>
           </div>
         </el-tab-pane>
         <el-tab-pane>
@@ -221,7 +221,7 @@
                     <div v-if="item.type == 2" class="question-index">(填空题)</div>
                     <div v-if="item.type == 3" class="question-index">(评分题)</div>
                     <div v-if="item.type == 4" class="question-index">(下拉题)</div>
-                    <div v-if="item.type == 5" class="question-index">(报名题)</div>
+                    <div v-if="item.type == 5" class="question-index">(定位题)</div>
                     <div class="question-title">
                       :{{ item.questionName }}
                     </div>
@@ -254,10 +254,7 @@
                         trigger: 'change',
                       }"
                     >
-                      <el-switch
-                        v-model="item.required"
-                      >
-                      </el-switch>
+                      <el-switch v-model="item.required"> </el-switch>
                     </el-form-item>
                   </div>
                   <!-- 问题描述 -->
@@ -276,7 +273,7 @@
                     <!-- 最少选项数 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
+                        v-if="item.type == 1"
                         :prop="`questions.${index}.min`"
                         label="最少选项数"
                         :rules="[
@@ -289,7 +286,7 @@
                         ]"
                       >
                         <el-input
-                          v-model="item.min"
+                          v-model.trim="item.min"
                           style="width: 125px"
                           clearable
                           placeholder="请填写最少选项数"
@@ -299,7 +296,7 @@
                     <!-- 最多选项数 -->
                     <el-col :span="10">
                       <el-form-item
-                        v-if="item.type == 1 || item.type == 5"
+                        v-if="item.type == 1"
                         :prop="`questions.${index}.max`"
                         label="最多选项数"
                         :rules="[
@@ -322,11 +319,11 @@
                   </el-row>
                   <el-row>
                     <!-- 高度 -->
-                    <el-col :span="10">
+                    <el-col :span="9">
                       <el-form-item
                         v-if="item.type == 2"
                         :prop="`questions.${index}.height`"
-                        label="填空框高度（行）"
+                        label="填空框高度(行)"
                         :rules="[
                           {
                             required: true,
@@ -349,7 +346,7 @@
                       <el-form-item
                         v-if="item.type == 2"
                         :prop="`questions.${index}.width`"
-                        label="宽度（px）"
+                        label="宽度(px)"
                         :rules="[
                           {
                             required: true,
@@ -369,7 +366,9 @@
                     </el-col>
                   </el-row>
                   <!-- 答案 -->
-                  <el-row v-if="item.type != 2 && item.type != 3">
+                  <el-row
+                    v-if="item.type != 2 && item.type != 3 && item.type != 5"
+                  >
                     <el-form-item
                       v-for="(opt, idx) in item.answers"
                       :key="idx"
@@ -424,36 +423,10 @@
                       </div>
                     </el-form-item>
                   </el-row>
-                  <el-row v-if="item.type == 5">
-                    <el-form-item
-                      v-for="(opt, idx) in item.answers"
-                      :key="idx"
-                      :label="`第${idx + 1}项名额`"
-                      :prop="`questions.${index}.answers.${idx}.number`"
-                      :rules="[
-                        {
-                          required: true,
-                          message: '请输入名额',
-                          trigger: 'blur',
-                        },
-                        {
-                          validator: isNum,
-                          trigger: 'blur',
-                        },
-                      ]"
-                    >
-                      <el-input
-                        v-model="opt.number"
-                        style="width: 120px; margin-left: 10px"
-                        clearable
-                        placeholder="请输入名额"
-                      />
-                    </el-form-item>
-                  </el-row>
                   <el-form-item label="编辑题目">
                     <el-button
                       icon="el-icon-circle-plus"
-                      v-show="item.type != 2 && item.type != 3"
+                      v-if="item.type != 2 && item.type != 3 && item.type != 5"
                       @click="addDomain(index)"
                       >新增选项</el-button
                     >
@@ -524,7 +497,7 @@
             <el-button @click="addQuestion(2)">填空题</el-button>
             <el-button @click="addQuestion(3)">评分题</el-button>
             <el-button @click="addQuestion(4)">下拉题</el-button>
-            <el-button @click="addQuestion(5)">报名题</el-button>
+            <el-button @click="addQuestion(5)">定位题</el-button>
           </el-button-group>
           <el-button
             id="addButton"
@@ -591,8 +564,7 @@ export default {
           },
         ],
       },
-      quest: 0,
-      activeNames: [],
+      activeNames: [0, 1, 2, 3, 4, 5],
       template: {},
       rules: {},
       templateId: 0,
@@ -608,12 +580,91 @@ export default {
         showIndex: true,
         limited: true,
         password: "",
-        quota: 0,
         logic: [],
-        questions: [],
+        quota: undefined,
+        startTime: "",
+        endTime: "",
+        questions: [
+          {
+            type: "2",
+            required: true,
+            questionName: "您的学号是",
+            questionSummary: "请输入学号",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+          {
+            type: "2",
+            required: true,
+            questionName: "您的姓名是",
+            questionSummary: "请输入姓名",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+          {
+            type: "0",
+            required: true,
+            questionName: "您的体温是",
+            questionSummary: "请选择体温范围",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [
+              { value: "37.5度以下" },
+              { value: "37.5度至38.5度" },
+              { value: "38.5度以上" },
+            ],
+          },
+          {
+            type: "0",
+            required: true,
+            questionName: "是否去过高风险地区",
+            questionSummary: "请选择近期是否经过高风险地区",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "是" }, { value: "否" }],
+          },
+          {
+            type: "0",
+            required: true,
+            questionName: "是否有新冠症状",
+            questionSummary: "请选择是否有感染新冠肺炎症状",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "是" }, { value: "否" }],
+          },
+          {
+            type: "5",
+            required: true,
+            questionName: "您当前所处的位置",
+            questionSummary: "请定位您当前所处的位置",
+            max: 2,
+            min: 1,
+            height: 1,
+            width: 600,
+            grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
+            answers: [{ value: "" }, { value: "" }],
+          },
+        ],
       },
       qrData: {
-        text: window.location.host + "/fill?code=" + this.code,
+        text: window.location.host + "/fill?templateId=" + this.templateId,
         logo: require("../assets/logo.png"),
       },
       exportLink: "",
@@ -621,143 +672,11 @@ export default {
       pageShow: 'edit',
       dialogVisible: false,
       popVisible: false,
+      opp: "",
+      gaodeMap: {},
     };
   },
-  created: function () {
-    this.code = this.$route.query.code;
-    this.templateId = this.$route.query.templateId;
-    if (this.templateId == undefined) this.templateId = 0;
-    console.log(this.templateId);
-    this.$axios({
-      method: "get",
-      url: "http://139.224.50.146:80/apis/details",
-      params: { password: "", code: this.code },
-    })
-      .then((response) => {
-        console.log(response);
-        if (response.data.success == true) {
-          this.modelForm.title = response.data.title;
-          this.modelForm.description = response.data.description;
-          this.modelForm.conclusion = response.data.conclusion;
-          this.modelForm.showIndex = response.data.showIndex;
-          this.modelForm.limited = response.data.limited;
-          this.modelForm.password = response.data.password;
-          this.modelForm.logic = response.data.logic;
-          this.logicVisiable = true;
-          response.data.quota == undefined
-            ? (this.modelForm.quota = 0)
-            : (this.modelForm.quota = response.data.quota);
-          if (response.data.startTime != undefined) {
-            this.modelForm.startTime = response.data.startTime;
-          }
-          if (response.data.endTime != undefined) {
-            this.modelForm.endTime = response.data.endTime;
-          }
-          var question = {
-            type: "0",
-            required: true,
-            questionName: "",
-            questionSummary: "",
-            max: 2,
-            min: 1,
-            height: 1,
-            width: 600,
-            grades: [],
-            answers: [],
-          };
-          var item = {};
-          var i = 0;
-          var j = 0;
-          for (i in response.data.questions) {
-            question = {
-              type: "0",
-              required: true,
-              questionName: "",
-              questionSummary: "",
-              max: 2,
-              min: 1,
-              height: 1,
-              width: 600,
-              grades: [],
-              answers: [],
-            };
-            item = response.data.questions[i];
-            question.questionName = item.stem;
-            question.questionSummary = item.description;
-            question.required = item.required;
-            question.answers = [];
-            switch (item.type) {
-              case "choice":
-                question.type = "0";
-                for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
-                }
-                break;
-              case "multi-choice":
-                question.type = "1";
-                question.max = item.max;
-                question.min = item.min;
-                for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
-                }
-                break;
-              case "filling":
-                question.type = "2";
-                question.height = item.height;
-                question.width = parseInt(item.width);
-                question.answers.push({
-                  value: "",
-                  scores: 0,
-                  number: 0,
-                });
-                break;
-              case "grade":
-                question.type = "3";
-                for (j in item.grades) {
-                  question.grades.push(item.grades[j]);
-                }
-                break;
-              case "dropdown":
-                question.type = "4";
-                for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: 0,
-                  });
-                }
-                break;
-              case "sign-up":
-                question.type = "5";
-                question.max = item.max;
-                question.min = item.min;
-                for (j in item.choices) {
-                  question.answers.push({
-                    value: item.choices[j],
-                    scores: 0,
-                    number: item.quotas[j],
-                  });
-                }
-                break;
-            }
-            console.log(question);
-            this.modelForm.questions.push(question);
-            this.activeNames.push(this.modelForm.questions.length - 1);
-          }
-        } else {
-          console.log(response.data.message);
-        }
-      })
-      .catch((err) => console.log(err));
-  },
+  mounted() {},
   methods: {
     removeLogic(index){
       this.modelForm.logic.splice(index,1);
@@ -765,25 +684,23 @@ export default {
     setid(i) {
       return "question" + i;
     },
-    setColor(key) {
-      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
-      else return '#fff'
-    },
-    pageChange(key) {
-      this.pageShow = key
-    },
     isNum: (rule, value, callback) => {
       const age = /^[0-9]*$/;
       if (!age.test(value)) {
         callback(new Error("请输入数字"));
-      } else if (parseInt(value) < 1) {
-        callback(new Error("请输入大于等于一的数字"));
       } else {
         callback();
       }
     },
     end() {
       this.$refs.modelForm.clearValidate();
+    },
+    setColor(key) {
+      if (key == this.pageShow) return 'rgba(168, 216, 255, 0.9)'
+      else return '#fff'
+    },
+    pageChange(key) {
+      this.pageShow = key
     },
     removeDomain(index, idx) {
       // 删除选项
@@ -842,13 +759,11 @@ export default {
     },
     addDomain(index) {
       // 新增选项
-      this.modelForm.questions[index].answers.push({
-        value: "",
-        number: 0,
-      });
+      this.modelForm.questions[index].answers.push({ value: "" });
     },
     addQuestion(index) {
       // 新增题目
+      this.popVisible = false;
       this.modelForm.questions.push({
         type: index.toString(),
         required: false,
@@ -859,14 +774,11 @@ export default {
         height: 1,
         width: 600,
         grades: ["非常不满意", "不满意", "一般", "满意", "非常满意"],
-        answers: [
-          { value: "", number: 0 },
-          { value: "", number: 0 },
-        ],
+        answers: [{ value: "" }, { value: "" }],
       });
       this.activeNames.push(this.modelForm.questions.length - 1);
       this.$router.push(
-        "/apply/edit#question" + (this.modelForm.questions.length - 1)
+        "/epidemic/new#question" + (this.modelForm.questions.length - 1)
       );
     },
     addlogic() {
@@ -949,39 +861,19 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
+          console.log("submit", templateQuestions);
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -990,8 +882,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "epidemic",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
@@ -1091,39 +986,18 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1132,8 +1006,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "epidemic",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
@@ -1142,12 +1019,13 @@ export default {
               console.log(response);
               if (response.data.success == true) {
                 this.templateId = response.data.templateId;
+                this.code = response.data.code;
                 this.$notify({
                   title: "提示",
                   message: "问卷保存成功",
                   type: "success",
                 });
-                this.$router.push("/preview?templateId=" + this.templateId);
+                this.$router.push("/preview?code=" + this.code);
               } else {
                 this.$notify({
                   title: "提示",
@@ -1234,39 +1112,18 @@ export default {
                 }
                 break;
               case "5":
-                quest.type = "sign-up";
-                quest.quotas = [];
-                quest.max = parseInt(question.max);
-                quest.min = parseInt(question.min);
-                if (quest.max < quest.min) {
-                  mes =
-                    "第" + (parseInt(i) + 1) + "题最少选项数大于最多选项数！";
-                  this.$notify({
-                    title: "提示",
-                    message: mes,
-                    type: "warning",
-                  });
-                  return;
-                }
-                for (j in question.answers) {
-                  x = question.answers[j];
-                  quest.choices.push(x.value);
-                  quest.quotas.push(parseInt(x.number));
-                }
+                quest.type = "location";
                 break;
             }
             console.log(quest);
             templateQuestions.push(quest);
             console.log(templateQuestions);
           }
-          if (this.modelForm.quota == undefined) {
-            this.modelForm.quota = 0;
-          }
           this.$axios({
             method: "post",
             url: "http://139.224.50.146:80/apis/submit",
             data: JSON.stringify({
-              templateId: parseInt(this.templateId),
+              templateId: this.templateId,
               title: this.modelForm.title,
               description: this.modelForm.description,
               conclusion: this.modelForm.conclusion,
@@ -1275,8 +1132,11 @@ export default {
               password: this.modelForm.password,
               startTime: this.modelForm.startTime,
               endTime: this.modelForm.endTime,
-              quota: parseInt(this.modelForm.quota),
-              type: "sign-up",
+              quota:
+                this.modelForm.quota == undefined
+                  ? 0
+                  : parseInt(this.modelForm.quota),
+              type: "epidemic",
               logic: this.modelForm.logic,
               questions: templateQuestions,
             }),
